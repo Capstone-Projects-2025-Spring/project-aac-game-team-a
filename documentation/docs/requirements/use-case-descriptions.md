@@ -5,7 +5,7 @@ sidebar_position: 5
 # Use-case descriptions
 
 ## Use Case Diagram
-![Use Case Diagram](https://github.com/your-repo/assets/your-image.png)
+![AAC_use_case_diagram](https://github.com/user-attachments/assets/120f0888-946a-4a64-a76c-f711d41c218c)
 
 ## Use Cases
 
