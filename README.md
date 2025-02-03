@@ -44,7 +44,7 @@ Discuss what you need to develop this project. This includes background informat
         <a href="https://github.com/ApplebaumIan">
             <img src="https://avatars.githubusercontent.com/u/9451941?v=4" width="100;" alt="ApplebaumIan"/>
             <br />
-            <sub><b>Isaac Schwartz</b></sub>
+            <sub><b>Isaac Schwartz!</b></sub>
         </a>
     </td>
     <td align="center">
