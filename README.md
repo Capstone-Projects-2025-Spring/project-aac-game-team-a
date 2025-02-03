@@ -53,6 +53,13 @@ Discuss what you need to develop this project. This includes background informat
             <sub><b>Null</b></sub>
         </a>
     </td></tr>
+    <td align="center">
+        <a href="https://github.com/kenfonseca">
+            <img src="documentation/static/img/kenProfPic.jpeg" width="100;" alt="leighflagg"/>
+            <br />
+            <sub><b>Kenneth Fonseca</b></sub>
+        </a>
+    </td></tr>
 </table>
 
 [//]: # ( readme: collaborators -end )
