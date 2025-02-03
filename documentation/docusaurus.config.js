@@ -20,7 +20,7 @@ const main_template_jira_scripts = () => {
 }
 
 // Fallback value if PROJECT_NAME is not defined:
-const rawProjectName = process.env.PROJECT_NAME || 'docs-dev-mode';
+const rawProjectName = process.env.PROJECT_NAME || 'Scribblers!';
 
 // Transform PROJECT_NAME (or fallback) to a title-like string:
 const title = rawProjectName
@@ -38,7 +38,7 @@ const title = rawProjectName
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   /*TODO: Change to your project's title and tagline*/
-  title: title,
+  title: 'Scribblers!',
   tagline: 'AAC Game',
   /*Unless you move this website to a seperate repo don't change url and baseurl.*/
   url: 'https://'+process.env.ORG_NAME+'.github.io/',
@@ -74,10 +74,9 @@ const config = {
           sidebarPath: require.resolve('./sidebars.js'),
           routeBasePath: 'docs',
           path: 'docs',
-          // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/'+process.env.ORG_NAME+'/'+process.env.PROJECT_NAME+'/edit/main/documentation/',
+            'https://github.com/Capstone-Projects-2025-Spring/project-aac-game-team-a/tree/main/documentation',
           // remarkPlugins: [require('mdx-mermaid')],
 
         },
