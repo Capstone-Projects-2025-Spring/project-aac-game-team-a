@@ -42,9 +42,9 @@ Discuss what you need to develop this project. This includes background informat
 <tr>
     <td align="center">
         <a href="https://github.com/ApplebaumIan">
-            <img src="https://avatars.githubusercontent.com/u/9451941?v=4" width="100;" alt="ApplebaumIan"/>
+            <img src="documentation/static/img/isaac_profile_pic.JPG" width="100;" alt="SchwartzIsaac"/>
             <br />
-            <sub><b>Isaac Schwartz!</b></sub>
+            <sub><b>Isaac Schwartz</b></sub>
         </a>
     </td>
     <td align="center">
@@ -52,6 +52,13 @@ Discuss what you need to develop this project. This includes background informat
             <img src="documentation/static/img/kenProfPic.jpeg" width="100;" alt="FonsecaKenneth"/>
             <br />
             <sub><b>Kenneth Fonseca</b></sub>
+        </a>
+    </td>
+    <td align="center">
+        <a href="https://github.com/tlheyward">
+            <img src="documentation/static/img/terrellProfPic.jpg" width="100;" alt="HeywardTerrell"/>
+            <br/>
+            <sub><b>Terrell Heyward</b></sub>
         </a>
     </td></tr>
 </table>
