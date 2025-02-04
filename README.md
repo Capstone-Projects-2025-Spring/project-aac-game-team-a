@@ -49,14 +49,14 @@ Discuss what you need to develop this project. This includes background informat
     </td>
     <td align="center">
         <a href="https://github.com/kenfonseca">
-            <img src="documentation/static/img/kenProfPic.jpeg" width="100;" alt="FonsecaKenneth"/>
+            <img src="https://github.com/Capstone-Projects-2025-Spring/project-aac-game-team-a/blob/main/documentation/static/img/kenProfPic.jpeg?raw=true" width="100;" alt="FonsecaKenneth"/>
             <br />
             <sub><b>Kenneth Fonseca</b></sub>
         </a>
     </td>
     <td align="center">
         <a href="https://github.com/tlheyward">
-            <img src="documentation/static/img/terrellProfPic.jpg" width="100;" alt="HeywardTerrell"/>
+            <img src="https://github.com/Capstone-Projects-2025-Spring/project-aac-game-team-a/blob/main/documentation/static/img/terrellProfPic.jpg?raw=true" width="100;" alt="HeywardTerrell"/>
             <br/>
             <sub><b>Terrell Heyward</b></sub>
         </a>
