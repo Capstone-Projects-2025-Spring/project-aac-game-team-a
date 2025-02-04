@@ -41,8 +41,8 @@ Discuss what you need to develop this project. This includes background informat
 <table>
 <tr>
     <td align="center">
-        <a href="https://github.com/ApplebaumIan">
-            <img src="documentation/static/img/isaac_profile_pic.JPG" width="100;" alt="SchwartzIsaac"/>
+        <a href="https://github.com/tuo62395">
+            <img src="https://github.com/user-attachments/assets/435425ae-fc11-42ec-a150-2d36e2cd33a7" width="100;" alt="SchwartzIsaac"/>
             <br />
             <sub><b>Isaac Schwartz</b></sub>
         </a>
