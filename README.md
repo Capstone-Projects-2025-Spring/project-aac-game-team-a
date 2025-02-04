@@ -53,6 +53,13 @@ Discuss what you need to develop this project. This includes background informat
             <br />
             <sub><b>Kenneth Fonseca</b></sub>
         </a>
+    </td>
+    <td align="center">
+        <a href="https://github.com/tlheyward">
+            <img src="documentation/static/img/terrellProfPic.jpg" width="100;" alt="HeywardTerrell"/>
+            <br/>
+            <sub><b>Terrell Heyward</b></sub>
+        </a>
     </td></tr>
 </table>
 
