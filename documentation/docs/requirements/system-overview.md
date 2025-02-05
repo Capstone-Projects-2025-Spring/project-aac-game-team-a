@@ -3,18 +3,20 @@ sidebar_position: 1
 ---
 
 # System Overview
-The application will be accessible via any web browser. The front-end framework is yet to
-be finalized by the development team. Key features of the front-end interface include:
+## Project abstraction
 
-* Navigation buttons for seamless user experience.
-* A drawing canvas for designated players.
-* Instructional pages for game guidelines.
-* User authentication and account management pages.
-* A game history page for reviewing past sessions.
-  
-The back-end infrastructure consists of:
+The AAC Pictionary Game is a web-based application designed to facilitate inclusive
+and engaging gameplay for children across the autism spectrum. The platform
+enables autistic children to communicate using an integrated AAC (Augmentative
+and Alternative Communication) board, while other participants interact via voice
+chat. Our goal is to minimize communication barriers and promote social
+interaction in a fun and supportive environment.
 
-* A server responsible for handling user requests, account data, and avatar
-selection.
-* A real-time communication module to manage in-game interactions.
-* A database for storing user information, game history, and related data.
+## Conceptual Design
+The application presents a user-friendly front-end interface where children interact
+with the game. The interface displays avatars for each user and incorporates an
+AAC board for autistic children. The system architecture consists of two primary
+back-end components:
+
+* A RESTful API that manages user authentication and account setup.
+* A socket-based service that handles real-time game connectivity.
