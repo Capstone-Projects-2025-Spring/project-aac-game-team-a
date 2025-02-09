@@ -6,15 +6,13 @@ sidebar_position: 4
 
 ## Functional
 
-* **Account setup and management** - A user must make an account to login to the web app to play the game
-
-* **Drawing Interface with AAC Support** – A simple and intuitive drawing canvas that includes AAC-friendly tools, such as pre-set icons, text-to-speech labels, and guided drawing prompts
+* **Drawing Interface with AAC Support** – A drawing canvas that includes AAC-friendly tools, such as pre-set icons, text-to-speech labels, and guided drawing prompts
 
 * **Customizable Avatars and Profiles** – Users can personalize their avatars and profiles with different expressions, colors, and themes
 
 * **Turn-Based Gameplay with Visual Timers** – Clear visual countdown timers and turn indicators to help children understand gameplay flow
 
-* **Replay and History Tracking** – A feature where users can review their past games, see their drawings, and hear their previous responses
+* **LeaderBoard** – Users can see where they placed within the lobby they are playing in
 
 * **Lobby management** - User can join a lobby or create one for their friends to join
   
