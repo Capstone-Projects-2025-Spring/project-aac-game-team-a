@@ -10,6 +10,8 @@ The Design Document - Part I Architecture describes the software architecture an
 
 In addition to the general requirements the Design Document - Part I Architecture will contain:
 
+## Component Descriptions
+
 ### Frontend (Client-Side):
 
 **GameRoom**  
@@ -27,13 +29,13 @@ This will gather any paths to reference images to feed to GameRoom class so it c
 **ChatMessage**  
 The messages or symbols to be sent in chat are handled by this class. It stores a player’s chat history to broadcast it to other player interfaces and also to determine the correct word for a prompt.
 
-**GameSettings**\
+**GameSettings**  
 This class is used to provide game sessions with rules and configurations such as how much time per round, how many players can join, and if AAC controls are enabled or not.
 
-**AACBoard**\
+**AACBoard**  
 This class manages AAC board integration from the AsTeRICS Grid REST API. It will fetch and store symbols from a board in the API and allow players to use them in the chat.
 
-**AACSymbol**\
+**AACSymbol**  
 This class is used to represent symbols fetched from the API with information such as an ID and the URL, and then give a label and category. 
 
 ### Backend (Server-Side):
@@ -49,6 +51,8 @@ The class is used to represent an individual stroke of a drawing, and stores the
 
 **SocketHandler**  
 This class manages WebSocket integration so that players can interact in real-time. It will handle client-server communication such ad connections, disconnections, drawing and chat events, and round starting or stopping.
+
+## Class Diagram
 
 <img width="1057" alt="Screenshot 2025-02-14 at 6 00 27 PM" src="https://github.com/user-attachments/assets/557f1ac1-3c1d-4f5d-8f31-6e43e22697d5" />
 <img width="1050" alt="Screenshot 2025-02-14 at 6 03 46 PM" src="https://github.com/user-attachments/assets/52505ab7-c295-41a5-9da8-6bc54d5100c5" />
