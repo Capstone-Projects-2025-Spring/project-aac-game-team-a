@@ -46,3 +46,4 @@ sidebar_position: 4
 
 9. **Low System Requirements** – The game should function efficiently on older devices or those using old browser versions.
 
+

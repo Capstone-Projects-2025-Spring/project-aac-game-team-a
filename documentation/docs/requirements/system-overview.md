@@ -19,3 +19,4 @@ Scribblers is a Pictionary-style, web-based application game that implements AAC
 * **Node.js** - Backend framework to implement a runtime enviornment for handling game logic, handle server-side game state, and manage real-time events.
 * **Socket.io (Server-Side)** - JavaScript library that uses the WebSocket protocol for providing real-time updates to users.
 * **MongoDB (NoSQL)** - Database management system that stores data in JSON-like documents for flexible game session data and user statistics. 
+
