@@ -1,15 +1,3 @@
----
-sidebar_position: 1
----
-
-**Purpose**
-
-The Design Document - Part I Architecture describes the software architecture and how the requirements are mapped into the design. This document will be a combination of diagrams and text that describes what the diagrams are showing.
-
-**Requirements**
-
-In addition to the general requirements the Design Document - Part I Architecture will contain:
-
 ## Component Descriptions
 
 ### Frontend (Client-Side):
@@ -327,12 +315,41 @@ Sequence Diagram 13
 After everyone draws for their third time, total points will be displayed, and rankings will be shown at the end of the game.  
 Triggering Event: All players have drawn three times.
 
-Describe algorithms employed in your project, e.g. neural network paradigm, training and training data set, etc.
+## Algorithms
 
-If there is a database:
+### 1. Player Selection (Random Drawer)
+- Selects one player randomly from the active lobby.
+- Uses `Math.random()` to pick an index from the player list.
 
-Entity-relation diagram.
+### 2. Word Selection (Random Prompt Assignment)
+- Retrieves three random words from a predefined list.
+- Uses Fisher-Yates shuffle or a similar algorithm.
+- If no selection in 15s, a word is randomly assigned.
 
-Table design.
+### 3. Guess Matching Algorithm
+- Converts guess and answer to lowercase, removes punctuation.
+- Awards correct answer points 
 
-A check list for architecture design is attached here [architecture\_design\_checklist.pdf](https://templeu.instructure.com/courses/106563/files/16928870/download?wrap=1 "architecture_design_checklist.pdf")  and should be used as a guidance.
+### 4. Score Calculation
+- Guessers earn points based on time taken.
+- Drawer earns points based on correct guesses.
+- Balanced scoring to avoid excessive competitiveness.
+  
+
+### Collection Schemas
+**Users Collection**  
+```json
+{
+  "avatar": "String",
+  "room_code": "String"
+}
+```
+
+#### Collection Schemas
+**Guess**  
+```json
+{
+  "guess": "String",
+}
+```
+
