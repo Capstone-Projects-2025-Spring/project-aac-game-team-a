@@ -1,10 +1,19 @@
+/**
+ * This class handles AAC board interactions
+ */
 class AACBoard {
-    constructor(boardId, AACSymbols, selectedSymbol){
-        // ID of the AAC board used for the game
+    constructor(boardId, AACSymbols, selectedSymbol){ 
+        /**
+         * ID of the AAC board used for the game
+         */
         this.boardId = boardId;
-        // An array of symbols being used
+        /**
+         * An array of symbols being used
+         */
         this.AACSymbols = AACSymbols;
-        // Reference to a symbol being selected during a game
+        /**
+         * Reference to a symbol being selected during a game
+         */
         this.selectedSymbol = AACSymbol | null;
     }
 
