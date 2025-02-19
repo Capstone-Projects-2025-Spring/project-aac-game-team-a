@@ -1,6 +1,8 @@
 /**
  * This class handles AAC board interactions
  */
+// Import the class "AACSymbol" to be used in this class
+import './AACSymbol.js';
 class AACBoard {
     /**
      * Creates a new AAC Board instance
