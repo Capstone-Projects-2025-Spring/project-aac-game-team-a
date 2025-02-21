@@ -1,3 +1,9 @@
+openapi: 3.0.0  # Add OpenAPI version here
+info:
+  title: WebSocket API
+  description: WebSocket API documentation for the ACC drawing game "Scribblers"
+  version: 1.0.0
+
 paths:
   /socket.io:
     post:
