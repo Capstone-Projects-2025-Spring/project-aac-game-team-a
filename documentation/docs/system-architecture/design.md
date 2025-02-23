@@ -9,22 +9,22 @@ The GameRoom class contains elements that pertain to management of game sessions
 This class is used to represent individual users who will be playing the game. It will store a player’s details and score pertaining to the game session, and 
 
 **DrawingCanvas**  
-This class handles drawing functionality such as the canvas to draw on, the tools to draw with, and the stroke/color to draw with. It gathers the data from the drawer so it can be sent to the interfaces of the other players. It will also aid in displaying the reference image to the current drawer and only the drawer. 
+This class handles drawing functionality such as the canvas to draw on, the tools to draw with, and the stroke/color to draw with. It gathers the data from the drawer so it can be sent to the interfaces of the other players. 
 
 **ReferenceImageProvider**  
-This will gather any paths to reference images to feed to GameRoom class so it can be displayed to the current drawer. The image paths are selected by the current word for the drawing prompt, and ensures that image selection is randomized each time. 
+When a prompt is displayed to a drawer, it will be accompanied by a reference image to assist the drawer if they have limited knowledge of the prompt to draw. This class will aid in storing and presenting the image to the current drawer and only to the current drawer. There will be multiple reference images per prompt to discourage the same drawing being done each time. 
 
-**ChatMessage**  
-The messages or symbols to be sent in chat are handled by this class. It stores a player’s chat history to broadcast it to other player interfaces and also to determine the correct word for a prompt.
+**GuessMessage**  
+The symbols to be sent in chat are handled by this class. It is used to broadcast AAC symbols a player selects to other player interfaces and also to determine the correct guess for a prompt.
 
 **GameSettings**  
 This class is used to provide game sessions with rules and configurations such as how much time per round, how many players can join, and if AAC controls are enabled or not.
 
 **AACBoard**  
-This class manages AAC board integration from the AsTeRICS Grid REST API. It will fetch and store symbols from a board in the API and allow players to use them in the chat.
+This class manages AAC board integration. We will be creating our own AAC Board and store symbols in this class to be referenced all througout the project. 
 
 **AACSymbol**  
-This class is used to represent symbols fetched from the API with information such as an ID and the URL, and then give a label and category. 
+This class is used to represent symbols to include in our AAC Board with information such as an ID, a label, category, and image. 
 
 ### Backend (Server-Side):
 
