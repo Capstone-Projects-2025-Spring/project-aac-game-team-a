@@ -1,3 +1,5 @@
+# Frontend Class Documentation
+
 **Frontend-Backend Integration**
 The frontend and backend communicate through API endpoints.
 

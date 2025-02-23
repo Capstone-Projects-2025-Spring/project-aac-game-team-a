@@ -18,12 +18,12 @@ The purpose of this class is to handle lobby-related HTTP requests.
   - **Returns**: JSON response with lobby details and HTTP status code
 
 - **getLobbyInfo() method**: Retrieves the current state of a lobby.
-  - **Pre-condition**: GET /api/lobby/{lobbyId}
+  - **Pre-condition**: GET /api/lobby/lobbyid
   - **Parameters**: int $lobbyId
   - **Returns**: JSON response with lobby state and HTTP status code
 
 - **startGame() method**: Begins the game once enough players have joined.
-  - **Pre-condition**: POST /api/lobby/{lobbyId}/start
+  - **Pre-condition**: POST /api/lobby/lobbyid/start
   - **Parameters**: int $lobbyId
   - **Returns**: JSON response with game state and HTTP status code
 
@@ -36,7 +36,7 @@ The DrawingController class manages all drawing-related operations.
   - **Returns**: JSON response with HTTP status code
 
 - **getCurrentDrawing() method**: Retrieves the current drawing in progress.
-  - **Pre-condition**: GET /api/drawing/{lobbyId}
+  - **Pre-condition**: GET /api/drawing/lobbyid
   - **Parameters**: int $lobbyId
   - **Returns**: JSON response with drawing data and HTTP status code
 
@@ -49,7 +49,7 @@ The GuessController class handles user guesses for the drawing.
   - **Returns**: JSON response with correctness status and HTTP status code
 
 - **getGuesses() method**: Retrieves all guesses for the current round.
-  - **Pre-condition**: GET /api/guess/{lobbyId}
+  - **Pre-condition**: GET /api/guess/lobbyid
   - **Parameters**: int $lobbyId
   - **Returns**: JSON response with list of guesses and HTTP status code
 
@@ -62,7 +62,7 @@ Manages scoring and ranking in the game.
   - **Returns**: JSON response with updated scores and HTTP status code
 
 - **getLeaderboard() method**: Retrieves the leaderboard for a lobby.
-  - **Pre-condition**: GET /api/score/leaderboard/{lobbyId}
+  - **Pre-condition**: GET /api/score/leaderboard/lobbyid
   - **Parameters**: int $lobbyId
   - **Returns**: JSON response with ranking data and HTTP status code
 
