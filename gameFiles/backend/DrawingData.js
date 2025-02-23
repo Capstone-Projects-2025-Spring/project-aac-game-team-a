@@ -1,5 +1,5 @@
 /**
- * Stores a player's drawing
+ * This class stores all drawing data related to a player's drawing 
  */
 class DrawingData{
     /**

@@ -1,9 +1,9 @@
 /**
- * Represents a symbol on a board
+ * This class represents a symbol on the guessing board
  */
 class AACSymbol{
     /**
-     * Creates an instance of an AACSymbol using an AAC Board in the AsTeRICS API
+     * Creates an instance of an AACSymbol to represent a symbol on the guessing board
      * 
      * @param {string} imageUrl The URL to the image of the symbol
      * @param {string} symbolId The ID of the symbol to be fetched

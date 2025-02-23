@@ -1,5 +1,5 @@
 /**
- * Handles the drawing interface
+ * This class handles all data associated with the drawing canvas
  */
 import { Fabric } from 'fabric';
 class DrawingCanvas{

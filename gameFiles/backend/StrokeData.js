@@ -1,5 +1,5 @@
 /**
- * Represents an indiviudal stroke in a drawing
+ * This class represents all data associated to an indiviudal stroke drawn on the canvas
  */
 class StrokeData{
     /**
