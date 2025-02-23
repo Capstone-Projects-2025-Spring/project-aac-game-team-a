@@ -42,8 +42,8 @@ This class manages WebSocket integration so that players can interact in real-ti
 
 ## Class Diagram
 
-<img width="1057" alt="Screenshot 2025-02-14 at 6 00 27 PM" src="https://github.com/user-attachments/assets/557f1ac1-3c1d-4f5d-8f31-6e43e22697d5" />
-<img width="1050" alt="Screenshot 2025-02-14 at 6 03 46 PM" src="https://github.com/user-attachments/assets/52505ab7-c295-41a5-9da8-6bc54d5100c5" />
+<img width="1056" alt="Screenshot 2025-02-22 at 12 23 14 PM" src="https://github.com/user-attachments/assets/8fdaae25-4a33-41b9-982f-71ecc77377da" />
+<img width="1057" alt="Screenshot 2025-02-22 at 12 23 38 PM" src="https://github.com/user-attachments/assets/8601dc7f-ba64-44ad-bb11-e15d2d6d79ed" />
 
 ## Sequence Diagrams
 
