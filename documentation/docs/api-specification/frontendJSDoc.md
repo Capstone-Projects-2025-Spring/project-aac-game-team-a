@@ -1,3 +1,3 @@
 # Frontend JSDoc Documentation
 
-<a target="blank" href={"/documentation/static/javadoc/frontend/index.html"}>Click here for frontend JSdocs</a>
+<a target="blank" href={"/javadoc/frontend/index.html"}>Click here for frontend JSdocs</a>
