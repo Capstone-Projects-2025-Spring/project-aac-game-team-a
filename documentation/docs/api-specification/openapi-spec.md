@@ -5,7 +5,16 @@ hide_table_of_contents: true
 sidebar_position: 2
 ---
 
-<iframe src="https://capstone-projects-2025-spring.github.io/project-aac-game-team-a/documentation/swagger-ui-dist/index.html" width="100%" height="800px"></iframe>
+<a target="_blank" href={"/undefined/api-docs/swagger-ui-dist/index.html"}>Click here for Swagger Doc</a>
+
+
+<!-- [Download the YAML file](/api-docs/swagger.yaml) -->
+
+<!-- import Redoc from 'redocusaurus';
+
+<Redoc specUrl="/api-docs/swagger.yaml" /> -->
+
+<!-- <iframe src="/api-docs/swagger.yaml width="100%" height="800px"></iframe> -->
 
 
 <!-- import ApiDocMdx from '@theme/ApiDocMdx';
