@@ -5,8 +5,8 @@ hide_table_of_contents: true
 sidebar_position: 2
 ---
 
-<!-- <a target="_blank" href={"/api-docs/swagger.yaml"}>Click here for Swagger Doc</a>
- -->
+<a target="_blank" href={"/undefined/api-docs/swagger.yaml"}>Click here for Swagger Doc</a>
+
 
 <!-- [Download the YAML file](/api-docs/swagger.yaml) -->
 
