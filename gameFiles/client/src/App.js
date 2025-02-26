@@ -1,3 +1,4 @@
+//this is a default file from react, we can delete it.
 import logo from './logo.svg';
 import './App.css';
 
