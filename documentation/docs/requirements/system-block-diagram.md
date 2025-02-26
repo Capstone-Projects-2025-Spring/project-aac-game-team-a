@@ -3,7 +3,7 @@ sidebar_position: 2
 ---
 
 # System Block Diagram
-![System Block Diagram](https://github.com/Capstone-Projects-2025-Spring/project-aac-game-team-a/blob/docasaurus-system-block-diagram/documentation/static/img/system-block-diagram.png?raw=true)
+![System Block Diagram](https://capstone-projects-2025-spring.github.io/project-aac-game-team-a/img/system-block-diagram.png)
 
 **Figure 1.** High-level design of Scribblers! web application.
 
