@@ -3,6 +3,6 @@
 import './assets/main.css'
 
 import { createApp } from 'vue'
-import App from './App.vue'
+import aacBoard from './aacBoard.vue'
 
-createApp(App).mount('#app')
+createApp(aacBoard).mount('#app')
