@@ -12,24 +12,12 @@
                 -->
                 <!-- Using "v-bind:key" or ":key" helps Vue properly associated objects in our array when they are updated -->
                 <li v-for="(page, index) in pages" class="nav-item mx-3" v-bind:key="index">
-                    <!-- Using the "link" array created in the Vue script -->
-                    <!-- using v-bind with attributes signals Vue to a specified field for the objects we made in the script
-                        note: you can use "v-bind:" or just ":"
-                    -->
-                    <!-- "active: activePage == index" will make the name of the tab the user is on more apparent-->
-                    <!-- Replacing the text in {{ }} with link.text signals Vue to iterate through the array and use the "text" field-->
-                    <!-- We use "v-on:click" to create an event associated with a mouse
-                            ".prevent" is used to prevent the user from navigating to the href (i assume it's for testing)
-                    -->
-                    <a 
-                        class="nav-link" 
-                        v-bind:class="{active: activePage == index}"
-                        aria-current="page" 
-                        v-bind:href="page.link.url"
-                        :title="`This goes to the ${page.link.text} page`"
-                        v-on:click.prevent="navLinkClick(index)"
 
-                    >{{ page.link.text }}</a>
+                    <navbar-link
+                        v-bind:page="page"
+                        v-bind:isActive="activePage == index"
+                        v-on:click.prevent="navLinkClick(index)"
+                    ></navbar-link>
                 </li>
             </ul>
             <form class="d-flex">
@@ -44,7 +32,14 @@
 </template>
 
 <script>
+import NavbarLink from './NavbarLink.vue';
 export default {
+    components:{
+        NavbarLink
+    },
+    created() {
+        this.getThemeSetting();
+    },
     props: ['pages', 'activePage', 'navLinkClick'],
     data(){
         return{
@@ -67,6 +62,17 @@ export default {
 
             // set our property to the local variable
             this.theme = theme;
+            this.storeThemeSetting();
+        },
+        storeThemeSetting(){
+            localStorage.setItem('theme', this.theme);
+        },
+        getThemeSetting(){
+            let theme = localStorage.getItem('theme');
+
+            if (theme) {
+                this.theme = theme;
+            }
         }
     }
 }
