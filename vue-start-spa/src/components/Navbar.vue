@@ -11,14 +11,13 @@
                         It will work with every "link" and "index" in the "links" array that we defined in our scripts
                 -->
                 <!-- Using "v-bind:key" or ":key" helps Vue properly associated objects in our array when they are updated -->
-                <li v-for="(page, index) in publishedPages" class="nav-item mx-3" v-bind:key="index">
-
-                    <navbar-link
-                        v-bind:page="page"
-                        v-bind:isActive="activePage == index"
-                        v-on:click.prevent="navLinkClick(index)"
-                    ></navbar-link>
-                </li>
+                <navbar-link
+                    v-for="(page, index) in publishedPages" class="nav-item mx-3" v-bind:key="index"
+                    v-bind:page="page"
+                    v-bind:index="index"
+                    v-bind:isActive="activePage == index"
+                    v-on:activated="$emit('activated')"
+                ></navbar-link>
             </ul>
             <form class="d-flex">
                 <!-- Toggles the action of the dark/light mode for navbar -->
@@ -45,7 +44,7 @@ export default {
             return this.pages.filter(p => p.published);
         }
     },
-    props: ['pages', 'activePage', 'navLinkClick'],
+    props: ['pages', 'activePage'],
     data(){
         return{
             theme: 'dark',

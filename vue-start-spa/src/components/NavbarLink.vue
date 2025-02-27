@@ -8,20 +8,22 @@
     <!-- We use "v-on:click" to create an event associated with a mouse
         ".prevent" is used to prevent the user from navigating to the href (i assume it's for testing)
     -->
-    <a 
-        class="nav-link" 
-        v-bind:class="activeClasses"
-        aria-current="page" 
-        v-bind:href="page.link.url"
-        :title="`This goes to the ${page.link.text} page`"
-
-    >{{ page.link.text }}</a>
+    <li>
+        <a 
+            class="nav-link" 
+            v-bind:class="activeClasses"
+            aria-current="page" 
+            v-bind:href="page.link.url"
+            :title="`This goes to the ${page.link.text} page`"
+            v-on:click.prevent="$bus.$emit('navbarLinkActivated', index)"
+        >{{ page.link.text }}</a>
+    </li>
 </template>
 
 <script>
 
 export default{
-    props: ['page', 'isActive'],
+    props: ['page', 'index', 'isActive'],
     computed: {
         activeClasses(){
             return{
