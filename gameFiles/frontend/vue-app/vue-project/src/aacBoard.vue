@@ -62,22 +62,22 @@ const getItemImage = (category, item) => {
 
 .grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 10px;
     max-width: 1000px;
     margin: auto;
 }
 
 button {
-    padding: 30px;
-    font-size: 70px;
+    padding: 10px;
+    font-size: 50px;
     cursor: pointer;
     border-radius: 10px;
 }
 
 .category-image, .item-image {
-    width: 50px;
-    height: 50px;
-    margin-bottom: 10px;
+    width: 200px;
+    height: 200px;
+    margin-bottom: 5px;
 }
 </style>
