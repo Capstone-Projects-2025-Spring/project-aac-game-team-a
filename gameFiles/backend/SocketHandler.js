@@ -1,20 +1,8 @@
-import WebSocket from 'ws';
-
 /**
  * This class handles real-time WebSocket communication for frontend and backend interactions
  */
 
-export default class SocketHandler{
-
-    /**
-     * Handles the process of starting the websocket an initalizing the session
-     * 
-     * @param {string} url
-     */
-    constructor(url) {
-        this.socket = new WebSocket(url);
-        this.socket.on('onPlayerJoin', this.onPlayerJoin.bind(this));
-    }
+class SocketHandler{
 
     /**
      * Handles all processes related to users joining a session
@@ -23,13 +11,12 @@ export default class SocketHandler{
      * @param {string} roomId The room ID number linked to the game session
      * @throws An error if the user could not join the game session
      */
-    onPlayerJoin(message){
-        console.log(message)
-        // try {
+    onPlayerJoin(socket, roomId){
+        try {
 
-        // } catch (err){
-        //     console.log("User could not join game session");
-        // }
+        } catch (err){
+            console.log("User could not join game session");
+        }
     }
 
     /**

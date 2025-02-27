@@ -1,4 +1,3 @@
-
 /**
  * This class manages the game session and rounds on the server
  */

@@ -1,4 +1,3 @@
-
 /**
  * Stores the configuration of the game
  */

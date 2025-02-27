@@ -1,4 +1,3 @@
-
 /**
  * Handles the paths to images to be referenced by the drawer
  */

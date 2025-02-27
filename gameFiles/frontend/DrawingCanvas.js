@@ -1,4 +1,3 @@
-
 /**
  * This class handles all data associated with the drawing canvas
  */
