@@ -24,31 +24,37 @@ import { ref } from 'vue';
 const currentCategory = ref(null);
 
 const categories = {
-    Animals: ['Dog', 'Cat', 'Bird'],
-    Food: ['Apple', 'Pizza', 'Carrot'],
-    Clothing: ['Shirt', 'Pants', 'Hat'],
-    Actions: ['Run', 'Jump', 'Eat'],
+    Animals: ['Dog', 'Cat', 'Bird', 'Elephant', 'Mouse', 'Horse'],
+    Food: ['Apple', 'Pizza', 'Carrot', 'Spaghetti', 'Banana', 'Grapes'],
+    Clothing: ['Shirt', 'Pants', 'Hat', 'Glasses', 'Shoe', 'Glove'],
+    Actions: ['Run', 'Jump', 'Eat', 'Sleep'],
     Shapes: ['Circle', 'Square', 'Triangle']
 };
 </script>
 
 <style scoped>
 .aac-board {
+    display: flex;
+    flex-direction: column;
     text-align: center;
     padding: 20px;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
 }
 
 .grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
-    max-width: 300px;
+    max-width: 1000px;
     margin: auto;
 }
 
 button {
-    padding: 15px;
-    font-size: 16px;
+    padding: 30px;
+    font-size: 70px;
     cursor: pointer;
+    border-radius: 10px;
 }
 </style>
