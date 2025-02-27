@@ -19,7 +19,7 @@
     ></page-viewer> -->
 
     <create-page
-        v-bind:page-created="pageCreated"
+        v-on:page-created="pageCreated"
     ></create-page>
 
 </template>
@@ -64,7 +64,8 @@ export default{
             this.pages = data;
         },
         pageCreated(pageObj){
-            console.log(pageObj);
+            // any data a user enters will mutate an array that handles the pages
+            this.pages.push(pageObj);
         }
     }
 }

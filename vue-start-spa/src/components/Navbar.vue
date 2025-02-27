@@ -11,7 +11,7 @@
                         It will work with every "link" and "index" in the "links" array that we defined in our scripts
                 -->
                 <!-- Using "v-bind:key" or ":key" helps Vue properly associated objects in our array when they are updated -->
-                <li v-for="(page, index) in pages" class="nav-item mx-3" v-bind:key="index">
+                <li v-for="(page, index) in publishedPages" class="nav-item mx-3" v-bind:key="index">
 
                     <navbar-link
                         v-bind:page="page"
@@ -40,12 +40,16 @@ export default {
     created() {
         this.getThemeSetting();
     },
+    computed: {
+        publishedPages(){
+            return this.pages.filter(p => p.published);
+        }
+    },
     props: ['pages', 'activePage', 'navLinkClick'],
     data(){
         return{
             theme: 'dark',
         }
-        
     },
     // methods to be used 
     methods: {

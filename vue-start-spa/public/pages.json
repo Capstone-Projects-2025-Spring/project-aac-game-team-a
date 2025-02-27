@@ -2,20 +2,24 @@
     
     "link": {"text": "Home", "url": "index.html"}, 
     "pageTitle": "Scribblers!",
-    "content": "Welcome to the drawing game Scribblers"
+    "content": "Welcome to the drawing game Scribblers",
+    "published": true
 },
 {
     "link": {"text": "Settings", "url": "settings.html"},
     "pageTitle": "Settings",
-    "content": "Change your settings"
+    "content": "Change your settings",
+    "published": true
 },
 {
     "link": {"text": "Host Game", "url": "hostGame.html"},
     "pageTitle": "Host Game",
-    "content": "Host the game for others to join"
+    "content": "Host the game for others to join",
+    "published": false
 },
 {
     "link": {"text": "Join Game", "url": "joinGame.html"},
     "pageTitle": "Join Game",
-    "content": "Join a game hosted by another player"
+    "content": "Join a game hosted by another player",
+    "published": false
 }]

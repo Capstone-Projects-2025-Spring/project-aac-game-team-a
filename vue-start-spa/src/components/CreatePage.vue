@@ -1,5 +1,5 @@
 <template>
-    <form action="" class="contaner mb-3">
+    <form action="" class="container mb-3">
         <div class="row">
             <div class="col-md-8">
                 <div class="mb-3">
@@ -47,7 +47,7 @@
                 </div>
                 <div class="row mb-3">
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox">
+                        <input class="form-check-input" type="checkbox" v-model="published">
                         <label class="form-check-label" for="gridCheck1">
                             Published
                         </label>
@@ -69,7 +69,20 @@
 
 <script>
 export default{
-    props: ['pageCreated'],
+    emits: {
+        pageCreated({pageTitle, content, link}){
+            if (!pageTitle){
+                return false;
+            }
+            if (!content){
+                return false;
+            }
+            if (!link || !link.text || !link.url){
+                return false;
+            }
+            return true;
+        }
+    },
     computed: {
         isFormInvalid(){
             return !this.pageTitle || !this.content || !this.linkText || !this.linkUrl
@@ -80,7 +93,8 @@ export default{
             pageTitle: '',
             content: '',
             linkText: '',
-            linkUrl: ''
+            linkUrl: '',
+            published: true
         }
     },
     methods: {
@@ -90,14 +104,28 @@ export default{
                 return;
             }
 
-            this.pageCreated({
+            this.$emit('pageCreated', {
                 pageTitle: this.pageTitle,
                 content: this.content,
                 link: {
                     text: this.linkText,
                     url: this.linkUrl
-                }
+                },
+                published: this.published
             });
+
+            this.pageTitle = '';
+            this.content = '';
+            this.linkText = '';
+            this.linkUrl = '';
+            this.published = true;
+        }
+    },
+    watch: {
+        pageTitle(newTitle, oldTitle){
+            if(this.linkText == oldTitle){
+                this.linkText = newTitle;
+            }
         }
     }
 }
