@@ -1,13 +1,28 @@
 <template>
-    <p>simple text</p>
+    <!-- A component has "props" that we pass data to (like parameters in a function) -->
+        
+    <!-- represents the navbar as a component in app -->
+    <navbar
+        v-bind:pages="pages"
+        v-bind:active-page="activePage"
+        :nav-link-click="(index) => activePage = index"
+    ></navbar>
+    
+    <!-- represents the main content as a component in app -->
+    <page-viewer 
+        v-bind:page="pages[activePage]"
+    ></page-viewer>
 </template>
 
 <script>
-export default {
+import Navbar from './components/Navbar.vue';
+import PageViewer from './components/PageViewer.vue';
 
-    // Providing data to application
-
-    // This data is not reactive, it's meant to initialize values for the properties
+export default{
+    components: {
+        Navbar,
+        PageViewer
+    },
     data(){
         return{
                 // property used to control whether the navbar is in light or dark mode
@@ -33,6 +48,6 @@ export default {
                 }
             ]
         };
-    },
+    }
 }
 </script>
