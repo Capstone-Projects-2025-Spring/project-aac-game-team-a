@@ -7,19 +7,23 @@
         v-bind:active-page="activePage"
     ></navbar>
 
+    <router-view>
+        
+    </router-view>
+
     <!-- v-show is a CSS solution to HIDING content -->
-    <div v-show="false"> hide this</div> 
+    <!-- <div v-show="false"> hide this</div>  -->
     
     <!-- represents the main content as a component in app -->
     <!--    v-if is a way to NOT PRESENT the content at all -->
-    <page-viewer 
+    <!-- <page-viewer 
         v-if="pages.length > 0"
         v-bind:page="pages[activePage]"
-    ></page-viewer>
-
+    ></page-viewer> -->
+<!-- 
     <create-page
         v-on:page-created="pageCreated"
-    ></create-page>
+    ></create-page> -->
 
 </template>
 
