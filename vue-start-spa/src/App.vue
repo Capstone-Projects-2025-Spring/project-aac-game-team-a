@@ -25,18 +25,29 @@
         v-on:page-created="pageCreated"
     ></create-page> -->
 
+
+    <!-- Toggle button for AAC Board -->
+    <button class="toggle-button" @click="showAacBoard = !showAacBoard">
+        {{ ShowAacBoard ? "Close AAC Board" : "Open AAC Board" }}
+    </button>
+
+    <!-- AAC Board Component -->
+    <aac-board v-if="showAacBoard"></aac-board>
 </template>
 
 <script>
 import Navbar from './components/Navbar.vue';
 import PageViewer from './components/PageViewer.vue';
 import CreatePage from './components/CreatePage.vue';
+import AacBoard from './components/aacBoard.vue';
+
 
 export default{
     components: {
         Navbar,
         PageViewer,
-        CreatePage
+        CreatePage,
+        AacBoard
     },
 
     created(){
@@ -57,7 +68,10 @@ export default{
             activePage: 0,
             
             // Creating an array of pages for Vue to iterate through for the pages in the navbar
-            pages: [] // this array is empty for a brief moment so we need an "empty" checker before displaying it
+            pages: [], // this array is empty for a brief moment so we need an "empty" checker before displaying it
+
+            //Property to track AAC Board visibility
+            showAacBoard: false
         };
     },
     methods :{
@@ -77,3 +91,23 @@ export default{
     }
 }
 </script>
+
+<style>
+/* Style for the toggle button */
+.toggle-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.toggle-button:hover {
+    background-color: #0056b3;
+}
+
+</style>
