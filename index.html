@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+
+    <title>Scribblers!</title>
+    <!-- Bootstrap for CSS stlying -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" > 
+    <!-- Vue.js -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    
+</head>
+<body>
+    <div id="app">
+        <!-- A component has "props" that we pass data to (like parameters in a function) -->
+        
+        <!-- represents the navbar as a component in app -->
+        <navbar
+            v-bind:pages="pages"
+            v-bind:active-page="activePage"
+            :nav-link-click="(index) => activePage = index"
+        ></navbar>
+        
+        <!-- represents the main content as a component in app -->
+        <page-viewer 
+            v-bind:page="pages[activePage]"
+        ></page-viewer>
+         
+    </div>
+    
+
+    <script>
+        // createApp() - create a Vue instance (there can be multiple)
+        // mount() - mounting the application in out webpage
+        //      mounted to the "div" element w/ id="content"
+
+        // Content for the pages
+        //      create the app to be mounted
+        let app = Vue.createApp({
+            
+            // Creating options for generating content
+
+            // Providing data to application
+
+            // This data is not reactive, it's meant to initialize values for the properties
+            data(){
+                return{
+                        // property used to control whether the navbar is in light or dark mode
+                        //      controlled by the "Toggle Navbar" button
+                        
+
+                        // data property to track the active page
+                        activePage: 0,
+                        
+                        // Creating an array of pages for Vue to iterate through
+                        pages: [
+                        {
+                            // An array of link info
+                            link: {text: 'Home', url: 'index.html'}, 
+                            pageTitle: 'Scribblers!',
+                            content: 'Welcome to the drawing game Scribblers'
+                        },
+                        {
+                            // An array of link info
+                            link: {text: 'Settings', url: 'settings.html'},
+                            pageTitle: 'Settings',
+                            content: 'Change your settings'
+                        }
+                    ]
+                };
+            }
+        });
+
+        // a component is like a mini application in an application
+        // it shows up like an HTML attribute
+        /**
+         * first parameter: naming convention
+         * second parameter: "options" object
+         */
+        app.component('page-viewer',{
+            props: ['page'],
+            template: `
+                <!-- This is our template to be used by Vue.creatApp() to generate content-->
+                <div class="container">
+                    <h1>{{page.pageTitle}}</h1>
+                    <p>{{page.content}}</p>
+                </div>  
+            `
+        });
+
+        app.component('navbar', {
+            props: ['pages', 'activePage', 'navLinkClick'],
+            template: `
+                <!-- Creating a navbar using Vue -->
+
+                <!-- HTML array of Bootstrap CSS navbar classes, controlled by a property (theme) created in Vue.js script to control light/dark navbar mode -->
+                <nav v-bind:class="[\`navbar-\${theme}\`, \`bg-\${theme}\`, 'navbar', 'navbar-expand-lg']">  
+                    <div class="container-fluid"> <!-- Bootstrap -->
+                        <a class="navbar-brand" href="#"> Scribblers </a> <!-- Bootstrap -->
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0 d-flex flex-row align-items-center mt-2"> <!-- Bootstrap -->
+                            <!-- Integrating Vue -->
+                            <!-- Vue uses a for loop defined by "v-for"
+                                    It will work with every "link" and "index" in the "links" array that we defined in our scripts
+                            -->
+                            <!-- Using "v-bind:key" or ":key" helps Vue properly associated objects in our array when they are updated -->
+                            <li v-for="(page, index) in pages" class="nav-item mx-3" v-bind:key="index">
+                                <!-- Using the "link" array created in the Vue script -->
+                                <!-- using v-bind with attributes signals Vue to a specified field for the objects we made in the script
+                                    note: you can use "v-bind:" or just ":"
+                                -->
+                                <!-- "active: activePage == index" will make the name of the tab the user is on more apparent-->
+                                <!-- Replacing the text in {{ }} with link.text signals Vue to iterate through the array and use the "text" field-->
+                                <!-- We use "v-on:click" to create an event associated with a mouse
+                                        ".prevent" is used to prevent the user from navigating to the href (i assume it's for testing)
+                                -->
+                                <a 
+                                    class="nav-link" 
+                                    v-bind:class="{active: activePage == index}"
+                                    aria-current="page" 
+                                    v-bind:href="page.link.url"
+                                    :title="\`This goes to the \${page.link.text} page\`"
+                                    v-on:click.prevent="navLinkClick(index)"
+
+                                >{{ page.link.text }}</a>
+                            </li>
+                        </ul>
+                        <form class="d-flex">
+                            <!-- Toggles the action of the dark/light mode for navbar -->
+                            <button 
+                                class="btn btn-primary"
+                                v-on:click.prevent="changeTheme()"
+                            >Toggle Navbar</button>
+                        </form>
+                    </div>
+                </nav>
+
+            `
+            ,
+            data(){
+                return{
+                    theme: 'dark',
+                }
+                
+            },
+            // methods to be used 
+            methods: {
+                // used in the "Toggle Button" button
+                changeTheme() {
+                    // variable local to changeTheme
+                    let theme = 'light';
+
+                    // if our "theme" property (this.them) is set to light, 
+                    // change the local "theme" to dark
+                    if(this.theme == 'light'){
+                        theme = 'dark';
+                    } 
+
+                    // set our property to the local variable
+                    this.theme = theme;
+                }
+            }
+        })
+        
+        app.mount('#app');
+    </script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+name: Unit Testing
+
+on:
+  push:
+    branches: [ "main" ]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - run: cd vue-start-spa
+      - run: npm run test
