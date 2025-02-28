@@ -1,6 +1,6 @@
 // this is a shortcut to not use "var app = Express()"
 // using Express
-const Express = require("exrpess")();
+const Express = require("express")();
 // Needed for the configuration process of socket.io
 const Http = require("http").Server(Express);
 // include socket.io
