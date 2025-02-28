@@ -25,6 +25,7 @@
         v-on:page-created="pageCreated"
     ></create-page> -->
 
+
     <!-- Toggle button for AAC Board -->
     <button class="toggle-button" @click="showAacBoard = !showAacBoard">
         {{ ShowAacBoard ? "Close AAC Board" : "Open AAC Board" }}
@@ -39,6 +40,7 @@ import Navbar from './components/Navbar.vue';
 import PageViewer from './components/PageViewer.vue';
 import CreatePage from './components/CreatePage.vue';
 import AacBoard from './components/aacBoard.vue';
+
 
 export default{
     components: {
@@ -107,4 +109,5 @@ export default{
 .toggle-button:hover {
     background-color: #0056b3;
 }
+
 </style>
