@@ -1,9 +1,11 @@
 import { WebSocketServer } from 'ws';
 
 const wss = new WebSocketServer({ port: 8080 });
+const games = []
 
 wss.on('connection', function connection(ws, req) {
-  const ip = req.socket.remoteAddress;
+  // const ip = req.socket.remoteAddress;
+  console.dir(ws)
   console.log("ip address of user: " + ip)
   ws.on('error', console.error);
 
@@ -11,29 +13,13 @@ wss.on('connection', function connection(ws, req) {
     console.log('received: %s', data);
   });
 
+  // starts a game session
+  ws.on('startSession', function gameRoom(data) {
+    ws.emit(data)
+  })
+
   ws.send('something');
 });
 
 // a quick response to know the websocket started
 console.log("websocket started")
-
-// const wss = new WebSocket.Server({ port: 8080 });
-
-// wss.on('connection', ws => {
-//   console.log('Client connected');
-
-//   ws.on('message', message => {
-//     console.log(`Received: ${message}`);
-//     ws.send(`Server received: ${message}`);
-//   });
-
-//   ws.on('close', () => {
-//     console.log('Client disconnected');
-//   });
-
-//   ws.on('error', error => {
-//     console.error('WebSocket error:', error);
-//   });
-// });
-
-// console.log('WebSocket server started on port 8080');
