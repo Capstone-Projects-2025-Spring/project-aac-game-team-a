@@ -40,12 +40,14 @@ const categoryList = Object.keys(categories);
 
 //Function that gets url for category images
 const getCategoryImage = (category) => {
-    return new URL(`./assets/aacSymbols/Categories/${category.toLowerCase()}.png`, import.meta.url).href;
+    //return new URL(`./assets/aacSymbols/Categories/${category.toLowerCase()}.png`, import.meta.url).href;
+    return `/aacSymbols/Categories/${category.toLowerCase()}.png`;
 };
 
 //Function to get item images for each category
 const getItemImage = (category, item) => {
-    return new URL(`./assets/aacSymbols/${category}/${item.toLowerCase()}.png`, import.meta.url).href;
+    //return new URL(`./assets/aacSymbols/${category}/${item.toLowerCase()}.png`, import.meta.url).href;
+    return `/aacSymbols/${category}/${item.toLowerCase()}.png`;
 };
 </script>
 
