@@ -7,18 +7,17 @@ sidebar_position: 4
 ## Functional
 
 1. **Lobby management** 
-    * An adult can create a lobby for kids to join
-    * Anybody with access to the website will join
+    * A host can create a lobby for others to join
+    * Anybody with access to the website can join
 
 2. **Accessibility chat**
-    * There will be an AAC layout on the tablet browser that will allow the children with aac needs to communicate with everybody in the lobby
-    * We will as include a texting interface for the kids who don't require the aac board
+    * There will be an AAC layout on the tablet browser that will allow the children with aac needs to guess during the drawing phase
 
 3. **Drawing Interface**
-    * There will be a scaffold of options that will help the aac children draw the animals
+    * There will be different colors to draw with and an eraser that will help the children draw the prompts
 
 4. **Customizable Avatars and Profiles**
-    * Users can personalize their avatars and profiles with different expressions, colors, and themes once they join a lobby
+    * Users can choose an avatar upon joining the game, and it will be their identifier for the remainder of the game.
 
 5. **Turn-Based Gameplay with Visual Timers** 
     * Clear visual countdown timers and turn indicators to help children understand gameplay flow
@@ -38,12 +37,10 @@ sidebar_position: 4
 
 5. **Data Persistence** – User progress, achievements, and settings should be securely stored and retrievable across different sessions.
 
-6. **Security & Privacy Compliance** – User data should be encrypted, and securely stored on a private database.
+6. **Customizable UI & UX** – Players should be able to adjust the interface based on their needs, such as color themes, font sizes, or simplified layouts.
 
-7. **Customizable UI & UX** – Players should be able to adjust the interface based on their needs, such as color themes, font sizes, or simplified layouts.
+7. **Auto-Save & Session Recovery** – If a player disconnects or the app crashes, they should be able to resume where they left off.
 
-8. **Auto-Save & Session Recovery** – If a player disconnects or the app crashes, they should be able to resume where they left off.
-
-9. **Low System Requirements** – The game should function efficiently on older devices or those using old browser versions.
+8. **Low System Requirements** – The game should function efficiently on older devices or those using old browser versions.
 
 
