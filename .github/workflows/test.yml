@@ -4,13 +4,23 @@ on:
   push:
     branches: [ "main" ]
 jobs:
-  test:
+  Unit_Test:
     runs-on: ubuntu-latest
+    env:
+      GIT_USER: ${{secrets.USER}}
+      GIT_PASS: ${{secrets.TOKEN}}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v1
         with:
           node-version: 22
       - run: npm ci
-      - run: npm run test
       - run: npm run coverage
+      - name: push to main
+        run: |
+          git config --global user.name "$(git --no-pager log --format=format:'%an' -n 1)"
+          git config --global user.email "$(git --no-pager log --format=format:'%ae' -n 1)"
+          git add ./documentation/static/coverage
+          git commit -m "Automated Coverage Report Generation"
+          git push
+      
