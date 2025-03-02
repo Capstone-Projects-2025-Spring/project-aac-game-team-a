@@ -14,3 +14,5 @@ jobs:
       - run: npm ci
       - run: npm run coverage
       - run: git add ./documentation/static/coverage
+      - run: git commit -m "Automated Coverage Report Generation"
+      - run: git push
