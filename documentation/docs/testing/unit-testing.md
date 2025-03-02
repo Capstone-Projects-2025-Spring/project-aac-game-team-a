@@ -7,6 +7,10 @@ sidebar_position: 1
 
 <a target="blank" href={"https://capstone-projects-2025-spring.github.io/project-aac-game-team-a/coverage/index.html"}>Click here for coverage report</a>
 
+## Testing Library
+
+This project utilizes Vitest, a vite-native testing framework. As this project utilizes Vue, this allows us to utilize one testingt framework to not only unit test front-end and back-end components, but also generate a coverage report for the project.
+
 ## Execution
 
 Unit tests can be executed using the following steps:
