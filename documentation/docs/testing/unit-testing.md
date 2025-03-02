@@ -9,7 +9,7 @@ sidebar_position: 1
 
 ## Testing Library
 
-This project utilizes Vitest, a vite-native testing framework. As this project utilizes Vue, this allows us to utilize one testingt framework to not only unit test front-end and back-end components, but also generate a coverage report for the project.
+This project utilizes Vitest, a vite-native testing framework. As this project utilizes Vue, this allows us to utilize one testing framework to not only unit test front-end and back-end components, but also generate a coverage report for the project.
 
 ## Execution
 
