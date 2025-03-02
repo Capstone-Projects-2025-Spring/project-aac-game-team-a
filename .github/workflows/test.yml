@@ -16,9 +16,11 @@ jobs:
           node-version: 22
       - run: npm ci
       - run: npm run coverage
-      - run: git config --global user.name "$(git --no-pager log --format=format:'%an' -n 1)"
-      - run: git config --global user.email "$(git --no-pager log --format=format:'%ae' -n 1)"
-      - run: git add ./documentation/static/coverage
-      - run: git commit -m "Automated Coverage Report Generation"
-      - run: git push
+      - name: push to main
+        run: |
+          git config --global user.name "$(git --no-pager log --format=format:'%an' -n 1)"
+          git config --global user.email "$(git --no-pager log --format=format:'%ae' -n 1)"
+          git add ./documentation/static/coverage
+          git commit -m "Automated Coverage Report Generation"
+          git push
       
