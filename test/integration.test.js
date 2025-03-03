@@ -1,196 +1,125 @@
-// Imports the Socket.IO client library to create a WebSocket client for testing
-import io from "socket.io-client"; // Need to declare the path to the Socket.io library when implemented
-// Imports the actual Node.js server from the project
-import { server } from "server"; // Import our server by replacing "server" with our server's actual path
-import { createServer } from "http";
-import { Server } from "socket.io";
-import { mount } from "vue/test-utils"; // Need to rename path to actual file
-import GameBoard from "GameBoard.vue"; // Need to rename path to actual file
+// !!!DISCLAIMER!!!: The paths to the following imports need to be redone as the project goes on
+import { io } from 'socket.io-client'; // Importing the Socket.io client library
+import { mount } from '@vue/test-utils'; // Importing Vue test utilities
+import LandingPage from 'LandingPage'; // Importing the LandingPage component
+import LobbyPage from 'LobbyPage'; // Importing the LobbyPage component
+import DrawingPage from 'DrawingPage'; // Importing the DrawingPage component
+import GuessingPage from 'GuessingPage'; // Importing the GuessingPage component
+import SummaryPage from 'SummaryPage'; // Importing the SummaryPage component
 
-// Describing the "test suite" i.e. all tests in this section for backend Socket.IO Integration
-describe("Scribblers Socket.IO Integration Tests", () => {
-    // declare socketClients(1 and 2) to store WebSocket connection
-    // declare the Socket.IO and HTTP servers
-    let socketClient1, socketClient2, ioServer, httpServer; 
-
-    // beforeAll() is used to ensure that this is the first action done before proceeding with tests
-    //      Purpose: need to setup socket to test socket back and forth communciation
-    //      Method listens for "done" signal
-    beforeAll(done => {
-        // create HTTP server
-        httpServer = createServer();
-        // use HTTP server to create Socket.io server
-        ioServer = new Server(httpServer);
-
-        // Start a listener 
-        httpServer.listen(() => {
-            // grab a random port from the HTTP instance
-            const { port } = httpServer.address();
-
-            // connect two players to `http://localhost` at random port
-            socketClient1 = io(`http://localhost:${port}`);
-            socketClient2 = io(`http://localhost:${port}`);
-
-            // once both players are connected, signal the action is "done"
-            Promise.all([
-                new Promise(resolve => socketClient1.on("connect", resolve)),
-                new Promise(resolve => socketClient2.on("connect", resolve))
-            ]).then(done);
-        });
-    });
-
-    // afterAll() ensures this action is done after all others
-    //      Purpose: can't diconnect client sockets and server instances if all tests are not done running
-    afterAll(() => 
-        socketClient1.disconnect(),
-        socketClient2.disconnect(),
-        ioServer.close(),
-        httpServer.close()
-    );
-
-    // Testing a player can join a game
-    test("Player joins a room", done => {
-        // declare object "playerData"
-        const playerData = { username: "P1:", userAvatar: "Lion", room: "room1" };
-
-        // the client socket emits a "joinRoom" message
-        //      this simulates a player attempting to join a room with the "playerData"
-        socketClient1.emit("joinRoom", playerData);
-
-        // expect the following when the server emits a "roomJoined" event
-        socketClient1.on("roomJoined", ({ room, players, avatar }) => {
-            // expect the room to be the one declared in playerData
-            expect(room).toBe(playerData.room);
-            // expect the players avatar to be the one declared in playerData
-            expect(avatar).toBe(playerData.userAvatar);
-            // expect the current players connected to include the username declared 
-            expect(players).toContain(playerData.username);
-            // this test is done
-            done();
-        });
-    });
-
-    // Testing a player can leave the room
-    test("Player leaves a room", done => {
-        // declare object "playerData"
-        const playerData = { username: "P1:", userAvatar: "Lion", room: "room1" };
-
-        // once a player emits "joinRoom", they emit "leaveRoom"
-        //      this simulates the player joining then leaving
-        socketClient1.emit("joinRoom", playerData);
-        socketClient1.emit("leaveRoom", playerData);
-
-        // expect the players in the session to not contain the username for socketClient1
-        socketClient1.on("roomLeft", ({ players }) => {
-            expect(players).not.toContain(playerData.username);
-            // test is finished
-            done();
-        });
-    });
-
-    // Test to ensure that data sent by one player reaches all players
-    test("Broadcasts a message to all players", done => {
-        // object with message for other users
-        const messageData = { message: "Me Scribble, you Scribble" };
-
-        // client1 emits the messages
-        socketClient1.emit("sendMessage", messageData);
-
-        // client2 receives the message
-        socketClient2.on("messageReceived", ({ message }) => {
-            // the message client2 receieves should match the one the client1 sent
-            expect(message).toBe(messageData.message);
-            // test is finished
-            done();
-        });
-    });
-    
-    // Testing the room starts when the users join the game
-    test("Game starts when enough players join", done => {
-        // room object with a max of 2 players
-        const room1 = {maxPlayers: 2, roomID: "room1", rounds: 1}
-
-        // two player objects
-        const player1 = { username: "Player1", room: room1.roomID };
-        const player2 = { username: "Player2", room: room1.roomID };
-
-        // have both users join
-        socketClient1.emit("joinRoom", player1);
-        socketClient2.emit("joinRoom", player2);
-        
-        // once the game has started, expect the following
-        socketClient1.on("gameStarted", ({ room }) => {
-            // expect the room ID to match player 1's room
-            expect(room.roomID).toBe(player1.room);
-            // expect the room ID to match player 2's room
-            expect(room.roomID).toBe(player2.room);
-            done();
-        });
-    });
-    
-    // Testing that the server returns an error message when invalid events are made by user
-    test("Handles invalid events", done => {
-        // emit some invalid event form the client
-        socketClient1.emit("invalidEvent");
-
-        // when the client receives the error message, it should be an invalid event
-        socketClient1.on("error", ({ message }) => {
-            expect(message).toBe("Invalid event");
-            done();
-        });
-    });
-});
-
-
-// mock a socket.io client connection
-jest.mock("socket.io-client");
-
-// Describing the "test suite" i.e. all tests in this section for frontend Vue.js GameBoard Integration
-describe("GameBoard", () => {
-
-    // socket variable to store the mocked instance
+// "describe" the test suite
+describe('Scribblers Integration Tests', () => {
     let socket;
 
-    // setup socket
+    // "beforeEach()" = perform this action before all tests
     beforeEach(() => {
-        // mock socket.on() to recieve server messages and socket.emit() to send server messages
-        socket = { on: jest.fn(), emit: jest.fn() };
-        // ensure that a mocked version of socket.io is used instead of the real thing
-        io.mockReturnValue(socket);
+        socket = io('http://localhost:3000'); // Establishing a connection to the backend server
     });
 
-    // Test that the gameboard is being rendered 
-    test("Renders game board correctly", () => {
-        // render GameBoard componenet
-        const wrapper = mount(GameBoard);
-        // Finds and checks to see if the element ".game-board" exists
-        expect(wrapper.find(".game-board").exists()).toBe(true);
+    // "afterEach()" = perform this action after all tests
+    afterEach(() => {
+        socket.disconnect(); // Disconnecting the socket after each test
     });
 
-    // Tests if drawings can be emited to the server
-    test("emits drawing event to the server", async () => {
-        // render GameBoard componenet
-        const wrapper = mount(GameBoard);
-        // emit a drawing with the coordinates shown
-        await wrapper.vm.$emit("draw", { x: 10, y: 20 });
+    // test that the host can create a lobby and receive a code  
+    test('Host creates a lobby and receives a room code', async () => {
+        const wrapper = mount(LandingPage); // Mount the LandingPage component
 
-        // ensure that the message emitted was a "drawing" message with the coordinates shown
-        expect(socket.emit).toHaveBeenCalledWith("drawing", { x: 10, y: 20 });
+        await wrapper.find('button#host-game').trigger('click'); // Simulate clicking the "Host Game" button
+        
+        socket.on('roomCreated', (roomCode) => { // Listen for the roomCreated event
+            expect(roomCode).toMatch(/[A-Z0-9]{6}/); // Check that the room code matches the expected format (format may be changed)
+        });
     });
 
-    // Testing for message emitting from a guess
-    test("emits guess event when user submits a guess", async () => {
-         // render GameBoard componenet
-        const wrapper = mount(GameBoard);
-      
-        // simulate user input
-        const input = wrapper.find("input[type='text']");
-        await input.setValue("Apple");
-      
-        // simulate form submission
-        await wrapper.find("form").trigger("submit.prevent");
-      
-        // ensure socket emits the "guess" event with the correct data
-        expect(socket.emit).toHaveBeenCalledWith("guess", { message: "Apple" });
-      });
+    // test that other players can join a room with the code given
+    test('Players enter room code and join lobby', async () => {
+        const wrapper = mount(LandingPage); // Mount the LandingPage component
+        
+        await wrapper.find('input#room-code').setValue('ABC123'); // Simulate entering a room code
+        await wrapper.find('button#join-game').trigger('click'); // Simulate clicking the "Join Game" button
+        
+        socket.on('roomJoined', (success) => { // Listen for the roomJoined event
+            expect(success).toBe(true); // Ensure the backend confirms successful room entry
+        });
+    });
+
+    // testing to see if users can select an avatar
+    test('Players select an avatar', async () => {
+        const wrapper = mount(LandingPage); // Mount the LandingPage component
+        
+        socket.emit('avatarChoices', ['Avatar1', 'Avatar2', 'Avatar3']); // Simulate receiving available avatars
+        await wrapper.find('button#select-avatar-0').trigger('click'); // Simulate selecting an avatar
+        
+        socket.on('avatarSelected', (selectedAvatar) => { // Listen for the avatarSelected event
+            expect(['Avatar1', 'Avatar2', 'Avatar3']).toContain(selectedAvatar); // Ensure selected avatar is valid
+        });
+    });
+
+    // Testing to see that users are given the correct roles when a game starts
+    test('Host starts the game and players navigate to drawing/guessing pages', async () => {
+        const wrapper = mount(LobbyPage); // Mount the LobbyPage component
+        
+        await wrapper.find('button#start-game').trigger('click'); // Simulate clicking the "Start Game" button
+        
+        socket.on('gameStarted', (role) => { // Listen for the gameStarted event
+            expect(['drawer', 'guesser']).toContain(role); // Ensure players receive a valid role
+        });
+    });
+
+    // Testing to ensure phases end correctly
+    test('Phase ends when timer expires or all guesses are correct', async () => {
+        const wrapper = mount(GuessingPage); // Mount the GuessingPage component
+
+        socket.emit('phaseEnd', { reason: 'timerExpired' }); // Simulate phase ending due to timer expiration
+        await new Promise(resolve => setTimeout(resolve, 500)); // Wait for UI update
+        expect(wrapper.text()).toContain('Round Over'); // Ensure phase end message is displayed
+    });
+
+    // Testing to ensure the prompt selection is working
+    test('Drawer selects a prompt and starts drawing', async () => {
+        const wrapper = mount(DrawingPage); // Mount the DrawingPage component
+        
+        socket.emit('promptChoices', ['Cat', 'Tree', 'Car']); // Simulate receiving three prompt choices
+        await wrapper.find('button#select-prompt-0').trigger('click'); // Simulate selecting the first prompt
+        
+        socket.on('promptSelected', (selectedPrompt) => { // Listen for the promptSelected event
+            expect(['Cat', 'Tree', 'Car']).toContain(selectedPrompt); // Ensure selected prompt is valid
+        });
+    });
+
+    // Testing to see if drawing progress and guesses work 
+    test('Guessers see drawing progress and can submit guesses', async () => {
+        const wrapper = mount(GuessingPage); // Mount the GuessingPage component
+        
+        socket.emit('drawingData', { lines: [{ x: 10, y: 20 }] }); // Simulate receiving drawing data
+        await wrapper.find('input#guess-input').setValue('Cat'); // Simulate entering a guess
+        await wrapper.find('button#submit-guess').trigger('click'); // Simulate submitting a guess
+        
+        socket.on('guessResponse', (correct) => { // Listen for the guessResponse event
+            expect(typeof correct).toBe('boolean'); // Ensure response is a boolean (correct or incorrect guess)
+        });
+    });
+
+    // Testing that players are correctly awarded points
+    test('Players are awarded points correctly', async () => {
+        socket.emit('correctGuess', { player: 'Alice', points: 10 }); // Simulate correct guess event
+        
+        socket.on('updateScore', ({ player, points }) => { // Listen for score update
+            expect(player).toBe('Alice'); // Ensure correct player received points
+            expect(points).toBe(10); // Ensure correct point value was awarded
+        });
+    });
+
+    // Testing to make sure that the summary screen shows the proper data
+    test('Game ends and users see the summary screen', async () => {
+        const wrapper = mount(SummaryPage); // Mount the SummaryPage component
+        
+        socket.emit('gameOver', { rankings: [{ player: 'Alice', score: 10 }] }); // Simulate game over event
+        
+        await new Promise(resolve => setTimeout(resolve, 500)); // Wait for UI update
+        
+        expect(wrapper.text()).toContain('Alice'); // Ensure the summary screen displays the player's name
+    });
 });
+
