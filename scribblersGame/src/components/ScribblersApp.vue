@@ -28,7 +28,20 @@
                 <h1>Canvas here</h1>
             </div>
             <div class="aac-board-box">
-                <h1>AAC board here</h1>
+                <h1>AAC Board Here</h1>
+                <!-- 
+                    Loop through array of buttons and display them
+                    Upon click, a message is displayed with the user's avatar and
+                    the button label as the message
+                -->
+                <button 
+                    v-for="(button, index) in AACButtons" 
+                    :key="index" 
+                    v-on:click="sendAACMessage(button.label)"
+                    class="aac-buttons"
+                >
+                    <img :src="button.imgSrc" :alt="button.label" class="button-image"/>
+                </button>
             </div>
         </div>
 
@@ -39,14 +52,7 @@
                     <img :src="message.avatar" :alt="message.user" class="game-avatar-image"/>
                     {{ message.text }}
                 </div>
-                <!-- Text area for user to input a message, sends on 'Enter' key press -->
-                <div class="text-input-container">
-                    <textarea
-                        v-model="text"
-                        class="text-message"
-                        v-on:keyup.enter="sendMessage"
-                    ></textarea>
-                </div>
+
             </div>
         </div>
     </div>
@@ -69,7 +75,13 @@ export default {
                 {id: 1, imgSrc: 'lion.png', label: 'Lion'},
                 {id: 2, imgSrc: 'tiger.webp', label: 'Tiger'},
                 {id: 3, imgSrc: 'bear.png', label: 'Bear'}
-            ]
+            ],
+            // Buttons for game AAC board
+            AACButtons: [
+                {id: 1, imgSrc: 'lion.png', label: 'Lion'},
+                {id: 2, imgSrc: 'tiger.webp', label: 'Tiger'},
+                {id: 3, imgSrc: 'bear.png', label: 'Bear'}
+            ],
         };
     },
     methods: {
@@ -81,19 +93,23 @@ export default {
             this.joined = true; // Updates state to indicate user has joined
             
             // Establish connection to the WebSocket server
+
+            // CHANGE THIS WHEN YOU WANT THE SERVER TO BE PUBLIC
+
             this.socketInstance = io("http://localhost:3000");
+            // this.socketInstance = io("http://[YOUR IP HERE]5:3000");
 
             // Listen for incoming messages from the server and update messages array
             this.socketInstance.on("message:received", (data) => {
                 this.messages = this.messages.concat(data);
             });
         },
-        
-        // Called when the user presses Enter in the text input
-        sendMessage() {
+
+        // Called when a user clicks on an AAC Button
+        sendAACMessage(label){
+            this.text = label;
             console.log(this.text); // Logs the message to the console
             this.addMessage(); // Adds the message to the local state
-            this.text = ""; // Clears the text input field
         },
         
         // Adds the user's message to the messages array and sends it to the server
@@ -165,8 +181,9 @@ export default {
 
 .game-container{
     display: flex;
-    justify-content: space-between; /* Space between left and right containers */
-    height: 100vh; /* Full height of the viewport */
+    flex-direction: row;
+    justify-content: space-evenly; /* Space between left and right containers */
+    height: 90vh; /* Full height of the viewport */
 }
 
 .left-container {
@@ -192,6 +209,14 @@ export default {
     background-color: #e0e0e0; /* Light background for the button box */
 }
 
+.aac-buttons{
+    margin: 10px; /* Adds space between buttons */
+    background: white;
+    border: 1px bold black;
+    padding: 10px;
+    cursor: pointer;
+}
+
 .right-container{
     height: 100vh; /* Takes full height of the page */
     display: flex;
@@ -199,29 +224,14 @@ export default {
 }
 
 .chat-container {            
-    height: 94.5%;             /* Takes up the full height of the viewport */
+    height: 95.5%;             /* Takes up the full height of the viewport */
     position: relative;        /* Ensures the text input stays at the bottom */
     overflow-y: auto;          /* Enables scrolling if messages exceed height */
     background-color: #c9c6c6; /* Optional background color */
     box-sizing: border-box;    /* Ensures padding is included in width/height */
     border: 5px solid black;
     resize: none;
-}
-
-.text-input-container {
-    right: 10px;
-    padding: 5px;
-    resize: none;  
-}
-
-.text-message {
-    width: 100%;               /* Takes up the full width of the text input container */
-    height: 50px;              /* Set a fixed height for the text area */
-    resize: none;              /* Disables resizing */
-    padding: 10px;
-    font-size: 16px;           /* Adjust font size as needed */
-    border-radius: 4px;        /* Optional: rounds the corners of the text area */
-    border: 1px solid #ccc;    /* Optional: adds a border to the text area */
+    width: 150px;
 }
 
 .game-avatar-image {
