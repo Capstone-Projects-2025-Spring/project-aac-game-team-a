@@ -97,7 +97,7 @@ export default {
             // CHANGE THIS WHEN YOU WANT THE SERVER TO BE PUBLIC
 
             this.socketInstance = io("http://localhost:3000");
-            // this.socketInstance = io("http://[YOUR IP HERE]5:3000");
+            // this.socketInstance = io("http://[YOUR IP HERE]:3000");
 
             // Listen for incoming messages from the server and update messages array
             this.socketInstance.on("message:received", (data) => {

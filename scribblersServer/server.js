@@ -30,6 +30,6 @@ io.on('connection', (socket) => {
 });
 
 // Start the server and listen on port 3000
-server.listen(3000, () => {
-    console.log("Scribblers server is running on port 3000");
+server.listen(3001, () => {
+    console.log("Scribblers server is running on port 3001");
 });
