@@ -361,4 +361,3 @@ Triggering Event: All players have drawn three times.
   "guess": "String",
 }
 ```
-

@@ -1,4 +1,3 @@
-
 /**
  * This class is used to represent chats going to guessing chat
  */

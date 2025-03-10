@@ -1,4 +1,3 @@
-
 /**
  * This class represents a symbol on the guessing board
  */

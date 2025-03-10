@@ -5,6 +5,13 @@ node_modules
 
 # local env files
 .env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# node_modules
+gameFiles/backend/node_modules
+.\gameFiles\backend\node_modules
 .env.*.local
 
 # Log files

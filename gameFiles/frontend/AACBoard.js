@@ -1,4 +1,3 @@
-
 /**
  * This class handles AAC board interactions
  */

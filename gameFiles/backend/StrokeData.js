@@ -1,4 +1,3 @@
-
 /**
  * This class represents all data associated to an indiviudal stroke drawn on the canvas
  */
