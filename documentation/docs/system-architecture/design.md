@@ -54,16 +54,19 @@ sequenceDiagram
 
 actor host
 participant landingPage.js
-participant index.js
+participant backend.js
 
 host ->> landingPage.js: clicks host game button
-landingPage.js -) index.js: hostGame websocket message
+landingPage.js -) backend.js: hostGame websocket message
+backend.js -->> landingPage.js: you are the host (websocket)
 landingPage.js ->> lobby.js: navigates to
 lobby.js ->> host: host sees lobby page
 ```
 Sequence Diagram 1
 
 The player setting up the game navigates to the website. Upon arrival, they see a large "Host Game" Button. This triggers the creation of a lobby with a room code that the host can share to the other players.
+
+The host navigates to the website, and they click the large "host game" button. This triggers landingPage.js to send a message to the backend notifying that the host has hosted a game. This returns a websocket message back to the landingPage that relays stores a isHost boolean on the host's LandingPage. Then the landingPage immediately navigates to lobby.js, bringing with it information including the isHost boolean. Then thes host can see the lobby page with the necessary host componenets.
 
 Triggering Event:
 Host navigates to the game website and clicks a button "Host Game".
@@ -75,13 +78,13 @@ sequenceDiagram
 
 actor host
 
-landingPage.js ->> index.js: hostGame websocket message
+landingPage.js ->> backend.js: hostGame websocket message
 
-index.js ->> index.js: generates room code
+backend.js ->> backend.js: generates room code
 landingPage.js ->> lobby.js: navigates to
-lobby.js ->> index.js: request room code (websocket)
+lobby.js ->> backend.js: request room code (websocket)
 activate lobby.js
-index.js -->> lobby.js: return room code (websocket)
+backend.js -->> lobby.js: return room code (websocket)
 deactivate lobby.js
 lobby.js ->> host: display room code
 
@@ -103,8 +106,8 @@ actor host
 
 host ->> lobby.js: presses start game
 activate lobby.js
-lobby.js ->> index.js: start game (websocket)
-index.js ->> lobby.js: to all fontends: start game (websocket)
+lobby.js ->> backend.js: start game (websocket)
+backend.js ->> lobby.js: to all fontends: start game (websocket)
 lobby.js ->> drawing.js: navigate to
 
 
@@ -119,13 +122,13 @@ actor host
 
 host ->> lobby.js: presses start game
 activate lobby.js
-lobby.js ->> index.js: start game (websocket)
-index.js ->> lobby.js: to all frontends: start game (websocket)
+lobby.js ->> backend.js: start game (websocket)
+backend.js ->> lobby.js: to all frontends: start game (websocket)
 lobby.js ->> guessing.js: navigate to
 ```
 Sequence Diagram 4: alternative diagram showing the possibility of guessing.
 
-Once everyone has joined, the host will press start game. This will trigger the beginning of the game cycle.  
+Once everyone has joined, the host will choose to press the "start game button". This will send a websocket message to the backend, which will be echoed back to all frontends. Then all frontends will navigate to either drawing.js or guessing.js depending on their role for the first round.
 
 Triggering Event: All players have joined the lobby, and the host wants to start the game.
 
@@ -138,8 +141,8 @@ actor player
 player ->> landingPage.js: enters room code
 
 activate landingPage.js
-landingPage.js ->> index.js: checks room code
-index.js -->> landingPage.js: validates room code
+landingPage.js ->> backend.js: checks room code
+backend.js -->> landingPage.js: validates room code
 landingPage.js ->> lobby.js: navigates to
 deactivate landingPage.js
 lobby.js ->> player: player sees lobby screen
@@ -148,7 +151,7 @@ lobby.js ->> player: player sees lobby screen
 ```
 Sequence Diagram 5
 
-Players use the room code provided by the host to enter it and join the lobby. 
+Players use the room code provided by the host to enter it and join the lobby. Once entered, the landingPage.js sends the code to the backend for verification, and returns whether it's a valid code or not. If it is valid, it will navigate the user to the appropriate lobby, lobby.js. Then the user will see the lobby screen. 
 
 Triggering Event: The host receives the room code and shares it with other players.
 
@@ -158,18 +161,19 @@ Triggering Event: The host receives the room code and shares it with other playe
 sequenceDiagram
 
 actor player
-landingPage.js ->> index.js: fetch available avatars (websocket)
-index.js -->> landingPage.js: return available avatars (websocket)
+landingPage.js ->> backend.js: fetch available avatars (websocket)
+backend.js -->> landingPage.js: return available avatars (websocket)
 landingPage.js ->> player: display possible avatars
 player ->> landingPage.js: select avatar
-landingPage.js ->> index.js: update available avatars (websocket)
+landingPage.js ->> backend.js: update available avatars (websocket)
+backend.js -->> landingPage.js: confirm update (websocket)
 landingPage.js ->> lobby.js: navigates to
 lobby.js ->> player: shows avatar in lobby screen
 
 ```
 Sequence Diagram 6
 
-Upon joining, each player will be presented with an array of avatars to choose from, and they must tap an avatar to join the lobby with that avatar.  
+Upon joining, each player will be presented with an array of avatars to choose from, and they must tap an avatar to join the lobby with that avatar. First, the frontend must fetch the available avatars from the backend as a websocket message. The backend returns the available avatars, and the landingPage displays them to the user for selection. The user will make a selection, and landingPage.js will update the avatar list in the backend, which will verify with a return value. Then the landingPage.js will navigate to lobby.js where the user will see the lobby along with their avatar.
 
 Triggering Event: A user has entered a valid room code.
 
@@ -181,10 +185,10 @@ sequenceDiagram
 actor player
 participant drawing.js
 participant lobby.js
-participant index.js
+participant backend.js
 
-index.js ->> index.js: randomly selects drawer
-index.js ->> lobby.js: start game websocket message (contains role info)
+backend.js ->> backend.js: randomly selects drawer
+backend.js ->> lobby.js: start game websocket message (contains role info)
 lobby.js ->> drawing.js: navigates to
 drawing.js ->> player: player sees drawing page
 
@@ -196,17 +200,17 @@ sequenceDiagram
 actor player
 participant guessing.js
 participant lobby.js
-participant index.js
+participant backend.js
 
-index.js ->> index.js: randomly selects drawer
-index.js ->> lobby.js: start game websocket message (contains role info)
+backend.js ->> backend.js: randomly selects drawer
+backend.js ->> lobby.js: start game websocket message (contains role info)
 lobby.js ->> guessing.js: navigates to
 guessing.js ->> player: player sees guessing page
 
 ```
 Sequence Diagram 8: alternative showing the possibility of guessing first.
 
-Out of all players, including the host, one is randomly selected to be the first drawer. They will be shown the drawing interface.  
+Out of all players, including the host, one is randomly selected to be the first drawer. They will be shown the drawing interface. First, the backend randomly select a drawer from the list of players. Next, it will send a start game websocket message containing role info. Each player's lobby.js will take that information and either navigate them to guessing.js or drawing.js, where the users will see the appropriate UI.
 
 Triggering Event: The host pressed start game.
 
@@ -217,16 +221,16 @@ sequenceDiagram
 
 actor drawer
 participant drawing.js
-index.js ->> index.js: selects 3 random prompts from list
-index.js ->> drawing.js: prompt choices (websocket)
+backend.js ->> backend.js: selects 3 random prompts from list
+backend.js ->> drawing.js: prompt choices (websocket)
 drawing.js ->> drawer: drawer sees prompt choices
 drawer ->> drawing.js: selects prompt
-drawing.js ->> index.js: current prompt (websocket)
+drawing.js ->> backend.js: current prompt (websocket)
 
 ```
 Sequence Diagram 9
 
-The drawer is provided with 3 random prompts on their screen as buttons to choose from to draw. They tap on the choice that they want, and then they can begin drawing.  
+The drawer is provided with 3 random prompts on their screen as buttons to choose from to draw. They tap on the choice that they want, and then they can begin drawing. First, the backend must randomly select 3 prompts from the list of possible prompts. The backend relays these choices in a websocket message to the drawing.js frontend file. the drawer sees the list, makes a choice, and drawing.js relays the choice to the backend.
 
 Triggering Event: The drawer has been randomly selected.
 
@@ -239,23 +243,25 @@ actor guesser
 actor drawer
 participant guessing.js
 participant drawing.js
-participant index.js
+participant backend.js
 
 drawer ->> drawing.js: draws on the interface
-drawing.js ->> index.js: frequent drawing information (websocket)
-index.js ->> guessing.js: frequent drawing information (websocket)
+drawing.js ->> backend.js: frequent drawing information (websocket)
+backend.js ->> guessing.js: frequent drawing information (websocket)
 guessing.js ->> guesser: guesser spectates drawing
 guesser ->> guessing.js: guesser makes a guess
-guessing.js ->> index.js: guess information (websocket)
-index.js ->> index.js: checks guess
-index.js -->> guessing.js: guess response (websocket)
+guessing.js ->> backend.js: guess information (websocket)
+backend.js ->> backend.js: checks guess
+backend.js -->> guessing.js: guess response (websocket)
 
 ```
 Sequence Diagram 10
 
 Default flow: The guessers spectate the drawing and make guesses using the AAC tablet as the round progresses.  
 Alternative flow: The guessers spectate the drawing and make guesses using the keyboard after clicking the keyboard toggle button.  
-There is a timer counting down during each drawing phase.  
+There is a timer counting down during each drawing phase. 
+
+Further explanation: First, the drawer begins drawing on the interface on drawing.js, and frequent websocket information containing drawing data is sent to the backend. The drawing data is echoed to all guessing.js frontends that are spectating. Guessers spectate and enter guesses, which are relayed from guessing.js to backend.js to be checked. The user sees the result of their guess when another websocket message comes back from the backend to guessing.js.
 
 Triggering Event: The drawer has selected one of the three random drawing prompts.  
 Alternate Triggering Event: The drawer ran out of time (15s) to choose a prompt and one has been randomly selected.
@@ -267,15 +273,15 @@ sequenceDiagram
 
 actor drawer
 actor guesser
-index.js ->> guessing.js: guessing over (websocket)
-index.js ->> drawing.js: drawing over (websocket)
+backend.js ->> guessing.js: guessing over (websocket)
+backend.js ->> drawing.js: drawing over (websocket)
 guessing.js ->> guesser: reveal the prompt
 drawing.js ->> drawer: show guessing phase results
 
 ```
 Sequence Diagram 11
 
-At this point, the correct answer will be displayed, and players will be awarded points. Point award values have not been determined yet.  
+At this point, the correct answer will be displayed, and players will be awarded points. Point award values have not been determined yet. First, the backend messages all guessing frontends and the drawing frontend that the drawing is over along with important information about the round. Then the prompt is revealed to the guessers, and the drawer sees the results of who guessed correctly.  
 
 Triggering Event: drawer draws prompt and players try to guess the drawing prompt.
 
@@ -286,16 +292,18 @@ actor guesser
 participant guessing.js
 
 guesser ->> guessing.js: enters guess
-guessing.js ->> index.js: guess (websocket)
-index.js ->> index.js: checks guess
-index.js ->> index.js: adds points to guesser's score
-index.js -->> guessing.js: correct guess response (websocket)
+guessing.js ->> backend.js: guess (websocket)
+backend.js ->> backend.js: checks guess
+backend.js ->> backend.js: adds points to guesser's score
+backend.js -->> guessing.js: correct guess response (websocket)
 guessing.js -->> guesser: guesser sees they guessed correct
 
 ```
 Sequence Diagram 12  
 
-Players will accumulate points based on their performance in the game, but we want to make sure that the game doesn't feel too competitive.  
+Players will accumulate points based on their performance in the game. When a guesser enters a guess, guessing.js sends the guess in a websocket to the backend where it is checked, points are added to the players score, and the guess response data is sent back to guessing.js for the user to see.
+
+Triggering event: The drawer has begun drawing and one of the guessers wants to make a guess.
 
 #11 **Users see summary screen**  
 ```mermaid
@@ -303,16 +311,17 @@ sequenceDiagram
 
 actor player
 participant summary.js
-participant index.js
-index.js ->> index.js: determines rankings
-index.js ->> summary.js: summary information (websocket)
+participant backend.js
+backend.js ->> backend.js: determines rankings
+backend.js ->> summary.js: summary information (websocket)
 summary.js ->> player: sees summary screen
 
 
 ```
 Sequence Diagram 13  
 
-After everyone draws for their third time, total points will be displayed, and rankings will be shown at the end of the game.  
+After everyone draws for their third time, total points will be displayed, and rankings will be shown at the end of the game. The backend will keep track of when the final round ends, and it will determine the rankings and deliver  the summary information to summary.js where users will see a summary screen.  
+
 Triggering Event: All players have drawn three times.
 
 ## Algorithms
@@ -352,4 +361,3 @@ Triggering Event: All players have drawn three times.
   "guess": "String",
 }
 ```
-

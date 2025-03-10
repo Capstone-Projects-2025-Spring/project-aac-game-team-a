@@ -1,0 +1,38 @@
+{
+  "name": "vue-start-spa",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "test": "vitest",
+    "coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.3",
+    "core-js": "^3.8.3",
+    "vue": "^3.2.13",
+    "vue-router": "^4.5.0"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^3.0.7",
+    "@vue/cli-plugin-babel": "~5.0.0",
+    "@vue/cli-service": "~5.0.0",
+    "vitest": "^3.0.7"
+  },
+  "description": "AAC pictionary game geared towards children",
+  "main": "babel.config.js",
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Capstone-Projects-2025-Spring/project-aac-game-team-a.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Capstone-Projects-2025-Spring/project-aac-game-team-a/issues"
+  },
+  "homepage": "https://github.com/Capstone-Projects-2025-Spring/project-aac-game-team-a#readme"
+}
