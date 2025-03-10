@@ -11,4 +11,4 @@
 # node_modules
 gameFiles/backend/node_modules
 .\gameFiles\backend\node_modules
-./node_modules
+node_modules

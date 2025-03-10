@@ -1,4 +1,5 @@
 const express = require('express');
+const SocketHandlerClass = require("./SocketHandler.cjs")
 const app = express();
 const http = require('http');
 const server = http.createServer(app);
@@ -9,15 +10,16 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
-io.on('connection', (socket) => {
-  var address = socket.handshake.address;
-  console.log('New connection from ' + address.address + ':' + address.port);
-  console.log('a user connected');
+io.on('connection', async (socket) => {
 
-  var client_ip_address = socket.request.connection.remoteAddress;
-  console.log('New connection from ' + client_ip_address);
+  const SocketHandler = new SocketHandlerClass(io, socket)
+  SocketHandler.onPlayerJoin()
+  SocketHandler.broadcastToRoom()
+  SocketHandler.onChatMessage()
 
 });
+
+
 
 server.listen(3000, () => {
   console.log('listening on *:3000');
