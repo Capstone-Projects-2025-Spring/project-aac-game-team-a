@@ -12,6 +12,8 @@ app.get('/', (req, res) => {
 
 io.on('connection', async (socket) => {
 
+  console.log("New user joined server: " + socket.id)
+
   const SocketHandler = new SocketHandlerClass(io, socket)
   SocketHandler.onPlayerJoin()
   SocketHandler.broadcastToRoom()
@@ -24,7 +26,6 @@ io.on('connection', async (socket) => {
 server.listen(3000, () => {
   console.log('listening on *:3000');
 });
-
 
 // import { WebSocketServer } from 'ws';
 
