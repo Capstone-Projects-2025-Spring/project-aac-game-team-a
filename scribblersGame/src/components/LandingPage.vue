@@ -1,20 +1,13 @@
-<script setup>
-defineProps({
-  msg: {
-    type: String,
-    required: true,
-  },
-})
+<!-- Used by App.vue -->
+<script setup lang="ts">
+defineProps<{
+  msg: string
+}>()
 </script>
 
 <template>
   <div class="greetings">
     <h1 class="green">{{ msg }}</h1>
-    <h3>
-      You’ve successfully created a project with
-      <a href="https://vite.dev/" target="_blank" rel="noopener">Vite</a> +
-      <a href="https://vuejs.org/" target="_blank" rel="noopener">Vue 3</a>.
-    </h3>
   </div>
 </template>
 
@@ -24,6 +17,10 @@ h1 {
   font-size: 2.6rem;
   position: relative;
   top: -10px;
+  text-align: center;
+  margin-bottom: 0px; /* Adds some space between the title and choose string */
+  font-size: 50px;
+  font-weight: bold;
 }
 
 h3 {
