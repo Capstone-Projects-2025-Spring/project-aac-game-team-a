@@ -1,32 +1,82 @@
-<template>
-  <!-- Main application component that includes the ScribblersApp component -->
-  <ScribblersApp></ScribblersApp>
-</template>
-
-<script>
-// Importing the ScribblersApp component
-import ScribblersApp from "./components/ScribblersApp.vue";
-
-export default {
-  name: "App", // Defining the name of the component
-  components: {
-    ScribblersApp // Registering ScribblersApp as a child component
-  },
-};
+<script setup lang="ts">
+import { RouterLink, RouterView } from 'vue-router'
+import LandingPage from './components/LandingPage.vue'
 </script>
 
-<style>
-/* Reset default margin for body */
-body {
-  margin: 0px;
+<template>
+  <header>
+
+    <div class="wrapper">
+      <LandingPage msg="Scribblers!" />
+      <nav>
+        <RouterLink to="/">Home</RouterLink>
+      </nav>
+    </div>
+  </header>
+
+  <RouterView />
+</template>
+
+<style scoped>
+header {
+  line-height: 1.5;
+  max-height: 100vh;
 }
 
-/* Styling for the main app container */
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif; /* Defines the font stack */
-  -webkit-font-smoothing: antialiased; /* Improves font rendering in WebKit browsers */
-  -moz-osx-font-smoothing: grayscale; /* Improves font rendering in macOS */
-  color: #2c3e50; /* Sets the default text color */
-  margin-top: 10px; /* Adds some spacing at the top */
+.logo {
+  display: block;
+  margin: 0 auto 2rem;
+}
+
+nav {
+  width: 100%;
+  font-size: 12px;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+nav a.router-link-exact-active {
+  color: var(--color-text);
+}
+
+nav a.router-link-exact-active:hover {
+  background-color: transparent;
+}
+
+nav a {
+  display: inline-block;
+  padding: 0 1rem;
+  border-left: 1px solid var(--color-border);
+}
+
+nav a:first-of-type {
+  border: 0;
+}
+
+@media (min-width: 1024px) {
+  header {
+    display: flex;
+    place-items: center;
+    padding-right: calc(var(--section-gap) / 2);
+  }
+
+  .logo {
+    margin: 0 2rem 0 0;
+  }
+
+  header .wrapper {
+    display: flex;
+    place-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  nav {
+    text-align: left;
+    margin-left: -1rem;
+    font-size: 1rem;
+
+    padding: 1rem 0;
+    margin-top: 1rem;
+  }
 }
 </style>
