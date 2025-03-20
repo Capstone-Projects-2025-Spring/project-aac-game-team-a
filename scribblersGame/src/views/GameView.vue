@@ -1,8 +1,12 @@
 <script>
 // Import the socket.io-client library to enable WebSocket communication
 import io from "socket.io-client";
+import AacBoard from '../components/aacBoard.vue'; //import AACBoard component
 
 export default {
+    components: {
+        AacBoard, //register Aac board as a component
+    },
     data() {
         return {
             currentUser: this.$route.query.user || "", // Stores the username entered by the user
@@ -68,12 +72,13 @@ export default {
                 <h1>Drawing board here</h1>
             </div>
             <div class="aac-board-box">
-                <h1>AAC Board Here</h1>
+                    <AacBoard />
                 <!-- 
                     Loop through array of buttons and display them
                     Upon click, a message is displayed with the user's avatar and
                     the button label as the message
                 -->
+                <!-- OLD AAC BOARD LINES BELOW
                 <button 
                     v-for="(button, index) in AACButtons" 
                     :key="index" 
@@ -81,7 +86,8 @@ export default {
                     class="aac-buttons"
                 >
                     <img :src="button.imgSrc" :alt="button.label" class="button-image"/>
-                </button>
+                </button>-->
+
             </div>
         </div>
 

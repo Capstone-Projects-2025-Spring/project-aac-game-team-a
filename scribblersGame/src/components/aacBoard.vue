@@ -1,0 +1,99 @@
+<template>
+    <div class="aac-board">
+        <!--back button-->
+        <button v-if="currentCategory" @click="currentCategory = null" class="back-button">Back</button> 
+
+        <!-- Grid for categories. -->
+        <div v-if="!currentCategory" class="grid">
+
+            <button v-for="(items, category) in categories" :key="category" @click="currentCategory = category">
+                <!-- image display for category -->
+                <img :src="getCategoryImage(category)" :alt="category" class="category-image"/>
+                <p>{{category}}</p>
+            </button>
+        </div>
+
+        <!-- Grid for items in a category. -->
+        <div v-else class="grid">
+            <button v-for="item in categories[currentCategory]" :key="item">
+                <img :src="getItemImage(currentCategory, item)" :alt="item" class="item-image"/>
+                <p>{{item}}</p>
+            </button>
+        </div>
+    </div>
+</template>
+
+<script setup>
+import { ref } from 'vue';
+
+const currentCategory = ref(null);
+
+const categories = {
+    Animals: ['Dog', 'Cat', 'Bird', 'Elephant', 'Mouse', 'Horse'],
+    Food: ['Apple', 'Pizza', 'Carrot', 'Spaghetti', 'Banana', 'Grapes'],
+    Clothing: ['Shirt', 'Pants', 'Hat', 'Glasses', 'Shoe', 'Glove'],
+    Actions: ['Run', 'Jump', 'Eat', 'Sleep'],
+    Shapes: ['Circle', 'Square', 'Triangle', 'Oval']
+};
+
+//List of categories for photos
+const categoryList = Object.keys(categories);
+
+//Function that gets url for category images
+const getCategoryImage = (category) => {
+    //return new URL(`/aacSymbols/Categories/${category.toLowerCase()}.png`, import.meta.url).href;
+    return `/aacSymbols/Categories/${category.toLowerCase()}.png`;
+};
+
+//Function to get item images for each category
+const getItemImage = (category, item) => {
+    //return new URL(`/aacSymbols/${category}/${item.toLowerCase()}.png`, import.meta.url).href;
+    return `/aacSymbols/${category}/${item.toLowerCase()}.png`;
+};
+</script>
+
+<style scoped>
+.aac-board {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    padding: 10px;
+    justify-content: center;
+    align-items: center;
+    min-height: 10vh;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+    max-width: 1000px;
+    margin: auto;
+}
+
+button {
+    padding: 0px;
+    font-size: 30px;
+    cursor: pointer;
+    border-radius: 10px;
+}
+
+.category-image, .item-image {
+    width: 100px;
+    height: 100px;
+    margin-bottom: 0px;
+}
+
+.back-button {
+    position: absolute;
+    top: 850px; /* Adjust top position as needed */
+    left: 100px; /* Move the back button to the left */
+    padding: 70px 50px;
+    font-size: 30px;
+    background-color: #4CAF50; /* Green background */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+</style>
