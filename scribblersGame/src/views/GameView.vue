@@ -40,6 +40,7 @@ export default {
           console.log(this.text); // Logs the message to the console
           this.addMessage(); // Adds the message to the local state and sends it to the server
         },
+        */
       
         // Adds the user's message to the messages array and sends it to the server
         addMessage(){
@@ -56,10 +57,13 @@ export default {
           // Send the message to the server via WebSocket
           this.socketInstance.emit('message', message);
         },
-        end of old aac stuff*/ 
+        
 
+        //Function that handles a word selection on the AAC board 
         handleItemSelected(item) {
             console.log('Item selected:', item); //logs selected item
+            this.text = item; //stores aac button selected by user
+            this.addMessage(); //sends websocket message
         }
     },
     // Automatically connect to the WebSocket server when the component is mounted
