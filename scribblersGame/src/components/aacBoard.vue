@@ -15,7 +15,7 @@
 
         <!-- Grid for items in a category. -->
         <div v-else class="grid">
-            <button v-for="item in categories[currentCategory]" :key="item">
+            <button v-for="item in categories[currentCategory]" :key="item" @click="selectItem(item)">
                 <img :src="getItemImage(currentCategory, item)" :alt="item" class="item-image"/>
                 <p>{{item}}</p>
             </button>
@@ -50,6 +50,13 @@ const getItemImage = (category, item) => {
     //return new URL(`/aacSymbols/${category}/${item.toLowerCase()}.png`, import.meta.url).href;
     return `/aacSymbols/${category}/${item.toLowerCase()}.png`;
 };
+
+//Function that emits an event from this component when user selects a word
+const selectItem = (item) => {
+    //Emit an event with the selected aac word
+    emit('itemSelected', item);
+};
+
 </script>
 
 <style scoped>
