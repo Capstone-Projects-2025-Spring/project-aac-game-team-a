@@ -33,6 +33,7 @@ export default {
                 this.messages = this.messages.concat(data); // Append received message to messages array
             });
         },
+        /*Old aac board stuff below
         // Called when a user clicks on an AAC Button
         sendAACMessage(label){
           this.text = label;
@@ -55,6 +56,11 @@ export default {
           // Send the message to the server via WebSocket
           this.socketInstance.emit('message', message);
         },
+        end of old aac stuff*/ 
+
+        handleItemSelected(item) {
+            console.log('Item selected:', item); //logs selected item
+        }
     },
     // Automatically connect to the WebSocket server when the component is mounted
     mounted(){
@@ -72,7 +78,8 @@ export default {
                 <h1>Drawing board here</h1>
             </div>
             <div class="aac-board-box">
-                    <AacBoard />
+                <!-- AacBoard component is rendered here and we catch item selections here.-->
+                    <AacBoard @itemSelected="handleItemSelected"/>
                 <!-- 
                     Loop through array of buttons and display them
                     Upon click, a message is displayed with the user's avatar and

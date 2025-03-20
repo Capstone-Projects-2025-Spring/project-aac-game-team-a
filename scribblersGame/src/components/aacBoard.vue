@@ -26,6 +26,9 @@
 <script setup>
 import { ref } from 'vue';
 
+//define the emit function to send events to parent
+const emit = defineEmits();
+
 const currentCategory = ref(null);
 
 const categories = {
