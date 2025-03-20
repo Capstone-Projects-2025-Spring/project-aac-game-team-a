@@ -1,8 +1,12 @@
 <script>
 // Import the socket.io-client library to enable WebSocket communication
 import io from "socket.io-client";
+import AacBoard from '../components/aacBoard.vue'; //import AACBoard component
 
 export default {
+    components: {
+        AacBoard, //register Aac board as a component
+    },
     data() {
         return {
             currentUser: this.$route.query.user || "", // Stores the username entered by the user
@@ -29,12 +33,14 @@ export default {
                 this.messages = this.messages.concat(data); // Append received message to messages array
             });
         },
+        /*Old aac board stuff below
         // Called when a user clicks on an AAC Button
         sendAACMessage(label){
           this.text = label;
           console.log(this.text); // Logs the message to the console
           this.addMessage(); // Adds the message to the local state and sends it to the server
         },
+        */
       
         // Adds the user's message to the messages array and sends it to the server
         addMessage(){
@@ -51,6 +57,14 @@ export default {
           // Send the message to the server via WebSocket
           this.socketInstance.emit('message', message);
         },
+        
+
+        //Function that handles a word selection on the AAC board 
+        handleItemSelected(item) {
+            console.log('Item selected:', item); //logs selected item
+            this.text = item; //stores aac button selected by user
+            this.addMessage(); //sends websocket message
+        }
     },
     // Automatically connect to the WebSocket server when the component is mounted
     mounted(){
@@ -68,12 +82,14 @@ export default {
                 <h1>Drawing board here</h1>
             </div>
             <div class="aac-board-box">
-                <h1>AAC Board Here</h1>
+                <!-- AacBoard component is rendered here and we catch item selections here.-->
+                    <AacBoard @itemSelected="handleItemSelected"/>
                 <!-- 
                     Loop through array of buttons and display them
                     Upon click, a message is displayed with the user's avatar and
                     the button label as the message
                 -->
+                <!-- OLD AAC BOARD LINES BELOW
                 <button 
                     v-for="(button, index) in AACButtons" 
                     :key="index" 
@@ -81,7 +97,8 @@ export default {
                     class="aac-buttons"
                 >
                     <img :src="button.imgSrc" :alt="button.label" class="button-image"/>
-                </button>
+                </button>-->
+
             </div>
         </div>
 
