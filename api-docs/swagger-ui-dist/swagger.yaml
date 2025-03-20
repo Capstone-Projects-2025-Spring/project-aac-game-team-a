@@ -36,85 +36,84 @@ components:
         strokeId: 
           type: number
           description: The ID of the stroke
-
-    EraseEvent:
-      type: object
-      description: Data structure for sending erasing information
+    
+    onPlayerJoin:
+      route: join_a_room
+      type: String Json
+      description: When a user joins a game they must use this endpoint to join a room
       properties:
-        x:
-          type: number
-          description: The x-coordinate of the erasing stroke
-        y:
-          type: number
-          description: The y-coordinate of the erasing stroke
-        thickness:
-          type: number
-          description: The thickness of the stroke
-        strokeId: 
-          type: number
-          description: The ID of the stroke
-
-    UndoEvent:
-      type: object
-      description: Data structure for sending drawing-undo information
-      properties:
-        strokeId: 
-          type: number
-          description: The ID of the stroke to be undone
-
-    GuessEvent:
-      type: object
-      description: Data structure for a player's word guess
-      properties:
-        playerId:
-          type: number
-          description: The unique ID of the player making the guess
-        word:
+        roomId:
           type: string
-          description: The word the player is guessing 
-
-    AACSelectSymbolEvent:
-      type: object
-      description: Event data for when a player selects a symbol from the AAC guess interface
+          description: This is the name of the room the user is going to join
+    
+    onChatMessage:
+      route: on_chat_message
+      type: String Json
+      description: Chat messages that will be broadcasted to everybody within the chat room
       properties:
-        playerId:
-          type: number
-          description: The unique ID of the player selecting the symbol
-        symbolId:
-          type: number
-          description: The unique ID of the selected symbol
-        text:
+        roomId:
           type: string
-          description: The text representation of the selected symbol
-
-    AACDeleteSymbolEvent:
-      type: object
-      description: Event data for when a player deletes a symbol from the AAC guess interface
-      properties:
-        playerId:
-          type: number
-          description: The unique ID of the player selecting the symbol
-        symbolId:
-          type: number
-          description: The unique ID of the selected symbol
-
-    AACSendMessageEvent:
-      type: object
-      description: Event data for when a player sends a message using the AAC board
-      properties:
-        playerId:
-          type: number
-          description: The unique ID of the player sending the message
-        message:
+          description: This is the name of the room the user is going to join
+        msg:
           type: string
-          description: The message composed using the AAC board
+          description: This is the message received
+    
+    broadcastToRoom:
+      route: broad_cast_to_room
+      type: String Json
+      description: Handles all processes related to updating game data to all players in the game session
+      properties:
+        roomId:
+          type: string
+          description: This is the name of the room the user is going to join
+        msg:
+          type: string
+          description: This is the message received
+    
 
   # Custom WebSocket message definitions, mimicking REST API calls
-  messages:
-    draw:
-      description: WebSocket event for sending drawing data
+    broad_cast_to_room:
+      description: This is the event that will emit data from broad cast to room
       payload:
-        $ref: "#/components/schemas/DrawEvent"
+        roomId: 
+          type: string
+          description: The id of the room the data is being broadcasted to
+        msg:
+          type: string
+          description: The message the sender produced
+        sender:
+          type: string
+          desciprtion: The id of the sender
+    onChatMessage:
+      description: This is the event that will emit data from broad cast to room
+      payload:
+        roomId: 
+          type: string
+          description: The id of the room the data is being broadcasted to
+        msg:
+          type: string
+          description: The message the sender produced
+        sender:
+          type: string
+          desciprtion: The id of the sender
+    broad_cast_to_room:
+      description: This is the event that will emit data from broad cast to room
+      payload:
+        roomId: 
+          type: string
+          description: The id of the room the data is being broadcasted to
+        msg:
+          type: string
+          description: The message the sender produced
+        sender:
+          type: string
+          desciprtion: The id of the sender
+    
+    messages:
+      draw:
+        description: WebSocket event for sending drawing data
+        payload:
+          $ref: "#/components/schemas/DrawEvent"
 
     erase:
       description: WebSocket event for erasing drawing data
@@ -130,18 +129,3 @@ components:
       description: WebSocket event for submitting a player's guess
       payload:
         $ref: "#/components/schemas/GuessEvent"
-
-    aac_select_symbol:
-      description: WebSocket event for selecting a symbol on the AAC board
-      payload:
-        $ref: "#/components/schemas/AACSelectSymbolEvent"
-
-    aac_delete_symbol:
-      descriptio: WebSocket event for deleting a selected symbol on the AAC board
-      payload:
-        $ref: "#/components/schemas/AACDeletSymbolEvent"
-
-    aac_send_message:
-      description: WebSocket event for sending a message using the AAC board
-      payload:
-        $ref: "#/components/schemas/AACSendMessageEvent"
