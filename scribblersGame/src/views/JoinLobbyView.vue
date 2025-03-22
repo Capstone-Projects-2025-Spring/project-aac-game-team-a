@@ -3,8 +3,31 @@
     <h1>Join a Game</h1>
 
     <div class="form-group">
-      <label>Room Code</label>
-      <input type="text" v-model="roomCode" placeholder="Enter room code" maxlength="16" />
+      <label>Select Room Code (4 shapes)</label>
+      <div class="shape-slots">
+        <div
+          v-for="(shape, index) in selectedShapes"
+          :key="index"
+          class="shape-slot"
+        >
+          <img v-if="shape" :src="shape" />
+        </div>
+      </div>
+      <div class="shape-container">
+        <button
+          v-for="(shape, index) in shapes"
+          :key="index"
+          @click="selectShape(shape)"
+          class="shape-button"
+        >
+          <img :src="shape.imgSrc" :alt="shape.label" />
+          <p>{{ shape.label }}</p>
+        </button>
+      </div>
+      <div class="button-row">
+        <button class="undo-btn" @click="undoShape">Undo Last</button>
+        <button class="clear-btn" @click="clearShapes">Clear All</button>
+      </div>
     </div>
 
     <div class="form-group">
@@ -26,18 +49,44 @@
   </div>
 </template>
 
-
 <script setup>
 import { ref } from 'vue'
 
-// Store room code input
-const roomCode = ref('')
+const selectedShapes = ref([null, null, null, null])
 
-// Store current user's name and avatar
+const shapes = [
+  { value: 1, imgSrc: 'circle.png', label: 'Circle' },
+  { value: 2, imgSrc: 'diamond.png', label: 'Diamond' },
+  { value: 3, imgSrc: 'heart.png', label: 'Heart' },
+  { value: 4, imgSrc: 'octagon.png', label: 'Octagon' },
+  { value: 5, imgSrc: 'pentagon.png', label: 'Pentagon' },
+  { value: 6, imgSrc: 'rectangle.png', label: 'Rectangle' },
+  { value: 7, imgSrc: 'square.png', label: 'Square' },
+  { value: 8, imgSrc: 'star.png', label: 'Star' },
+  { value: 9, imgSrc: 'triangle.png', label: 'Triangle' }
+]
+
+function selectShape(shape) {
+  const index = selectedShapes.value.findIndex((s) => s === null)
+  if (index !== -1) {
+    selectedShapes.value[index] = shape.imgSrc
+  }
+}
+
+function undoShape() {
+  const lastIndex = [...selectedShapes.value].reverse().findIndex((s) => s !== null)
+  if (lastIndex !== -1) {
+    selectedShapes.value[selectedShapes.value.length - 1 - lastIndex] = null
+  }
+}
+
+function clearShapes() {
+  selectedShapes.value = [null, null, null, null]
+}
+
 const currentUser = ref('')
 const currentUserAvatar = ref('')
 
-// Avatar options with image source and label
 const landingPageButtons = [
   { id: 1, imgSrc: 'lion.png', label: 'Lion' },
   { id: 2, imgSrc: 'tiger.webp', label: 'Tiger' },
@@ -49,78 +98,135 @@ const landingPageButtons = [
   { id: 8, imgSrc: 'dog.png', label: 'Dog' }
 ]
 
-// Select an avatar and set user data
 function selectAvatar(button) {
   currentUser.value = button.label
   currentUserAvatar.value = button.imgSrc
 }
 
-
-// Validate and attempt to join a game
 function joinGame() {
-  if (!roomCode.value || !currentUserAvatar.value) {
-    alert('Please enter a room code and select an avatar.')
+  if (selectedShapes.value.includes(null) || !currentUserAvatar.value) {
+    alert('Please select all 4 shapes and an avatar.')
     return
   }
-  alert(`Joining room ${roomCode.value} as ${currentUser.value}`)
-  // Add navigation or join logic here
+  const roomCode = selectedShapes.value
+    .map((shapeImg) => shapes.find((s) => s.imgSrc === shapeImg)?.value || '')
+    .join('')
+  alert(`Joining room ${roomCode} as ${currentUser.value}`)
 }
 </script>
 
-
 <style scoped>
-/* Join screen container styling */
 .join-screen {
   max-width: 500px;
   margin: 80px auto;
   padding: 40px;
-  background-color: #ffffff;
+  background-color: #fff;
   border-radius: 20px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
   text-align: center;
   font-family: 'Segoe UI', sans-serif;
 }
 
-
-/* Heading styling */
 h1 {
   font-size: 2rem;
   margin-bottom: 30px;
   color: #333;
 }
 
-/* Form group spacing and layout */
 .form-group {
   margin-bottom: 30px;
   text-align: left;
 }
 
-/* Form label styling */
-label {
-  display: block;
-  margin-bottom: 8px;
-  color: #555;
-  font-weight: bold;
+.shape-slots {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
 }
 
-/* Room code input styling */
-input[type='text'] {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #ddd;
+.shape-slot {
+  width: 60px;
+  height: 60px;
+  border: 1px solid #ccc;
   border-radius: 10px;
-  font-size: 1rem;
-  transition: border-color 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Input focus highlight */
-input:focus {
+.shape-slot img {
+  width: 40px;
+  height: 40px;
+}
+
+.shape-container {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-top: 10px;
+  justify-items: center;
+}
+
+.shape-button {
+  border: 2px solid transparent;
+  border-radius: 10px;
+  padding: 6px;
+  cursor: pointer;
+  text-align: center;
+  width: 80px;
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.shape-button img {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 5px;
+}
+
+.shape-button p {
+  margin: 0;
+  font-size: 0.8rem;
+}
+
+.shape-button:hover {
+  transform: scale(1.05);
   border-color: #007bff;
-  outline: none;
 }
 
+.button-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 10px;
+}
 
-/* Avatar container grid layout with 4 buttons per row */
+.undo-btn,
+.clear-btn {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.undo-btn {
+  background-color: #ffca2c;
+}
+
+.undo-btn:hover {
+  background-color: #e0a800;
+}
+
+.clear-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.clear-btn:hover {
+  background-color: #a71d2a;
+}
+
 .avatar-container {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -129,47 +235,37 @@ input:focus {
   margin-top: 10px;
 }
 
-
-/* Avatar button styling */
 .avatar-button {
   border: 2px solid transparent;
   border-radius: 12px;
   padding: 10px;
   cursor: pointer;
-  transition: border-color 0.3s, transform 0.2s;
   text-align: center;
   width: 100px;
+  transition: border-color 0.3s, transform 0.2s;
 }
 
-
-/* Avatar image styling inside button */
 .avatar-button img {
   width: 60px;
   height: 60px;
-  object-fit: cover;
   border-radius: 8px;
   margin-bottom: 5px;
 }
 
-/* Avatar label styling */
 .avatar-button p {
   margin: 0;
   font-size: 0.9rem;
 }
 
-/* Avatar button hover effect */
 .avatar-button:hover {
   transform: scale(1.05);
 }
 
-/* Selected avatar button styling */
 .avatar-button.selected {
   border-color: #007bff;
   background-color: #f0f8ff;
 }
 
-
-/* Join Game button styling */
 .join-btn {
   margin-top: 25px;
   padding: 12px 20px;
@@ -179,11 +275,9 @@ input:focus {
   border: none;
   border-radius: 12px;
   cursor: pointer;
-  box-shadow: 0 5px 15px rgba(40, 167, 69, 0.2);
   transition: background-color 0.3s, transform 0.1s;
 }
 
-/* Join Game button hover effect */
 .join-btn:hover {
   background-color: #1c7c31;
   transform: translateY(-2px);
