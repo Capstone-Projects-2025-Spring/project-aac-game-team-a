@@ -2,10 +2,12 @@
 // Import the socket.io-client library to enable WebSocket communication
 import io from "socket.io-client";
 import AacBoard from '../components/aacBoard.vue'; //import AACBoard component
+import DrawingBoard from '../components/DrawingBoard.vue'; // import Drawing board component
 
 export default {
     components: {
         AacBoard, //register Aac board as a component
+        DrawingBoard, //register drawing board as a component
     },
     data() {
         return {
@@ -79,7 +81,8 @@ export default {
         <!-- Left side: Drawing canvas and button box -->
         <div class="left-container">
             <div class="drawing-box">
-                <h1>Drawing board here</h1>
+                <!-- <h1>Drawing board here</h1> -->
+                <DrawingBoard></DrawingBoard>
             </div>
             <div class="aac-board-box">
                 <!-- AacBoard component is rendered here and we catch item selections here.-->
