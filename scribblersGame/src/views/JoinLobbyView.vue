@@ -45,7 +45,7 @@
       </div>
     </div>
 
-    <button class="join-btn" @click="joinGame">Join Game</button>
+    <RouterLink to="/avatar" class="join-btn" @click="joinGame">Join Game</RouterLink>
   </div>
 </template>
 

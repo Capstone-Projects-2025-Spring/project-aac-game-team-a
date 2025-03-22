@@ -20,6 +20,7 @@ io.on('connection', (socket) => {
 
     // Listener for 'message' events from the client
     socket.on('message', (data) => {
+        console.log('message received:', data); 
         socket.broadcast.emit('message:received', data); // Broadcasts received messages to all other clients
     });
 
