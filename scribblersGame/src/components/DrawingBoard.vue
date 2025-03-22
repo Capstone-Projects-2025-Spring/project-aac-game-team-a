@@ -17,7 +17,7 @@ onMounted(() => {
     }
 
     // Set up canvas size
-    canvas.width = window.innerWidth;
+    canvas.width = 1201;
     canvas.height = 400;
     context = canvas.getContext("2d");
     context.fillStyle = start_background_color;
@@ -55,30 +55,39 @@ function saveState() {
 
 function start(event) {
     if (!context) return;
-    is_drawing = true;
-    context.beginPath();
-    context.moveTo(event.clientX - canvasRef.value.offsetLeft, event.clientY - canvasRef.value.offsetTop);
-    event.preventDefault();
+
+const rect = canvasRef.value.getBoundingClientRect();
+const x = event.clientX - rect.left;
+const y = event.clientY - rect.top;
+
+is_drawing = true;
+context.beginPath(); // Start a new path
+context.moveTo(x, y); // Set starting point at the cursor
 }
 
 function draw(event) {
     if (!is_drawing || !context) return;
-    context.lineTo(event.clientX - canvasRef.value.offsetLeft, event.clientY - canvasRef.value.offsetTop);
-    context.strokeStyle = draw_color;
-    context.lineWidth = draw_width;
-    context.lineCap = "round";
-    context.lineJoin = "round";
-    context.stroke();
-    event.preventDefault();
+
+const rect = canvasRef.value.getBoundingClientRect();
+const x = event.clientX - rect.left;
+const y = event.clientY - rect.top;
+
+context.lineTo(x, y);
+context.strokeStyle = draw_color;
+context.lineWidth = draw_width;
+context.lineCap = "round";
+context.lineJoin = "round";
+context.stroke();
+
+event.preventDefault();
+
 }
 
 function stop(event) {
-    if (is_drawing && context) {
-        context.stroke();
-        context.closePath();
-        is_drawing = false;
-    }
-    event.preventDefault();
+    if (!context) return;
+
+is_drawing = false;
+context.closePath();
 }
 
 function clear_canvas() {
@@ -166,12 +175,12 @@ function undo_action() {
 
     button {
         border-radius: 8px;
-        border: 1px solid transparent;
+        border: 2px solid;
         padding: 0.6em 1.2em;
         font-size: 1em;
         font-weight: 500;
         font-family: inherit;
-        background-color: #1a1a1a;
+        background-color: #f6f3f3;
         cursor: pointer;
         transition: border-color 0.25s;
     }
@@ -209,7 +218,9 @@ function undo_action() {
 
     /* style for canvas */
     canvas {
-        box-shadow: -3px 2px 9px 6px black;
+        /*box-shadow: -3px 2px 9px 6px black;*/
+        border: 2px solid #05080b;
+        border-color: #05080b;
         cursor: pointer;
         background-color: white;
     }
