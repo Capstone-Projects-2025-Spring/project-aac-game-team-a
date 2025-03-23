@@ -36,8 +36,12 @@ io.on('connection', (socket) => {
     //assign drawer if there isn't one
     if (!currentDrawer){
         currentDrawer = socket.id; //makes this user the drawer
-        socket.emit('you-are-drawer');
-        console.log(`User ${socket.id} is the drawer`);
+        const wordForDrawer = getRandomWord(); // Get a random word for the drawer
+
+        // Send "you-are-drawer" and  randomly selected word to the new drawer
+        socket.emit('you-are-drawer', { word: wordForDrawer });
+
+        console.log(`User ${socket.id} is the drawer with word: ${wordForDrawer}`);
 
     }
 
