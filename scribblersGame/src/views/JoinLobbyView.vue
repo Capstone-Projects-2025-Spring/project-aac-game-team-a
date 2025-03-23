@@ -3,6 +3,7 @@
     <h1>Join a Game</h1>
 
     <div class="form-group">
+      <!-- Section for selecting room code using shapes -->
       <label>Select Room Code (4 shapes)</label>
       <div class="shape-slots">
         <div
@@ -10,10 +11,12 @@
           :key="index"
           class="shape-slot"
         >
+          <!-- Display selected shape images -->
           <img v-if="shape" :src="shape" />
         </div>
       </div>
       <div class="shape-container">
+        <!-- Display shape selection buttons -->
         <button
           v-for="(shape, index) in shapes"
           :key="index"
@@ -25,16 +28,18 @@
         </button>
       </div>
       <div class="button-row">
+        <!-- Buttons to undo and clear shape selections -->
         <button class="undo-btn" @click="undoShape">Undo Last</button>
         <button class="clear-btn" @click="clearShapes">Clear All</button>
       </div>
     </div>
 
     <div class="form-group">
+      <!-- Section for choosing an avatar -->
       <label>Choose Your Avatar</label>
       <div class="avatar-container">
         <button
-          v-for="(button, index) in landingPageButtons"
+          v-for="(button, index) in avatarButtons"
           :key="index"
           @click="selectAvatar(button)"
           :class="['avatar-button', { selected: currentUserAvatar === button.imgSrc }]"
@@ -45,15 +50,25 @@
       </div>
     </div>
 
-    <RouterLink to="/avatar" class="join-btn" @click="joinGame">Join Game</RouterLink>
+    <!-- Button to join the lobby with the selected configurations -->
+    <RouterLink 
+    :to="{
+        path: '/game', // Navigates to the game route
+        query: { user: currentUser, avatar: currentUserAvatar} // Passes selected user data as query params
+    }"
+    class="join-btn" 
+    @click="joinLobby">
+      Join Lobby</RouterLink>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 
+// Reactive state for storing selected shapes
 const selectedShapes = ref([null, null, null, null])
 
+// List of available shapes
 const shapes = [
   { value: 1, imgSrc: 'circle.png', label: 'Circle' },
   { value: 2, imgSrc: 'diamond.png', label: 'Diamond' },
@@ -66,6 +81,7 @@ const shapes = [
   { value: 9, imgSrc: 'triangle.png', label: 'Triangle' }
 ]
 
+// Function to select a shape and add it to the room code
 function selectShape(shape) {
   const index = selectedShapes.value.findIndex((s) => s === null)
   if (index !== -1) {
@@ -73,6 +89,7 @@ function selectShape(shape) {
   }
 }
 
+// Function to undo the last selected shape
 function undoShape() {
   const lastIndex = [...selectedShapes.value].reverse().findIndex((s) => s !== null)
   if (lastIndex !== -1) {
@@ -80,14 +97,17 @@ function undoShape() {
   }
 }
 
+// Function to clear all selected shapes
 function clearShapes() {
   selectedShapes.value = [null, null, null, null]
 }
 
+// Reactive state for user information
 const currentUser = ref('')
 const currentUserAvatar = ref('')
 
-const landingPageButtons = [
+// List of available avatars
+const avatarButtons = [
   { id: 1, imgSrc: 'lion.png', label: 'Lion' },
   { id: 2, imgSrc: 'tiger.webp', label: 'Tiger' },
   { id: 3, imgSrc: 'bear.png', label: 'Bear' },
@@ -98,12 +118,14 @@ const landingPageButtons = [
   { id: 8, imgSrc: 'dog.png', label: 'Dog' }
 ]
 
+// Function to select an avatar
 function selectAvatar(button) {
   currentUser.value = button.label
   currentUserAvatar.value = button.imgSrc
 }
 
-function joinGame() {
+// Function to validate selection and join the lobby
+function joinLobby() {
   if (selectedShapes.value.includes(null) || !currentUserAvatar.value) {
     alert('Please select all 4 shapes and an avatar.')
     return
