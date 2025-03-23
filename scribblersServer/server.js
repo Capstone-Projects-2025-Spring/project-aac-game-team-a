@@ -14,9 +14,32 @@ const io = new Server(server, {
     }
 });
 
+let currentDrawer = null; //keeps track of current drawer (by socket ID)
+
+//drawing prompt word list
+const wordsList = [
+    'eat', 'jump', 'run', 'sleep', 'bird', 'cat', 'dog', 'elephant', 
+    'horse', 'mouse', 'glasses', 'glove', 'hat', 'pants', 'shirt', 
+    'shoe', 'apple', 'banana', 'carrot', 'grapes', 'pizza', 'spaghetti'
+];
+
+// Function to select a random word from the list
+function getRandomWord() {
+    const randomIndex = Math.floor(Math.random() * wordsList.length);
+    return wordsList[randomIndex];
+}
+
 // Event listener for new socket connections
 io.on('connection', (socket) => {
     console.log(`User ${socket.id} is connected`); // Logs when a new user connects
+
+    //assign drawer if there isn't one
+    if (!currentDrawer){
+        currentDrawer = socket.id; //makes this user the drawer
+        socket.emit('you-are-drawer');
+        console.log(`User ${socket.id} is the drawer`);
+
+    }
 
     // Listener for 'message' events from the client
     socket.on('message', (data) => {
@@ -27,6 +50,8 @@ io.on('connection', (socket) => {
     // Listener for socket disconnection
     socket.on('disconnect', () => {
         console.log(`User ${socket.id} disconnected`); // Logs when a user disconnects
+
+        //TODO: at some point, handle drawer leaving here?
     });
 });
 
