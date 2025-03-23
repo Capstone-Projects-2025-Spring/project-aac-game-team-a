@@ -14,8 +14,14 @@ const io = new Server(server, {
     }
 });
 
-let currentDrawer = null; //keeps track of current drawer (by socket ID)
+let currentDrawerID = null; //keeps track of current drawer (by socket ID)
+let currentDrawerIndex = 0; //index in queue of current drawer
 let currentPrompt = null; //keeps track of current prompt
+let playerCount = 0; //number of player that have joined
+let correctGuesses = 0; //tracks how many have guessed correctly in a round
+let playersQueue = []; //queue of players by socket ID
+const maxCycles = 2; //number of cycles (how many times each player draws)
+let currentCycle = 0; //tracks cycle number
 
 //drawing prompt word list
 const wordsList = [
@@ -33,25 +39,35 @@ function getRandomWord() {
 // Event listener for new socket connections
 io.on('connection', (socket) => {
     console.log(`User ${socket.id} is connected`); // Logs when a new user connects
+    playerCount++;
+
+    //add player to the queue
+    playersQueue.push(socket.id);
 
     //assign drawer if there isn't one
-    if (!currentDrawer){
-        currentDrawer = socket.id; //makes this user the drawer
-        wordForDrawer = getRandomWord(); // Get a random word for the drawer
-        currentPrompt = wordForDrawer;
+    if (!currentDrawerID){
+        currentDrawerID = socket.id; //makes this user the drawer
+        currentPrompt = getRandomWord(); // Get a random word for the drawer
 
         // Send "you-are-drawer" and  randomly selected word to the new drawer
-        socket.emit('you-are-drawer', { word: wordForDrawer });
+        socket.emit('you-are-drawer', { word: currentPrompt });
 
-        console.log(`User ${socket.id} is the drawer with word: ${wordForDrawer}`);
+        console.log(`User ${socket.id} is the drawer with word: ${currentPrompt}`);
 
+    }
+
+    if(currentDrawerIndex === 0) {
+        currentPrompt = getRandomWord();
+        socket.to(playersQueue[currentDrawerIndex]).emit('you-are-drawer', {word: currentPrompt});
+        console.log(`User ${socket.id} is the drawer with word: ${currentPrompt}`);
     }
 
     // Listener for 'message' events from the client
     socket.on('message', (data) => {
         console.log('message received:', data); 
+
         //process guesses made by non drawing players
-        if(socket.id !== currentDrawer) {
+        if(socket.id !== currentDrawerID) {
             if (data.text.toLowerCase() === currentPrompt.toLowerCase()) {
                 console.log(`Player ${socket.id} guessed correctly!`);
 
@@ -61,8 +77,29 @@ io.on('connection', (socket) => {
                 }); */
                 data.text = 'Guessed Correctly!';
 
-                //TODO: reset game here
+                
                 socket.emit('message:received', data); // Broadcasts received messages to all other clients, including player who guesesd correct
+                correctGuesses++;
+
+                //check if all guessers ahve guessed correctly
+                if (correctGuesses === playerCount - 1) {
+                    correctGuesses = 0;
+
+                    //next drawer
+                    currentDrawerIndex = (currentDrawerIndex + 1) % playersQueue.length;
+                    currentPrompt = getRandomWord();
+                }
+
+                //check if max cycles have been reached
+                if (currentCycle < maxCycles) {
+                    currentCycle++;
+                    socket.to(playersQueue[currentDrawerIndex]).emit('you-are-drawer', {word: currentPrompt});
+                    console.log(`User ${playersQueue[currentDrawerIndex]} is the drawer with word: ${currentPrompt}`);
+                } else {
+                    console.log("End of game.");
+                    //TODO: End of game ***
+                }
+
             }
             socket.broadcast.emit('message:received', data); // Broadcasts received messages to all other clients
 
@@ -76,7 +113,8 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         console.log(`User ${socket.id} disconnected`); // Logs when a user disconnects
 
-        //TODO: at some point, handle drawer leaving here?
+
+        //TODO: at some point, handle people disconnecting
     });
 });
 
