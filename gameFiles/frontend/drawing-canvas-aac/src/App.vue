@@ -4,6 +4,10 @@ import HelloWorld from './components/HelloWorld.vue'
 
 <template>
   <HelloWorld msg="Canvas" />
+  <!-- <img src="../public/vite.svg" alt="My Image"> -->
+  <button @click="toggleValue">
+    switch
+  </button>
 </template>
 
 

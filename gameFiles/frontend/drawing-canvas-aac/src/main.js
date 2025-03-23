@@ -2,6 +2,14 @@ import { createApp } from 'vue'
 import './style.css'
 import App from './App.vue'
 import HelloWorld from './components/HelloWorld.vue';
+import { io } from "socket.io-client";
+
+const SOCKET_URL = "http://localhost:3001"; // Replace with your server URL
+
+const socket = io(SOCKET_URL, {
+  transports: ["websocket"], // Use WebSockets for efficiency
+  reconnection: true,        // Enable automatic reconnection
+});
 
 //creates vue app DO NO TOUCH
 createApp(App).mount('#app')
@@ -20,10 +28,29 @@ createApp(App).mount('#app')
  let draw_color = "black";
  let is_drawing = false;
  let draw_width = 1; 
+ let drawer = true
 
+ const toggleValue = () => {
+    drawer = !drawer;
+};
  //Saves each new stroke
  function saveState() {
-    undoHistory.push(context.getImageData(0, 0, canvas.width, canvas.height));
+    const imageData = canvas.toDataURL('image/png'); // Convert to Base64
+    let contextData = context.getImageData(0, 0, canvas.width, canvas.height)
+    undoHistory.push(contextData);
+    let data = contextData.data;
+    console.log(data)
+    // console.log(socket)
+    socket.emit("draw_data", imageData);
+    // socket.on('draw_data', (data) => {
+    //     const img = new Image();
+    //     img.src = data.image;
+    //     img.onload = () => {
+    //       const canvas = document.getElementById('myCanvas');
+    //       const ctx = canvas.getContext('2d');
+    //       ctx.drawImage(img, 0, 0);
+    //     };
+    // });
  }
 
  //changes stroke color
