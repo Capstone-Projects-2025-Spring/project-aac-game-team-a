@@ -18,6 +18,27 @@ io.on('connection', async (socket) => {
   SocketHandler.onPlayerJoin()
   SocketHandler.broadcastToRoom()
   SocketHandler.onChatMessage()
+  socket.on("draw_data", (data) => {
+    console.log("draw_data log")
+    try {
+        // const jsonData = JSON.parse(data);
+        // console.log('Received JSON data:', jsonData);
+        // const roomId = jsonData.roomId
+        // console.log('room id: ' + roomId)
+        // const returnData = {
+        //     "roomID": roomId, 
+        //     "msg": jsonData.msg, 
+        //     "sender": socket.id
+        // }
+        // io.to(roomId).emit("on_chat_message", JSON.stringify({"message":returnData}));
+        // console.log(socket.id + " sent " + {"message":data} + " to " + roomId +" room")
+        console.log(data)
+
+    } catch (err){
+        console.log("Message data unable to be updated");
+        console.error(err)
+    }
+});
 
 });
 

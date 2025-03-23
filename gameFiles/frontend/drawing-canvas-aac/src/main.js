@@ -2,6 +2,14 @@ import { createApp } from 'vue'
 import './style.css'
 import App from './App.vue'
 import HelloWorld from './components/HelloWorld.vue';
+import { io } from "socket.io-client";
+
+const SOCKET_URL = "http://localhost:3000"; // Replace with your server URL
+
+const socket = io(SOCKET_URL, {
+  transports: ["websocket"], // Use WebSockets for efficiency
+  reconnection: true,        // Enable automatic reconnection
+});
 
 //creates vue app DO NO TOUCH
 createApp(App).mount('#app')
@@ -23,7 +31,11 @@ createApp(App).mount('#app')
 
  //Saves each new stroke
  function saveState() {
-    undoHistory.push(context.getImageData(0, 0, canvas.width, canvas.height));
+    let contextData = context.getImageData(0, 0, canvas.width, canvas.height)
+    undoHistory.push(contextData);
+    let data = contextData.data;
+    console.log(data)
+    socket.on("draw_data", data);
  }
 
  //changes stroke color
