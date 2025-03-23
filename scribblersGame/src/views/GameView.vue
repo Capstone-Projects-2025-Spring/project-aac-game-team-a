@@ -3,6 +3,9 @@
 import io from "socket.io-client";
 import AacBoard from '../components/aacBoard.vue'; //import AACBoard component
 import DrawingBoard from '../components/DrawingBoard.vue'; // import Drawing board component
+import { inject, onMounted } from "vue";
+
+const socket = inject("socket"); // Inject the socket instance
 
 export default {
     components: {
@@ -29,7 +32,7 @@ export default {
         // Connect to the server
         serverConnect(){
             // Establish connection to the WebSocket server
-            this.socketInstance = io("http://localhost:3001"); // CHANGE THIS WHEN YOU WANT THE SERVER TO BE PUBLIC
+            this.socketInstance = socket; // CHANGE THIS WHEN YOU WANT THE SERVER TO BE PUBLIC
             // this.socketInstance = io("http://[YOUR IP HERE]:3000");
 
             // Listen for incoming messages from the server and update messages array
@@ -45,6 +48,11 @@ export default {
                 this.isDrawer = true;
                 this.promptWord = data.word;
             });
+
+            // Listen for 'draw_data:received' message to handle canvas data
+            this.socketInstance.on("draw_data:received", (data) => {
+                console.log(data)
+            })
         },
         /*Old aac board stuff below
         // Called when a user clicks on an AAC Button

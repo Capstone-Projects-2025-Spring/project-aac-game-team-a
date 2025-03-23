@@ -49,7 +49,14 @@ onMounted(() => {
 
 function saveState() {
     if (context) {
-        undoHistory.push(context.getImageData(0, 0, canvasRef.value.width, canvasRef.value.height));
+        const canvas = canvasRef.value;
+        const imageData = canvas.toDataURL('image/png'); // Convert to Base64
+        let contextData = context.getImageData(0, 0, canvas.width, canvas.height)
+        undoHistory.push(contextData);
+        // let data = contextData.data;
+        // console.log(data)
+        // console.log(socket)
+        socket.emit("draw_data", imageData);
     }
 }
 
