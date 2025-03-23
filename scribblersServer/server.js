@@ -51,7 +51,6 @@ io.on('connection', (socket) => {
 
         // Send "you-are-drawer" and  randomly selected word to the new drawer
         socket.emit('you-are-drawer', { word: currentPrompt });
-
         console.log(`User ${socket.id} is the drawer with word: ${currentPrompt}`);
 
     }
@@ -61,6 +60,18 @@ io.on('connection', (socket) => {
         socket.to(playersQueue[currentDrawerIndex]).emit('you-are-drawer', {word: currentPrompt});
         console.log(`User ${socket.id} is the drawer with word: ${currentPrompt}`);
     }
+
+    socket.on("draw_data", (data) => {
+        console.log("draw_data log")
+        try {
+            console.log(data)
+            socket.broadcast.emit('draw_data:received', data)
+    
+        } catch (err){
+            console.log("Message data unable to be updated");
+            console.error(err)
+        }
+    });
 
     // Listener for 'message' events from the client
     socket.on('message', (data) => {
