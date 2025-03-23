@@ -17,6 +17,17 @@ const io = new Server(server, {
 // Event listener for new socket connections
 io.on('connection', (socket) => {
     console.log(`User ${socket.id} is connected`); // Logs when a new user connects
+    socket.on("draw_data", (data) => {
+        console.log("draw_data log")
+        try {
+            console.log(data)
+            socket.broadcast.emit('draw_data:received', data)
+    
+        } catch (err){
+            console.log("Message data unable to be updated");
+            console.error(err)
+        }
+    });
 
     // Listener for 'message' events from the client
     socket.on('message', (data) => {
