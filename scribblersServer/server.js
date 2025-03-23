@@ -44,6 +44,7 @@ io.on('connection', (socket) => {
     //add player to the queue
     playersQueue.push(socket.id);
 
+    /*
     //assign drawer if there isn't one
     if (!currentDrawerID){
         currentDrawerID = socket.id; //makes this user the drawer
@@ -51,14 +52,14 @@ io.on('connection', (socket) => {
 
         // Send "you-are-drawer" and  randomly selected word to the new drawer
         socket.emit('you-are-drawer', { word: currentPrompt });
-        console.log(`User ${socket.id} is the drawer with word: ${currentPrompt}`);
+        console.log(`FIRST DRAWER: User ${socket.id} is the drawer with word: ${currentPrompt}`);
 
-    }
+    }*/
 
     if(currentDrawerIndex === 0) {
         currentPrompt = getRandomWord();
-        socket.to(playersQueue[currentDrawerIndex]).emit('you-are-drawer', {word: currentPrompt});
-        console.log(`User ${socket.id} is the drawer with word: ${currentPrompt}`);
+        io.to(playersQueue[currentDrawerIndex]).emit('you-are-drawer', {word: currentPrompt});
+        console.log(`(1)User ${socket.id} is the drawer with word: ${currentPrompt}`);
     }
 
     socket.on("draw_data", (data) => {
@@ -104,7 +105,7 @@ io.on('connection', (socket) => {
                 //check if max cycles have been reached
                 if (currentCycle < maxCycles) {
                     currentCycle++;
-                    socket.to(playersQueue[currentDrawerIndex]).emit('you-are-drawer', {word: currentPrompt});
+                    io.to(playersQueue[currentDrawerIndex]).emit('you-are-drawer', {word: currentPrompt});
                     console.log(`User ${playersQueue[currentDrawerIndex]} is the drawer with word: ${currentPrompt}`);
                 } else {
                     console.log("End of game.");
@@ -122,7 +123,7 @@ io.on('connection', (socket) => {
 
     // Listener for socket disconnection
     socket.on('disconnect', () => {
-        console.log(`User ${socket.id} disconnected`); // Logs when a user disconnects
+        console.log(`(2)User ${socket.id} disconnected`); // Logs when a user disconnects
 
 
         //TODO: at some point, handle people disconnecting
