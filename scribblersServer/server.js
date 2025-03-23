@@ -15,6 +15,7 @@ const io = new Server(server, {
 });
 
 let currentDrawer = null; //keeps track of current drawer (by socket ID)
+let currentPrompt = null; //keeps track of current prompt
 
 //drawing prompt word list
 const wordsList = [
@@ -36,7 +37,8 @@ io.on('connection', (socket) => {
     //assign drawer if there isn't one
     if (!currentDrawer){
         currentDrawer = socket.id; //makes this user the drawer
-        const wordForDrawer = getRandomWord(); // Get a random word for the drawer
+        wordForDrawer = getRandomWord(); // Get a random word for the drawer
+        currentPrompt = wordForDrawer;
 
         // Send "you-are-drawer" and  randomly selected word to the new drawer
         socket.emit('you-are-drawer', { word: wordForDrawer });
@@ -48,7 +50,26 @@ io.on('connection', (socket) => {
     // Listener for 'message' events from the client
     socket.on('message', (data) => {
         console.log('message received:', data); 
-        socket.broadcast.emit('message:received', data); // Broadcasts received messages to all other clients
+        //process guesses made by non drawing players
+        if(socket.id !== currentDrawer) {
+            if (data.text.toLowerCase() === currentPrompt.toLowerCase()) {
+                console.log(`Player ${socket.id} guessed correctly!`);
+
+                /*
+                socket.emit('correct-guess', {
+                    user: data.user
+                }); */
+                data.text = 'Guessed Correctly!';
+
+                //TODO: reset game here
+                socket.emit('message:received', data); // Broadcasts received messages to all other clients, including player who guesesd correct
+            }
+            socket.broadcast.emit('message:received', data); // Broadcasts received messages to all other clients
+
+            
+        }
+
+        
     });
 
     // Listener for socket disconnection

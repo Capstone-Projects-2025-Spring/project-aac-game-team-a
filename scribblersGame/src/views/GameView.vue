@@ -15,6 +15,8 @@ export default {
             currentUserAvatar:  this.$route.query.avatar || "", // Stores the username entered by the user
             text: "", // Stores the message typed by the user
             messages: [], // Array to store all received messages
+            isDrawer: false, //track if user is the drawer
+            promptWord: "", //store the random drawing prompt word
             // Buttons for game AAC board with associated images and labels
             AACButtons: [
                 {id: 1, imgSrc: 'lion.png', label: 'Lion'},
@@ -33,6 +35,12 @@ export default {
             // Listen for incoming messages from the server and update messages array
             this.socketInstance.on("message:received", (data) => {
                 this.messages = this.messages.concat(data); // Append received message to messages array
+            });
+
+            //Listen for 'you-are-drawer' message and random prompt word
+            this.socketInstance.on("you-are-drawer", (data) => {
+                this.isDrawer = true;
+                this.promptWord = data.word;
             });
         },
         /*Old aac board stuff below
@@ -80,10 +88,16 @@ export default {
     <div class="game-container"> 
         <!-- Left side: Drawing canvas and button box -->
         <div class="left-container">
+            <!--Display drawing prompt for drawer-->
+            <div v-if="isDrawer" class="draw-prompt">
+                <h2>DRAW: {{ promptWord }}</h2>
+            </div>
+
             <div class="drawing-box">
                 <!-- <h1>Drawing board here</h1> -->
                 <DrawingBoard></DrawingBoard>
             </div>
+
             <div class="aac-board-box">
                 <!-- AacBoard component is rendered here and we catch item selections here.-->
                     <AacBoard @itemSelected="handleItemSelected"/>
@@ -139,6 +153,15 @@ export default {
       display: flex;
       flex-direction: column; /* Stack the boxes vertically */
       justify-content: flex-start;
+  }
+
+  .draw-prompt {
+    background-color: #ffcc00; /* Light yellow background */
+      padding: 10px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 20px; /* Space between prompt and drawing area */
   }
 
   .drawing-box {
