@@ -28,7 +28,8 @@
     </div>
 
     <!-- Launch room button -->
-    <button class="launch-btn" @click="launchRoom">Launch Room</button>
+    <!-- <button class="launch-btn" @click="launchRoom">Launch Room</button> -->
+    <RouterLink to="/avatar" class="launch-btn" @click="launchRoom">Launch Room</RouterLink>
   </div>
 </template>
 

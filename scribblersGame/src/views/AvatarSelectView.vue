@@ -1,6 +1,5 @@
 <script>
 // Importing RouterLink from vue-router to enable navigation within the app
-import { RouterLink } from 'vue-router'
 
 export default {
     data() {
@@ -17,12 +16,6 @@ export default {
         };
     },
     methods: {
-        // Called when the user clicks an avatar button to join the game
-        join(button){
-            this.currentUser = button.label; //  Assigns the selected avatar's label as the username
-            this.currentUserAvatar = button.imgSrc; // Assigns the selected avatar's image
-            console.log(this.currentUser); // Logs the username to the console
-        },
     },
     name: "AvatarSelect",
 };
@@ -43,7 +36,6 @@ export default {
                     }"
                     v-for="(button, index) in landingPageButtons" 
                     :key="index" 
-                    v-on:click="join(button)"
                     class="avatar-buttons"
                 >
                     <img :src="button.imgSrc" :alt="button.label" class="button-image"/>
