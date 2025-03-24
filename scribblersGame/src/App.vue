@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterView } from 'vue-router'
 import LandingPage from './components/LandingPage.vue'
 </script>
 
@@ -9,7 +9,7 @@ import LandingPage from './components/LandingPage.vue'
     <div class="wrapper">
       <LandingPage msg="Scribblers!" />
       <nav>
-        <RouterLink to="/">Home</RouterLink>
+        <!-- <RouterLink to="/">Home</RouterLink> -->
       </nav>
     </div>
   </header>

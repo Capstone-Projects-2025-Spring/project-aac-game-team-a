@@ -296,6 +296,7 @@ h1 {
   color: white;
   border: none;
   border-radius: 12px;
+  text-decoration: none;
   cursor: pointer;
   transition: background-color 0.3s, transform 0.1s;
 }
