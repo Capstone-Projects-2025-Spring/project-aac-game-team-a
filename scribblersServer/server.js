@@ -20,7 +20,7 @@ let currentPrompt = null; //keeps track of current prompt
 let playerCount = 0; //number of player that have joined
 let correctGuesses = 0; //tracks how many have guessed correctly in a round
 let playersQueue = []; //queue of players by socket ID
-const maxCycles = 2; //number of cycles (how many times each player draws)
+const maxCycles = 10; //number of cycles (how many times each player draws)
 let currentCycle = 0; //tracks cycle number
 
 //drawing prompt word list
@@ -56,7 +56,8 @@ io.on('connection', (socket) => {
 
     }*/
 
-    if(currentDrawerIndex === 0) {
+    if(currentDrawerIndex === 0 && !currentDrawerID) {
+        currentDrawerID = socket.id; //assigns first user to join's ID to currentDrawerID
         currentPrompt = getRandomWord();
         io.to(playersQueue[currentDrawerIndex]).emit('you-are-drawer', {word: currentPrompt});
         console.log(`(1)User ${socket.id} is the drawer with word: ${currentPrompt}`);
@@ -76,7 +77,7 @@ io.on('connection', (socket) => {
 
     // Listener for 'message' events from the client
     socket.on('message', (data) => {
-        console.log('message received:', data); 
+        //console.log('message received:', data); 
 
         //process guesses made by non drawing players
         if(socket.id !== currentDrawerID) {
@@ -100,12 +101,17 @@ io.on('connection', (socket) => {
                     //next drawer
                     currentDrawerIndex = (currentDrawerIndex + 1) % playersQueue.length;
                     currentPrompt = getRandomWord();
+
+                    //notify the previous drawer that they are guessing
+                    const previousDrawerIndex = (currentDrawerIndex - 1 + playersQueue.length) % playersQueue.length;
+                    io.to(playersQueue[previousDrawerIndex]).emit('you-are-guesser');
                 }
 
                 //check if max cycles have been reached
                 if (currentCycle < maxCycles) {
                     currentCycle++;
                     io.to(playersQueue[currentDrawerIndex]).emit('you-are-drawer', {word: currentPrompt});
+                    currentDrawerID = playersQueue[currentDrawerIndex].id;
                     console.log(`User ${playersQueue[currentDrawerIndex]} is the drawer with word: ${currentPrompt}`);
                 } else {
                     console.log("End of game.");
