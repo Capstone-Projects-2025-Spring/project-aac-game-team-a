@@ -80,6 +80,7 @@ io.on('connection', (socket) => {
         //console.log('message received:', data); 
 
         //process guesses made by non drawing players
+        //console.log(`guess incoming from socket.id: ${socket.id}, currentDrawerID: ${currentDrawerID}`);
         if(socket.id !== currentDrawerID) {
             if (data.text.toLowerCase() === currentPrompt.toLowerCase()) {
                 console.log(`Player ${socket.id} guessed correctly!`);
@@ -111,8 +112,8 @@ io.on('connection', (socket) => {
                 if (currentCycle < maxCycles) {
                     currentCycle++;
                     io.to(playersQueue[currentDrawerIndex]).emit('you-are-drawer', {word: currentPrompt});
-                    currentDrawerID = playersQueue[currentDrawerIndex].id;
-                    console.log(`User ${playersQueue[currentDrawerIndex]} is the drawer with word: ${currentPrompt}`);
+                    currentDrawerID = playersQueue[currentDrawerIndex];
+                    //console.log(`User ${playersQueue[currentDrawerIndex]} is the drawer with word: ${currentPrompt}, and currentDrawerID is: ${currentDrawerID}`);
                 } else {
                     console.log("End of game.");
                     //TODO: End of game ***
