@@ -238,6 +238,7 @@ input:focus {
   color: white;
   border: none;
   border-radius: 12px;
+  text-decoration: none;
   cursor: pointer;
   box-shadow: 0 5px 15px rgba(0, 123, 255, 0.2);
   transition: background-color 0.3s, transform 0.1s;

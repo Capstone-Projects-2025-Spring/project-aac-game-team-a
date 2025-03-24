@@ -1,23 +1,29 @@
 <script setup lang="ts">
-import WelcomeItem from './WelcomeItem.vue'
-import DocumentationIcon from './icons/IconDocumentation.vue'
-import ToolingIcon from './icons/IconTooling.vue'
-import EcosystemIcon from './icons/IconEcosystem.vue'
-import CommunityIcon from './icons/IconCommunity.vue'
-import SupportIcon from './icons/IconSupport.vue'
-
-const openReadmeInEditor = () => fetch('/__open-in-editor?file=README.md')
 </script>
 
 <template>
-  <div class="lobbyButtons">
-    <RouterLink to="/hostLobby" class="lobbyButton">Host Lobby</RouterLink>
-    <RouterLink to="/joinLobby" class="lobbyButton">Join Lobby</RouterLink>
+  <div class="home-elements">
+    <h1 class="welcome-text">Welcome to Scribbers!</h1>
+    <div class="lobby-buttons">
+      <RouterLink to="/hostLobby" class="host-lobby-button">Host Lobby</RouterLink>
+      <RouterLink to="/joinLobby" class="join-lobby-button">Join Lobby</RouterLink>
+    </div>
   </div>
 </template>
 
 <style scoped>
-.lobbyButtons {
+.home-elements {
+  max-width: 500px;
+  margin: 80px auto;
+  padding: 40px;
+  background-color: #fff;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.lobby-buttons {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -25,13 +31,13 @@ const openReadmeInEditor = () => fetch('/__open-in-editor?file=README.md')
   margin-top: 50px;
 }
 
-.lobbyButton {
+.join-lobby-button {
   display: inline-block;
   padding: 12px 24px;
   font-size: 1.2rem;
   font-weight: bold;
   color: white;
-  background-color: #007bff;
+  background-color: #28a745;
   border: none;
   border-radius: 8px;
   text-decoration: none;
@@ -40,13 +46,38 @@ const openReadmeInEditor = () => fetch('/__open-in-editor?file=README.md')
   width: 200px;
 }
 
-.lobbyButton:hover {
-  background-color: #022142;
+.join-lobby-button:hover {
+  background-color: #1c7c31;
   transform: scale(1.05);
 }
 
+.host-lobby-button {
+  display: inline-block;
+  padding: 12px 24px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: white;
+  background-color: #28a745;
+  border: none;
+  border-radius: 8px;
+  text-decoration: none;
+  text-align: center;
+  transition: background-color 0.3s, transform 0.2s;
+  width: 200px;
+}
+
+.host-lobby-button:hover {
+  background-color: #1c7c31;
+  transform: scale(1.05);
+}
+
+.welcome-text {
+  position: relative;
+
+}
+
 @media (min-width: 1024px){
-  .lobbyButtons{
+  .lobby-buttons{
     display: flex;
     flex-direction: column;
     align-items: center;

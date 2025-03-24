@@ -1,41 +1,36 @@
 <!-- Used by App.vue -->
-<script setup lang="ts">
-defineProps<{
-  msg: string
-}>()
-</script>
 
 <template>
   <div class="greetings">
-    <h1 class="green">{{ msg }}</h1>
+    <RouterLink to="/" class="title-button">Scribblers!</RouterLink>
   </div>
 </template>
 
 <style scoped>
-h1 {
+
+.title-button {
   font-weight: 500;
-  font-size: 2.6rem;
+  /* font-size: 2.6rem; */
   position: relative;
-  top: -10px;
-  text-align: center;
+  /* top: 75px;
+  left: 100px; */
+  text-decoration: none;
   margin-bottom: 0px; /* Adds some space between the title and choose string */
   font-size: 50px;
   font-weight: bold;
+  font-family: 'Segoe UI', sans-serif;
+  color: #000;
 }
 
-h3 {
-  font-size: 1.2rem;
+.title-button:hover {
+  color: rgb(76, 75, 75);
+  transform: scale(1.05);
 }
 
-.greetings h1,
-.greetings h3 {
-  text-align: center;
+.greetings{
+  margin: auto;
+  width: 50%;
+  padding: 10px;
 }
 
-@media (min-width: 1024px) {
-  .greetings h1,
-  .greetings h3 {
-    text-align: left;
-  }
-}
 </style>
