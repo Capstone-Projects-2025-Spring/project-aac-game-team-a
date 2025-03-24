@@ -44,22 +44,25 @@ io.on('connection', (socket) => {
     //add player to the queue
     playersQueue.push(socket.id);
 
-    //assign drawer if there isn't one
-    if (!currentDrawerID){
-        currentDrawerID = socket.id; //makes this user the drawer
-        currentPrompt = getRandomWord(); // Get a random word for the drawer
+    socket.on("join_game", (data) => {
+        //assign drawer if there isn't one
+        if (!currentDrawerID){
+            currentDrawerID = socket.id; //makes this user the drawer
+            currentPrompt = getRandomWord(); // Get a random word for the drawer
 
-        // Send "you-are-drawer" and  randomly selected word to the new drawer
-        socket.emit('you-are-drawer', { word: currentPrompt });
-        console.log(`User ${socket.id} is the drawer with word: ${currentPrompt}`);
+            // Send "you-are-drawer" and  randomly selected word to the new drawer
+            socket.emit('you-are-drawer', { word: currentPrompt });
+            console.log(`User ${socket.id} is the drawer with word: ${currentPrompt}`);
 
-    }
+        }
 
-    if(currentDrawerIndex === 0) {
-        currentPrompt = getRandomWord();
-        socket.to(playersQueue[currentDrawerIndex]).emit('you-are-drawer', {word: currentPrompt});
-        console.log(`User ${socket.id} is the drawer with word: ${currentPrompt}`);
-    }
+        if(currentDrawerIndex === 0) {
+            currentPrompt = getRandomWord();
+            socket.to(playersQueue[currentDrawerIndex]).emit('you-are-drawer', {word: currentPrompt});
+            console.log(`User ${socket.id} is the drawer with word: ${currentPrompt}`);
+        }
+
+    })
 
     socket.on("draw_data", (data) => {
         console.log("draw_data log")
@@ -130,6 +133,6 @@ io.on('connection', (socket) => {
 });
 
 // Start the server and listen on port 3000
-server.listen(3001, () => {
-    console.log("Scribblers server is running on port 3001");
+server.listen(3002, () => {
+    console.log("Scribblers server is running on port 3002");
 });

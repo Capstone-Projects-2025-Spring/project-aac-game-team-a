@@ -1,6 +1,9 @@
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:3001"); // Replace with your server URL
+const socket = io("http://localhost:3002", {
+  transports: ["websocket"], // Use WebSockets for efficiency
+  reconnection: true,        // Enable automatic reconnection
+}); // Replace with your server URL
 
 export default {
   install: (app) => {

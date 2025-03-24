@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, inject } from "vue";
 
 const canvasRef = ref(null);
 let context = null;
@@ -9,8 +9,11 @@ let is_drawing = false;
 let draw_width = 1;
 const start_background_color = "white";
 
+const socket = inject("socket"); // Get the socket instance
+
 onMounted(() => {
     const canvas = canvasRef.value;
+    // const socket = inject("socket"); // Inject the socket instance
     if (!canvas) {
         console.error("Canvas not found!");
         return;
@@ -47,14 +50,15 @@ onMounted(() => {
     document.querySelector(".Ubutton").addEventListener("click", undo_action);
 });
 
-function saveState() {
+function saveState(event) {
     if (context) {
         const canvas = canvasRef.value;
         const imageData = canvas.toDataURL('image/png'); // Convert to Base64
         let contextData = context.getImageData(0, 0, canvas.width, canvas.height)
         undoHistory.push(contextData);
-        // let data = contextData.data;
-        // console.log(data)
+        let data = contextData.data;
+        console.log(data)
+        console.log(event)
         // console.log(socket)
         socket.emit("draw_data", imageData);
     }

@@ -5,7 +5,6 @@ import AacBoard from '../components/aacBoard.vue'; //import AACBoard component
 import DrawingBoard from '../components/DrawingBoard.vue'; // import Drawing board component
 import { inject, onMounted } from "vue";
 
-const socket = inject("socket"); // Inject the socket instance
 
 export default {
     components: {
@@ -31,10 +30,11 @@ export default {
     methods: {
         // Connect to the server
         serverConnect(){
+            const socket = inject("socket"); // Inject the socket instance
             // Establish connection to the WebSocket server
             this.socketInstance = socket; // CHANGE THIS WHEN YOU WANT THE SERVER TO BE PUBLIC
             // this.socketInstance = io("http://[YOUR IP HERE]:3000");
-
+            this.socketInstance.emit("join_game", "data")
             // Listen for incoming messages from the server and update messages array
             this.socketInstance.on("message:received", (data) => {
                 this.messages = this.messages.concat(data); // Append received message to messages array
@@ -51,7 +51,14 @@ export default {
 
             // Listen for 'draw_data:received' message to handle canvas data
             this.socketInstance.on("draw_data:received", (data) => {
-                console.log(data)
+                console.log("draw data" + data)
+                const img = new Image();
+                img.src = data.image;
+                img.onload = () => {
+                const canvas = document.getElementById('canvas');
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                };
             })
         },
         /*Old aac board stuff below
