@@ -1,6 +1,10 @@
 <script setup>
 import { ref, onMounted } from "vue";
 
+//define the emit function to send events to parent
+const emit = defineEmits();
+const props = defineProps(['cast-draw-color, cast-draw-x, cast-draw-y, cast-draw-width']);
+
 const canvasRef = ref(null);
 let context = null;
 let undoHistory = [];
@@ -47,47 +51,58 @@ onMounted(() => {
     document.querySelector(".Ubutton").addEventListener("click", undo_action);
 });
 
+//  Pushes current canvas state onto undo stack
 function saveState() {
     if (context) {
         undoHistory.push(context.getImageData(0, 0, canvasRef.value.width, canvasRef.value.height));
     }
 }
 
+//  Start new drawing stroke
 function start(event) {
     if (!context) return;
 
-const rect = canvasRef.value.getBoundingClientRect();
-const x = event.clientX - rect.left;
-const y = event.clientY - rect.top;
+    const rect = canvasRef.value.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
 
-is_drawing = true;
-context.beginPath(); // Start a new path
-context.moveTo(x, y); // Set starting point at the cursor
+    emit("startDrawData", x, y, draw_color, draw_width);
+    //console.log("Drawing started");
+
+    is_drawing = true;
+    context.beginPath(); // Start a new path
+    context.moveTo(x, y); // Set starting point at the cursor
 }
 
+//  Function to draw on canvas while mouse moves
 function draw(event) {
     if (!is_drawing || !context) return;
 
-const rect = canvasRef.value.getBoundingClientRect();
-const x = event.clientX - rect.left;
-const y = event.clientY - rect.top;
+    const rect = canvasRef.value.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
 
-context.lineTo(x, y);
-context.strokeStyle = draw_color;
-context.lineWidth = draw_width;
-context.lineCap = "round";
-context.lineJoin = "round";
-context.stroke();
+    emit("addDrawData", x, y);
+    //console.log("Drawing...");
 
-event.preventDefault();
+    context.lineTo(x, y);
+    context.strokeStyle = draw_color;
+    context.lineWidth = draw_width;
+    context.lineCap = "round";
+    context.lineJoin = "round";
+    context.stroke();
 
+    event.preventDefault();
 }
 
 function stop(event) {
     if (!context) return;
 
-is_drawing = false;
-context.closePath();
+    emit("endDrawData");
+    //console.log("Drawing ended");
+
+    is_drawing = false;
+    context.closePath();
 }
 
 function clear_canvas() {

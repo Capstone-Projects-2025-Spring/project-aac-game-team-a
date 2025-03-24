@@ -45,15 +45,22 @@ export default {
                 this.isDrawer = true;
                 this.promptWord = data.word;
             });
+
+            // Listen for broadcasted initial drawing data
+            this.socketInstance.on("cast-draw-init", (x, y, draw_color, draw_width) => {
+                console.log("Received initial drawing data", x, y, draw_color, draw_width);
+            });
+
+            // Listen for broadcasted drawing data
+            this.socketInstance.on("cast-draw", (x, y) => {
+                console.log("Received drawing data", x, y);
+            });
+
+            // Listen for broadcasted final drawing data
+            this.socketInstance.on("cast-draw-end", () => {
+                console.log("Received final drawing data");
+            });
         },
-        /*Old aac board stuff below
-        // Called when a user clicks on an AAC Button
-        sendAACMessage(label){
-          this.text = label;
-          console.log(this.text); // Logs the message to the console
-          this.addMessage(); // Adds the message to the local state and sends it to the server
-        },
-        */
       
         // Adds the user's message to the messages array and sends it to the server
         addMessage(){
@@ -77,6 +84,21 @@ export default {
             console.log('Item selected:', item); //logs selected item
             this.text = item; //stores aac button selected by user
             this.addMessage(); //sends websocket message
+        },
+
+        //  Handles sending initial drawing data to observer canvases (on mouse click)
+        sendDrawDataInit(x, y, draw_color, draw_width) {
+            this.socketInstance.emit('draw-init', x, y, draw_color, draw_width);
+        },
+
+        //  Handles sending drawing data to observer canvases (on mouse move)
+        sendDrawData(x, y) {
+            this.socketInstance.emit('draw', x, y);
+        },
+
+        //  Handles sending final drawing data to observer canvases (on mouse up)
+        sendDrawDataEnd() {
+            this.socketInstance.emit('draw-end');
         }
     },
     // Automatically connect to the WebSocket server when the component is mounted
@@ -98,27 +120,17 @@ export default {
 
             <div class="drawing-box">
                 <!-- <h1>Drawing board here</h1> -->
-                <DrawingBoard></DrawingBoard>
+                <!-- handles emit statements in DrawingBoard.vue -->
+                <DrawingBoard 
+                    @startDrawData="sendDrawDataInit" 
+                    @addDrawData="sendDrawData" 
+                    @endDrawData="sendDrawDataEnd">
+                </DrawingBoard>
             </div>
 
             <div class="aac-board-box">
                 <!-- AacBoard component is rendered here and we catch item selections here.-->
-                    <AacBoard @itemSelected="handleItemSelected"/>
-                <!-- 
-                    Loop through array of buttons and display them
-                    Upon click, a message is displayed with the user's avatar and
-                    the button label as the message
-                -->
-                <!-- OLD AAC BOARD LINES BELOW
-                <button 
-                    v-for="(button, index) in AACButtons" 
-                    :key="index" 
-                    v-on:click="sendAACMessage(button.label)"
-                    class="aac-buttons"
-                >
-                    <img :src="button.imgSrc" :alt="button.label" class="button-image"/>
-                </button>-->
-
+                <AacBoard @itemSelected="handleItemSelected"/>
             </div>
         </div>
 
@@ -129,7 +141,6 @@ export default {
                     <img :src="message.avatar" :alt="message.user" class="game-avatar-image"/>
                     {{ message.text }}
                 </div>
-
             </div>
         </div>
     </div>
