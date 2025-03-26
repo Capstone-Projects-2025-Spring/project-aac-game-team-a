@@ -3,13 +3,16 @@
 import io from "socket.io-client";
 import AacBoard from '../components/aacBoard.vue'; //import AACBoard component
 import DrawingBoard from '../components/DrawingBoard.vue'; // import Drawing board component
-import { inject, onMounted } from "vue";
+import { inject, onMounted, ref } from "vue";
+import ViewBoard from "@/components/ViewBoard.vue";
 
+const parentImage = ref("data:image/png;base64,iVBORw0KGgo..."); // Example Base64 data
 
 export default {
     components: {
         AacBoard, //register Aac board as a component
         DrawingBoard, //register drawing board as a component
+        ViewBoard
     },
     data() {
         return {
@@ -50,16 +53,26 @@ export default {
             });
 
             // Listen for 'draw_data:received' message to handle canvas data
-            this.socketInstance.on("draw_data:received", (data) => {
-                console.log("draw data" + data)
-                const img = new Image();
-                img.src = data.image;
-                img.onload = () => {
-                const canvas = document.getElementById('canvas');
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                };
-            })
+            // this.socketInstance.on("draw_data:received", (data) => {
+            //     console.log("Draw data received", data);
+
+            //     // Ensure the canvas element exists
+            //     const canvas = document.getElementById('canvas');
+            //     if (!canvas) {
+            //         console.error("Canvas element not found!");
+            //         return;
+            //     }
+
+            //     const ctx = canvas.getContext('2d');
+
+            //     // Create a new Image object to load the received drawing data
+            //     const img = new Image();
+            //     img.src = data.image; // Assuming data.image contains a base64-encoded image
+            //     img.onload = () => {
+            //         ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear previous drawing
+            //         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            //     };
+            // })
         },
         /*Old aac board stuff below
         // Called when a user clicks on an AAC Button
@@ -119,6 +132,7 @@ export default {
             <div class="aac-board-box">
                 <!-- AacBoard component is rendered here and we catch item selections here.-->
                     <AacBoard @itemSelected="handleItemSelected"/>
+                    <ViewBoard :imageFromParent="parentImage"/>
                 <!-- 
                     Loop through array of buttons and display them
                     Upon click, a message is displayed with the user's avatar and
