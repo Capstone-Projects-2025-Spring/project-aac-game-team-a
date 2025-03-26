@@ -17,8 +17,8 @@ export default {
             messages: [], // Array to store all received messages
             isDrawer: false, //track if user is the drawer
             promptWord: "", //store the random drawing prompt word
-            // Buttons for game AAC board with associated images and labels
-            AACButtons: [
+            ctx: CanvasRenderingContext2D,
+            AACButtons: [// Buttons for game AAC board with associated images and labels
                 {id: 1, imgSrc: 'lion.png', label: 'Lion'},
                 {id: 2, imgSrc: 'tiger.webp', label: 'Tiger'},
                 {id: 3, imgSrc: 'bear.png', label: 'Bear'}
@@ -49,15 +49,38 @@ export default {
                 console.log('you are a guesser now');
                 this.isDrawer = false;
             });
+
+            // Listen for broadcasted initial drawing data
+            this.socketInstance.on("cast-draw-init", (x, y, draw_color, draw_width) => {
+                this.ctx = document.getElementById("canvas").getContext("2d");
+                this.ctx.strokeStyle = draw_color;
+                this.ctx.lineWidth = draw_width;
+                this.ctx.beginPath();
+                this.ctx.moveTo(x, y);
+            });
+
+            // Listen for broadcasted drawing data
+            this.socketInstance.on("cast-draw", (x, y) => {
+                this.ctx.lineTo(x, y);
+                this.ctx.stroke();
+            });
+
+            // Listen for broadcasted final drawing data
+            this.socketInstance.on("cast-draw-end", () => {
+                this.ctx.closePath();
+            });
+
+            // Listen for broadcasted clear canvas
+            this.socketInstance.on("cast-draw-clear", () => {
+                this.ctx.fillStyle = "white";
+                this.ctx.clearRect(0, 0, document.getElementById("canvas").width, document.getElementById("canvas").height);
+            });
+
+            // Listen for broadcasted undo canvas
+            this.socketInstance.on("cast-draw-undo", (previousState) => {
+                this.ctx.putImageData(previousState, 0, 0);
+            });
         },
-        /*Old aac board stuff below
-        // Called when a user clicks on an AAC Button
-        sendAACMessage(label){
-          this.text = label;
-          console.log(this.text); // Logs the message to the console
-          this.addMessage(); // Adds the message to the local state and sends it to the server
-        },
-        */
       
         // Adds the user's message to the messages array and sends it to the server
         addMessage(){
@@ -75,12 +98,36 @@ export default {
           this.socketInstance.emit('message', message);
         },
         
-
         //Function that handles a word selection on the AAC board 
         handleItemSelected(item) {
             console.log('Item selected:', item); //logs selected item
             this.text = item; //stores aac button selected by user
             this.addMessage(); //sends websocket message
+        },
+
+        //  Handles sending initial drawing data to observer canvases (on mouse click)
+        sendDrawDataInit(x, y, draw_color, draw_width) {
+            this.socketInstance.emit('draw-init', x, y, draw_color, draw_width);
+        },
+
+        //  Handles sending drawing data to observer canvases (on mouse move)
+        sendDrawData(x, y) {
+            this.socketInstance.emit('draw', x, y);
+        },
+
+        //  Handles sending final drawing data to observer canvases (on mouse up)
+        sendDrawDataEnd() {
+            this.socketInstance.emit('draw-end');
+        },
+
+        //  Handles sending request to clear canvas
+        sendDrawDataClear() {
+            this.socketInstance.emit('draw-clear');
+        },
+
+        //  Handles sending request to clear undo canvas
+        sendDrawDataUndo(previousState) {
+            this.socketInstance.emit('draw-undo', previousState);
         }
     },
     // Automatically connect to the WebSocket server when the component is mounted
@@ -100,29 +147,21 @@ export default {
                 <h2>DRAW: {{ promptWord }}</h2>
             </div>
 
+            <!-- Display Drawing board -->
             <div class="drawing-box">
-                <!-- <h1>Drawing board here</h1> -->
-                <DrawingBoard></DrawingBoard>
+                <!-- handles emit statements in DrawingBoard.vue -->
+                <DrawingBoard 
+                    @startDrawData="sendDrawDataInit" 
+                    @addDrawData="sendDrawData" 
+                    @endDrawData="sendDrawDataEnd"
+                    @canvasClear="sendDrawDataClear"
+                    @canvasUndo="sendDrawDataUndo">
+                </DrawingBoard>
             </div>
 
             <div class="aac-board-box">
                 <!-- AacBoard component is rendered here and we catch item selections here.-->
-                    <AacBoard @itemSelected="handleItemSelected"/>
-                <!-- 
-                    Loop through array of buttons and display them
-                    Upon click, a message is displayed with the user's avatar and
-                    the button label as the message
-                -->
-                <!-- OLD AAC BOARD LINES BELOW
-                <button 
-                    v-for="(button, index) in AACButtons" 
-                    :key="index" 
-                    v-on:click="sendAACMessage(button.label)"
-                    class="aac-buttons"
-                >
-                    <img :src="button.imgSrc" :alt="button.label" class="button-image"/>
-                </button>-->
-
+                <AacBoard @itemSelected="handleItemSelected"/>
             </div>
         </div>
 
@@ -133,7 +172,6 @@ export default {
                     <img :src="message.avatar" :alt="message.user" class="game-avatar-image"/>
                     {{ message.text }}
                 </div>
-
             </div>
         </div>
     </div>

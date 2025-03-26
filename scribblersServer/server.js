@@ -121,17 +121,33 @@ io.on('connection', (socket) => {
 
             }
             socket.broadcast.emit('message:received', data); // Broadcasts received messages to all other clients
-
-            
         }
-
-        
+    });
+    
+    //  Listeners for handling drawing data
+    socket.on("draw-init", (x, y, draw_color, draw_width, context) => {
+        socket.broadcast.emit("cast-draw-init", x, y, draw_color, draw_width, context);
     });
 
+    socket.on("draw", (x, y) => {
+        socket.broadcast.emit("cast-draw", x, y);
+    });
+
+    socket.on("draw-end", () => {
+        socket.broadcast.emit("cast-draw-end");
+    });
+
+    socket.on("draw-clear", () => {
+        socket.broadcast.emit("cast-draw-clear");
+    });
+
+    socket.on("draw-undo", () => {
+        socket.broadcast.emit("cast-draw-undo", previousState);
+    });
+    
     // Listener for socket disconnection
     socket.on('disconnect', () => {
         console.log(`(2)User ${socket.id} disconnected`); // Logs when a user disconnects
-
 
         //TODO: at some point, handle people disconnecting
     });
