@@ -3,7 +3,6 @@ import { ref, onMounted } from "vue";
 
 //define the emit function to send events to parent
 const emit = defineEmits();
-const props = defineProps(['cast-draw-color, cast-draw-x, cast-draw-y, cast-draw-width']);
 
 const canvasRef = ref(null);
 let context = null;
@@ -110,6 +109,7 @@ function clear_canvas() {
         context.fillStyle = start_background_color;
         context.clearRect(0, 0, canvasRef.value.width, canvasRef.value.height);
         context.fillRect(0, 0, canvasRef.value.width, canvasRef.value.height);
+        emit("canvasClear");
     }
 }
 
@@ -117,6 +117,7 @@ function undo_action() {
     if (context && undoHistory.length > 0) {
         let previousState = undoHistory.pop();
         context.putImageData(previousState, 0, 0);
+        emit("canvasUndo", previousState);
     }
 }
 </script>

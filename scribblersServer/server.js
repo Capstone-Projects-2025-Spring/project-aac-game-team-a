@@ -116,19 +116,25 @@ io.on('connection', (socket) => {
         }
     });
     
-    socket.on("draw-init", (x, y, draw_color, draw_width) => {
-        //console.log(`Drawing started: `, x, y, draw_color, draw_width);
-        socket.broadcast.emit("cast-draw-init", x, y, draw_color, draw_width);
+    //  Listeners for handling drawing data
+    socket.on("draw-init", (x, y, draw_color, draw_width, context) => {
+        socket.broadcast.emit("cast-draw-init", x, y, draw_color, draw_width, context);
     });
 
     socket.on("draw", (x, y) => {
-        //console.log("Drawing...", x, y);
         socket.broadcast.emit("cast-draw", x, y);
     });
 
     socket.on("draw-end", () => {
-        //console.log("Drawing ended");
         socket.broadcast.emit("cast-draw-end");
+    });
+
+    socket.on("draw-clear", () => {
+        socket.broadcast.emit("cast-draw-clear");
+    });
+
+    socket.on("draw-undo", () => {
+        socket.broadcast.emit("cast-draw-undo", previousState);
     });
     
     // Listener for socket disconnection
