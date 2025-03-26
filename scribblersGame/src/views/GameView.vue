@@ -40,10 +40,14 @@ export default {
             //Listen for 'you-are-drawer' message and random prompt word
             this.socketInstance.on("you-are-drawer", (data) => {
                 console.log('you are the drawer now');
-                console.log(this.socketInstance.connected);
-                console.log(this.socketInstance);
                 this.isDrawer = true;
                 this.promptWord = data.word;
+            });
+
+            //Listen for 'you-are-guesser' message when drawing is done
+            this.socketInstance.on('you-are-guesser', (data) => {
+                console.log('you are a guesser now');
+                this.isDrawer = false;
             });
 
             // Listen for broadcasted initial drawing data

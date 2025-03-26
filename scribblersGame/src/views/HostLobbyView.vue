@@ -27,8 +27,32 @@
       <input type="number" v-model="rounds" min="1" max="10" />
     </div>
 
+    <div class="form-group">
+      <!-- Section for choosing an avatar -->
+      <label>Choose Your Avatar</label>
+      <div class="avatar-container">
+        <button
+          v-for="(button, index) in avatarButtons"
+          :key="index"
+          @click="selectAvatar(button)"
+          :class="['avatar-button', { selected: currentUserAvatar === button.imgSrc }]"
+        >
+          <img :src="button.imgSrc" :alt="button.label" />
+          <p>{{ button.label }}</p>
+        </button>
+      </div>
+    </div>
+
     <!-- Launch room button -->
-    <button class="launch-btn" @click="launchRoom">Launch Room</button>
+    <!-- <button class="launch-btn" @click="launchRoom">Launch Room</button> -->
+    <RouterLink 
+    :to="{
+        path: '/game', // Navigates to the game route
+        query: { user: currentUser, avatar: currentUserAvatar} // Passes selected user data as query params
+    }"
+    class="launch-btn" 
+    @click="launchRoom">
+        Launch Room</RouterLink>
   </div>
 </template>
 
@@ -40,6 +64,8 @@ const visibility = ref('public')
 const maxPlayers = ref(4)
 const rounds = ref(3)
 const randomCodeDigits = ref([])
+const currentUser = ref('')
+const currentUserAvatar = ref('')
 
 // Shape mapping
 const shapes = [
@@ -68,6 +94,24 @@ function generateRandomCode() {
 function getShapeImg(digit) {
   const found = shapes.find((s) => s.value === digit)
   return found ? found.imgSrc : ''
+}
+
+// List of available avatars
+const avatarButtons = [
+  { id: 1, imgSrc: 'lion.png', label: 'Lion' },
+  { id: 2, imgSrc: 'tiger.webp', label: 'Tiger' },
+  { id: 3, imgSrc: 'bear.png', label: 'Bear' },
+  { id: 4, imgSrc: 'monkey.png', label: 'Monkey' },
+  { id: 5, imgSrc: 'gorilla.png', label: 'Gorilla' },
+  { id: 6, imgSrc: 'eagle.png', label: 'Eagle' },
+  { id: 7, imgSrc: 'cat.png', label: 'Cat' },
+  { id: 8, imgSrc: 'dog.png', label: 'Dog' }
+]
+
+// Function to select an avatar
+function selectAvatar(button) {
+  currentUser.value = button.label
+  currentUserAvatar.value = button.imgSrc
 }
 
 function launchRoom() {
@@ -131,6 +175,45 @@ label {
   height: 40px;
 }
 
+.avatar-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  justify-items: center;
+  margin-top: 10px;
+}
+
+.avatar-button {
+  border: 2px solid transparent;
+  border-radius: 12px;
+  padding: 10px;
+  cursor: pointer;
+  text-align: center;
+  width: 100px;
+  transition: border-color 0.3s, transform 0.2s;
+}
+
+.avatar-button img {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  margin-bottom: 5px;
+}
+
+.avatar-button p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.avatar-button:hover {
+  transform: scale(1.05);
+}
+
+.avatar-button.selected {
+  border-color: #007bff;
+  background-color: #f0f8ff;
+}
+
 select,
 input[type='number'] {
   width: 100%;
@@ -155,6 +238,7 @@ input:focus {
   color: white;
   border: none;
   border-radius: 12px;
+  text-decoration: none;
   cursor: pointer;
   box-shadow: 0 5px 15px rgba(0, 123, 255, 0.2);
   transition: background-color 0.3s, transform 0.1s;
