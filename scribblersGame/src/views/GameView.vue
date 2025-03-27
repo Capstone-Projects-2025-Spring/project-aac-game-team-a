@@ -86,6 +86,11 @@ export default {
             // Listen for broadcasted timer update from server
             this.socketInstance.on("timer-update", (serverTime) => {
                 this.roundTimer = serverTime;
+                /*
+                if (serverTime == 0){
+                    HANDLE END OF ROUND LOGIC HERE
+                }
+                */
             });
         },
       
