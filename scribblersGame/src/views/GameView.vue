@@ -1,6 +1,5 @@
 <script>
-// Import the socket.io-client library to enable WebSocket communication
-import io from "socket.io-client";
+import io from "socket.io-client"; // Import the socket.io-client library to enable WebSocket communication
 import AacBoard from '../components/aacBoard.vue'; //import AACBoard component
 import DrawingBoard from '../components/DrawingBoard.vue'; // import Drawing board component
 
@@ -12,14 +11,15 @@ export default {
     data() {
         return {
             currentUser: this.$route.query.user || "", // Stores the username entered by the user
-            currentUserAvatar:  this.$route.query.avatar || "", // Stores the username entered by the user
+            currentUserAvatar: this.$route.query.avatar || "", // Stores the username entered by the user
             text: "", // Stores the message typed by the user
             messages: [], // Array to store all received messages
             isDrawer: false, //track if user is the drawer
             promptWord: "", //store the random drawing prompt word
             context: CanvasRenderingContext2D, // stores drawing context for drawing broadcasted data
             roundLength: 10, // how many seconds each round will last
-            roundTimer: 0,  //  tracks counter state
+            roundTimer: 0,  // tracks counter state
+            roomCode: this.$route.query.roomCode, // stores room code for game as array of numbers
             AACButtons: [// Buttons for game AAC board with associated images and labels
                 {id: 1, imgSrc: 'lion.png', label: 'Lion'},
                 {id: 2, imgSrc: 'tiger.webp', label: 'Tiger'},
@@ -150,6 +150,7 @@ export default {
     // Automatically connect to the WebSocket server when the component is mounted
     mounted(){
         this.serverConnect();
+        console.log("Room Code:", this.roomCode);
     },
     name: "GameView",
 };
@@ -166,8 +167,7 @@ export default {
 
             <!-- Display Drawing board -->
             <div class="drawing-box">
-                <!-- handles emit statements in DrawingBoard.vue -->
-                <DrawingBoard 
+                <DrawingBoard
                     @startDrawData="sendDrawDataInit" 
                     @addDrawData="sendDrawData" 
                     @endDrawData="sendDrawDataEnd"
