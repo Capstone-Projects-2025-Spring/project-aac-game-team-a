@@ -41,7 +41,10 @@ function getRandomWord() {
 
 // Event listener for new socket connections
 io.on('connection', (socket) => {
-    console.log(`User ${socket.id} is connected`); // Logs when a new user connects
+    socket.on('join-room', (code)  => {
+        socket.join(code);
+        console.log(`User ${socket.id} is connected to room ${code}`); // Logs when a new user connects
+    })
     playerCount++;
 
     //add player to the queue
@@ -79,7 +82,7 @@ io.on('connection', (socket) => {
     });
 
     // Listener for 'message' events from the client
-    socket.on('message', (data) => {
+    socket.on('message', (data, room) => {
         //console.log('message received:', data); 
 
         //process guesses made by non drawing players
@@ -95,7 +98,7 @@ io.on('connection', (socket) => {
                 data.text = 'Guessed Correctly!';
 
                 
-                socket.emit('message:received', data); // Broadcasts received messages to all other clients, including player who guesesd correct
+                io.in(room).emit('message:received', data); // Broadcasts received messages to all other clients, including player who guesesd correct
                 correctGuesses++;
 
                 //check if all guessers ahve guessed correctly
@@ -123,7 +126,7 @@ io.on('connection', (socket) => {
                 }
 
             }
-            socket.broadcast.emit('message:received', data); // Broadcasts received messages to all other clients
+            socket.to(room).emit('message:received', data); // Broadcasts received messages to all other clients
         }
     });
     

@@ -34,6 +34,8 @@ export default {
             this.socketInstance = io("http://localhost:3001"); // CHANGE THIS WHEN YOU WANT THE SERVER TO BE PUBLIC
             // this.socketInstance = io("http://[YOUR IP HERE]:3000");
 
+            this.socketInstance.emit('join-room', this.roomCode.join(''));
+
             // Listen for incoming messages from the server and update messages array
             this.socketInstance.on("message:received", (data) => {
                 this.messages = this.messages.concat(data); // Append received message to messages array
@@ -107,7 +109,7 @@ export default {
           this.messages = this.messages.concat(message);
           
           // Send the message to the server via WebSocket
-          this.socketInstance.emit('message', message);
+          this.socketInstance.emit('message', message, this.roomCode.join(''));
         },
         
         //Function that handles a word selection on the AAC board 
