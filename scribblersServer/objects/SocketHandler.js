@@ -11,11 +11,12 @@ class SocketHandler{
      * 
      * @param {IO} io deals with 
      * @param {Socket} socket Handles the object
+     * @param {GameSessions} gameSessions Acts as the database for the game
      */
-    constructor(io, socket){
+    constructor(io, socket, gameSessions){
         this.io = io
         this.socket = socket
-        this.gameSession = {} // Holds all of the games being played (key: sessionID)
+        this.gameSession = gameSessions // Holds all of the games being played (key: sessionID)
     }
     
     // Function to select a random word from the list
@@ -59,10 +60,13 @@ class SocketHandler{
 
                 // Generating game session data
                 let gameSessionData = new GameSessionClass(
-                    randomInteger, [currentDrawerID], numbRounds, numbPlayers, null, currentPrompt, currentDrawerID, numbPlayers
+                    randomInteger, [currentDrawerID], numbRounds, 0, null, currentPrompt, currentDrawerID, numbPlayers
                 )
-                this.gameSession[gameSessionData.sessionID] = gameSessionData
-                console.log("gamesession data: " + this.gameSession[gameSessionData.sessionID].toString())
+                console.log("sessionID type: "+ typeof gameSessionData.sessionID)
+                this.gameSession.saveSession(gameSessionData)
+                console.log("gamesession data: " + this.gameSession.retrieveSession(gameSessionData.sessionID).toString())
+                console.log("sessions: " + JSON.stringify(this.gameSession))
+
 
                 this.socket.join(randomInteger)
                 this.io.to(randomInteger).emit('drawer', {"message": gameSessionData.toJson()});
@@ -93,12 +97,14 @@ class SocketHandler{
                 console.log('Received JSON data:', data);
                 const roomId = data.sessionID
                 console.log('room id: ' + roomId)
+                console.log("sessionID type: ", typeof roomId)
 
                 this.socket.join(roomId)
-                console.log(this.gameSession)
-                const gameData = this.gameSession[roomId];
+                // console.log(this.gameSession)
+                const gameData = this.gameSession.retrieveSession(roomId);
                 console.log("game data: " + gameData.toString())
                 gameData.players.push(this.socket.id)
+
                 this.io.to(roomId).emit("message", {"message": gameData.toJson()});
             } catch (error){
                 console.log("User could not join game session");
@@ -171,11 +177,35 @@ class SocketHandler{
      * @throws An error if the round was unable to start
      */
     onRoundStart(){
-        try {
+        this.socket.on("on_round_start", (data) => {
+            try{
+                // const jsonData = JSON.parse(data);
+                console.log('Received JSON data: '+ JSON.stringify(data));
+                const roomId = data.sessionID
+                console.log('room id: ' + roomId)
+                console.log("sessionID type: "+ typeof roomId)
 
-        } catch (err){
-            console.log("Round was unable to start");
-        }
+                // console.log(this.gameSession)
+                const gameData = this.gameSession.retrieveSession(roomId);
+                console.log("Game data: " + gameData.toString())
+
+                let currentPrompt = this.getRandomWord();
+                console.log("current prompt: " + currentPrompt)
+
+                let drawer = gameData.players.pop()
+
+                const startGameResult = gameData.startRound(currentPrompt, drawer)
+                if(!startGameResult){
+                    this.io.to(roomId).emit("message", {"error": 'Game over'});
+                }
+
+                gameData.players.push(drawer)
+                this.io.to(roomId).emit("message", {"message": gameData.toJson()});
+            } catch (error){
+                console.log("User was not able to go to next round");
+                console.error(error)
+            }
+        });
     }
 
     /**
@@ -212,7 +242,7 @@ class SocketHandler{
                     "sender": this.socket.id
                 }
 
-                this.io.to(roomId).emit("broad_cast_to_room", JSON.stringify({"message":returnData}));
+                this.io.to(roomId).emit("broad_cast_to_room", JSON.stringify({"message": returnData}));
                 console.log(this.socket.id + " sent " + returnData + " to " + roomId +" room")
             } catch (err){
                 console.log("Data was unable to be broadcast to the game session");

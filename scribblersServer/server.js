@@ -8,6 +8,7 @@ const server = http.createServer(app); // Creating an HTTP server using Express
 
 const GameSessionClass = require("./objects/GameSessionClass")
 const SocketHandlerClass = require("./objects/SocketHandler")
+const GameSessionsDBClass = require("./Database/GameSessions.js")
 
 
 // Initializing a new Socket.io server instance and configuring CORS
@@ -26,7 +27,9 @@ let correctGuesses = 0; //tracks how many have guessed correctly in a round
 let playersQueue = []; //queue of players by socket ID
 const maxCycles = 10; //number of cycles (how many times each player draws)
 let currentCycle = 0; //tracks cycle number
-let gamesessions = {};
+// console.log("games session type: " + typeof GameSessionsDBClass)
+let gamesessions = {}
+const GameSessionDB = new GameSessionsDBClass()
 
 //drawing prompt word list
 const wordsList = [
@@ -60,10 +63,11 @@ io.on('connection', (socket) => {
         console.log(`FIRST DRAWER: User ${socket.id} is the drawer with word: ${currentPrompt}`);
 
     }*/
-    const SocketHandler = new SocketHandlerClass(io, socket)
+    const SocketHandler = new SocketHandlerClass(io, socket, GameSessionDB)
     SocketHandler.createGame()
     SocketHandler.onPlayerJoin()
-    
+    SocketHandler.onRoundStart()
+
     if(currentDrawerIndex === 0 && !currentDrawerID) {
         // Generating game code 
         const randomNumbers = Array.from({ length: 4 }, () => Math.floor(Math.random() * 9));

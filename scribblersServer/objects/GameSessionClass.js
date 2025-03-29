@@ -5,7 +5,7 @@ class GameSession{
     /**
      * Creates an instance of an GameSession to track data about the current game session
      * 
-     * @param {string} sessionID The unique ID of the current game session
+     * @param {Number} sessionID The unique ID of the current game session
      * @param {Array} players The array of player objects linked to the game session
      * @param {number} numberRounds The amount of rounds for this game
      * @param {number} roundsCompleted The counter of number of rounds completed in the current game session
@@ -57,11 +57,22 @@ class GameSession{
      * 
      * @throws An error if it cannot start a new round in an existing game session
      */
-    startRound(){
+    startRound(newPrompt, drawer){
         try {
+            this.prompt = newPrompt
+            this.drawer = drawer
+            this.roundsCompleted = this.roundsCompleted + 1
 
+            if(this.roundsCompleted > this.numberRounds){
+                console.log("End of a the game")
+                return false
+            }
+
+            console.log("start of a new round")
+            return true
         } catch (err){
             console.log("Could not start new round");
+            console.error(err)
         }
     }
 
