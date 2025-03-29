@@ -29,6 +29,9 @@ const maxCycles = 10; //number of cycles (how many times each player draws)
 let currentCycle = 0; //tracks cycle number
 // console.log("games session type: " + typeof GameSessionsDBClass)
 const GameSessionDB = new GameSessionsDBClass()
+let timerInterval = null;
+let timerLength = 0;
+
 
 //drawing prompt word list
 const wordsList = [
@@ -42,6 +45,7 @@ function getRandomWord() {
     const randomIndex = Math.floor(Math.random() * wordsList.length);
     return wordsList[randomIndex];
 }
+
 
 // Event listener for new socket connections
 io.on('connection', (socket) => {
@@ -170,6 +174,23 @@ io.on('connection', (socket) => {
     socket.on("draw-undo", () => {
         socket.broadcast.emit("cast-draw-undo", previousState);
     });
+
+    //  Listener for timer
+    socket.on("timer-start", (length) => {
+        if (timerLength != 0) return;
+        timerInterval = setInterval(updateTimer, 1000);
+        timerLength = length;
+    });
+
+    //  Handles timer functionality
+    function updateTimer(){
+        io.emit("timer-update", timerLength);
+        
+        if (timerLength == 0)
+            clearInterval(timerInterval);
+        else
+            timerLength--;
+    }
     
     // Listener for socket disconnection
     socket.on('disconnect', () => {

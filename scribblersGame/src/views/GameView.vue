@@ -17,7 +17,9 @@ export default {
             messages: [], // Array to store all received messages
             isDrawer: false, //track if user is the drawer
             promptWord: "", //store the random drawing prompt word
-            ctx: CanvasRenderingContext2D,
+            context: CanvasRenderingContext2D, // stores drawing context for drawing broadcasted data
+            roundLength: 10, // how many seconds each round will last
+            roundTimer: 0,  //  tracks counter state
             AACButtons: [// Buttons for game AAC board with associated images and labels
                 {id: 1, imgSrc: 'lion.png', label: 'Lion'},
                 {id: 2, imgSrc: 'tiger.webp', label: 'Tiger'},
@@ -52,33 +54,43 @@ export default {
 
             // Listen for broadcasted initial drawing data
             this.socketInstance.on("cast-draw-init", (x, y, draw_color, draw_width) => {
-                this.ctx = document.getElementById("canvas").getContext("2d");
-                this.ctx.strokeStyle = draw_color;
-                this.ctx.lineWidth = draw_width;
-                this.ctx.beginPath();
-                this.ctx.moveTo(x, y);
+                this.context = document.getElementById("canvas").getContext("2d");
+                this.context.strokeStyle = draw_color;
+                this.context.lineWidth = draw_width;
+                this.context.beginPath();
+                this.context.moveTo(x, y);
             });
 
             // Listen for broadcasted drawing data
             this.socketInstance.on("cast-draw", (x, y) => {
-                this.ctx.lineTo(x, y);
-                this.ctx.stroke();
+                this.context.lineTo(x, y);
+                this.context.stroke();
             });
 
             // Listen for broadcasted final drawing data
             this.socketInstance.on("cast-draw-end", () => {
-                this.ctx.closePath();
+                this.context.closePath();
             });
 
             // Listen for broadcasted clear canvas
             this.socketInstance.on("cast-draw-clear", () => {
-                this.ctx.fillStyle = "white";
-                this.ctx.clearRect(0, 0, document.getElementById("canvas").width, document.getElementById("canvas").height);
+                this.context.fillStyle = "white";
+                this.context.clearRect(0, 0, document.getElementById("canvas").width, document.getElementById("canvas").height);
             });
 
             // Listen for broadcasted undo canvas
             this.socketInstance.on("cast-draw-undo", (previousState) => {
-                this.ctx.putImageData(previousState, 0, 0);
+                this.context.putImageData(previousState, 0, 0);
+            });
+
+            // Listen for broadcasted timer update from server
+            this.socketInstance.on("timer-update", (serverTime) => {
+                this.roundTimer = serverTime;
+                /*
+                if (serverTime == 0){
+                    HANDLE END OF ROUND LOGIC HERE
+                }
+                */
             });
         },
       
@@ -128,6 +140,11 @@ export default {
         //  Handles sending request to clear undo canvas
         sendDrawDataUndo(previousState) {
             this.socketInstance.emit('draw-undo', previousState);
+        },
+
+        //  Send request to start server timer
+        sendTimerStart(length){
+            this.socketInstance.emit('timer-start', length);
         }
     },
     // Automatically connect to the WebSocket server when the component is mounted
@@ -167,6 +184,10 @@ export default {
 
         <div class="right-container">
             <div class="chat-container">
+                <!--  Remove after testing timer -->
+                <h2>Timer: {{ roundTimer }}</h2>
+                <button type="test" class="test" @click="sendTimerStart(roundLength)">test</button>
+                
                 <!-- Loop through messages array and display each message -->
                 <div v-for="message in messages" :key="message.id">
                     <img :src="message.avatar" :alt="message.user" class="game-avatar-image"/>
