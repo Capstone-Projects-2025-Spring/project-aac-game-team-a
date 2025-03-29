@@ -27,15 +27,45 @@ let timerLength = 0;
 
 //drawing prompt word list
 const wordsList = [
-    'eat', 'jump', 'run', 'sleep', 'bird', 'cat', 'dog', 'elephant', 
-    'horse', 'mouse', 'glasses', 'glove', 'hat', 'pants', 'shirt', 
-    'shoe', 'apple', 'banana', 'carrot', 'grapes', 'pizza', 'spaghetti'
+    'eat', 'jump', 'run', 'sleep',
+    'bird', 'cat', 'dog', 'elephant', 'horse', 'mouse',
+    'glasses', 'glove', 'hat', 'pants', 'shirt', 'shoe', 
+    'apple', 'banana', 'carrot', 'grapes', 'pizza', 'spaghetti'
 ];
+
+// drawing prompt with word and filepath to image
+const promptList = [
+    {word: 'Eat', path: 'aacSymbols/Actions/eat.png'},
+    {word: 'Jump', path: 'aacSymbols/Actions/jump.png'},
+    {word: 'Run', path: 'aacSymbols/Actions/run.png'},
+    {word: 'Sleep', path: 'aacSymbols/Actions/sleep.png'},
+
+    {word: 'Bird', path: 'aacSymbols/Animals/bird.png'},
+    {word: 'Cat', path: 'aacSymbols/Animals/cat.png'},
+    {word: 'Dog', path: 'aacSymbols/Animals/dog.png'},
+    {word: 'Elephant', path: 'aacSymbols/Animals/elephant.png'},
+    {word: 'Horse', path: 'aacSymbols/Animals/horse.png'},
+    {word: 'Mouse', path: 'aacSymbols/Animals/mouse.png'},
+
+    {word: 'Glasses', path: 'aacSymbols/Clothing/glasses.png'},
+    {word: 'Glove', path: 'aacSymbols/Clothing/glove.png'},
+    {word: 'Hat', path: 'aacSymbols/Clothing/hat.png'},
+    {word: 'Pants', path: 'aacSymbols/Clothing/pants.png'},
+    {word: 'Shirt', path: 'aacSymbols/Clothing/shirt.png'},
+    {word: 'Shoe', path: 'aacSymbols/Clothing/shoe.png'},
+
+    {word: 'Apple', path: 'aacSymbols/Food/apple.png'},
+    {word: 'Banana', path: 'aacSymbols/Food/banana.png'},
+    {word: 'Carrot', path: 'aacSymbols/Food/carrot.png'},
+    {word: 'Grapes', path: 'aacSymbols/Food/grapes.png'},
+    {word: 'Pizza', path: 'aacSymbols/Food/pizza.png'},
+    {word: 'Spaghetti', path: 'aacSymbols/Food/spaghetti.png'},
+]
 
 // Function to select a random word from the list
 function getRandomWord() {
-    const randomIndex = Math.floor(Math.random() * wordsList.length);
-    return wordsList[randomIndex];
+    const randomIndex = Math.floor(Math.random() * promptList.length);
+    return promptList[randomIndex];
 }
 
 
@@ -62,8 +92,12 @@ io.on('connection', (socket) => {
     if(currentDrawerIndex === 0 && !currentDrawerID) {
         currentDrawerID = socket.id; //assigns first user to join's ID to currentDrawerID
         currentPrompt = getRandomWord();
-        io.to(playersQueue[currentDrawerIndex]).emit('you-are-drawer', {word: currentPrompt});
-        console.log(`(1)User ${socket.id} is the drawer with word: ${currentPrompt}`);
+        io.to(playersQueue[currentDrawerIndex]).emit('you-are-drawer', 
+            {
+                word: currentPrompt.word, 
+                path: currentPrompt.path
+            });
+        console.log(`(1)User ${socket.id} is the drawer with word: ${currentPrompt.word}`);
     }
 
     socket.on("draw_data", (data) => {
