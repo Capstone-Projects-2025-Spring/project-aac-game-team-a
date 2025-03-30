@@ -131,24 +131,24 @@ io.on('connection', (socket) => {
     });
     
     //  Listeners for handling drawing data
-    socket.on("draw-init", (x, y, draw_color, draw_width, context) => {
-        socket.broadcast.emit("cast-draw-init", x, y, draw_color, draw_width, context);
+    socket.on("draw-init", (room, x, y, draw_color, draw_width, context) => {
+        socket.to(room).emit("cast-draw-init", x, y, draw_color, draw_width, context);
     });
 
-    socket.on("draw", (x, y) => {
-        socket.broadcast.emit("cast-draw", x, y);
+    socket.on("draw", (room, x, y) => {
+        socket.to(room).emit("cast-draw", x, y);
     });
 
-    socket.on("draw-end", () => {
-        socket.broadcast.emit("cast-draw-end");
+    socket.on("draw-end", (room) => {
+        socket.to(room).emit("cast-draw-end");
     });
 
-    socket.on("draw-clear", () => {
-        socket.broadcast.emit("cast-draw-clear");
+    socket.on("draw-clear", (room) => {
+        socket.to(room).emit("cast-draw-clear");
     });
 
-    socket.on("draw-undo", () => {
-        socket.broadcast.emit("cast-draw-undo", previousState);
+    socket.on("draw-undo", (room) => {
+        socket.to(room).emit("cast-draw-undo");
     });
 
     //  Listener for timer
