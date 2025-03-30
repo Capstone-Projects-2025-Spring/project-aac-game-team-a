@@ -6,6 +6,11 @@ const { Server } = require('socket.io'); // Importing the Server class from sock
 const app = express(); // Initializing an Express application
 const server = http.createServer(app); // Creating an HTTP server using Express
 
+const GameSessionClass = require("./objects/GameSessionClass")
+const SocketHandlerClass = require("./objects/SocketHandler")
+const GameSessionsDBClass = require("./Database/GameSessions.js")
+
+
 // Initializing a new Socket.io server instance and configuring CORS
 const io = new Server(server, {
     cors: {
@@ -22,8 +27,11 @@ let correctGuesses = 0; //tracks how many have guessed correctly in a round
 let playersQueue = []; //queue of players by socket ID
 const maxCycles = 10; //number of cycles (how many times each player draws)
 let currentCycle = 0; //tracks cycle number
+// console.log("games session type: " + typeof GameSessionsDBClass)
+const GameSessionDB = new GameSessionsDBClass()
 let timerInterval = null;
 let timerLength = 0;
+
 
 //drawing prompt word list
 const wordsList = [
@@ -58,13 +66,32 @@ io.on('connection', (socket) => {
         console.log(`FIRST DRAWER: User ${socket.id} is the drawer with word: ${currentPrompt}`);
 
     }*/
+    const SocketHandler = new SocketHandlerClass(io, socket, GameSessionDB)
+    SocketHandler.createGame()
+    SocketHandler.onPlayerJoin()
+    SocketHandler.onRoundStart()
 
-    if(currentDrawerIndex === 0 && !currentDrawerID) {
-        currentDrawerID = socket.id; //assigns first user to join's ID to currentDrawerID
-        currentPrompt = getRandomWord();
-        io.to(playersQueue[currentDrawerIndex]).emit('you-are-drawer', {word: currentPrompt});
-        console.log(`(1)User ${socket.id} is the drawer with word: ${currentPrompt}`);
-    }
+    // if(currentDrawerIndex === 0 && !currentDrawerID) {
+    //     // Generating game code 
+    //     const randomNumbers = Array.from({ length: 4 }, () => Math.floor(Math.random() * 9));
+    //     const randomInteger = parseInt(randomNumbers.join(""), 10);
+    //     console.log(randomInteger);
+
+    //     // grab number of players
+    //     let numbPlayers = 4
+    //     // grab number of rounds
+    //     let numbRounds = 3
+    //     // grab the a player
+    //     currentDrawerID = socket.id; //assigns first user to join's ID to currentDrawerID
+    //     // Generating game session data
+    //     let gameSessionData = new GameSessionClass(randomInteger,[currentDrawerID], numbRounds, numbPlayers, null)
+    //     gamesessions[gameSessionData.sessionID] = gameSessionData
+
+    //     currentPrompt = getRandomWord();
+    //     io.to(playersQueue[currentDrawerIndex]).emit('you-are-drawer', {word: currentPrompt});
+    //     console.log(`(1)User ${socket.id} is the drawer with word: ${currentPrompt}`);
+    //     console.log("games session data: " + gamesessions[gameSessionData.sessionID].toString())
+    // }
 
     socket.on("draw_data", (data) => {
         console.log("draw_data log")
