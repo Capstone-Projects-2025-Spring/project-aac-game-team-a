@@ -1,6 +1,7 @@
 const exp = require('constants'); // Importing constants module (not needed in this case)
 const express = require('express'); // Importing Express.js to create the server
 const http = require('http'); // Importing HTTP module to create an HTTP server
+const { runMain } = require('module');
 const { Server } = require('socket.io'); // Importing the Server class from socket.io
 
 const app = express(); // Initializing an Express application
@@ -27,23 +28,74 @@ let correctGuesses = 0; //tracks how many have guessed correctly in a round
 let playersQueue = []; //queue of players by socket ID
 const maxCycles = 10; //number of cycles (how many times each player draws)
 let currentCycle = 0; //tracks cycle number
+let imagesPerPrompt = 3; // represents the amount of images to choose from per prompt
+
 const activeTimers = new Map();
 const GameSessionDB = new GameSessionsDBClass()
 
 
 //drawing prompt word list
 const wordsList = [
-    'eat', 'jump', 'run', 'sleep', 'bird', 'cat', 'dog', 'elephant', 
-    'horse', 'mouse', 'glasses', 'glove', 'hat', 'pants', 'shirt', 
-    'shoe', 'apple', 'banana', 'carrot', 'grapes', 'pizza', 'spaghetti'
+    'eat', 'jump', 'run', 'sleep',
+    'bird', 'cat', 'dog', 'elephant', 'horse', 'mouse',
+    'glasses', 'glove', 'hat', 'pants', 'shirt', 'shoe', 
+    'apple', 'banana', 'carrot', 'grapes', 'pizza', 'spaghetti'
 ];
 
+// drawing prompt objects
+const promptList = [
+    {word: 'Eat', type: 'Actions'},
+    {word: 'Jump', type: 'Actions'},
+    {word: 'Run', type: 'Actions'},
+    {word: 'Sleep', type: 'Actions'},
+
+    {word: 'Bird', type: 'Animals'},
+    {word: 'Cat', type: 'Animals'},
+    {word: 'Dog', type: 'Animals'},
+    {word: 'Elephant', type: 'Animals'},
+    {word: 'Horse', type: 'Animals'},
+    {word: 'Mouse', type: 'Animals'},
+
+    {word: 'Glasses', type: 'Clothing'},
+    {word: 'Gloves', type: 'Clothing'},
+    {word: 'Hat', type: 'Clothing'},
+    {word: 'Pants', type: 'Clothing'},
+    {word: 'Shirt', type: 'Clothing'},
+    {word: 'Shoe', type: 'Clothing'},
+
+    {word: 'Apple', type: 'Food'},
+    {word: 'Banana', type: 'Food'},
+    {word: 'Carrot', type: 'Food'},
+    {word: 'Grapes', type: 'Food'},
+    {word: 'Pizza', type: 'Food'},
+    {word: 'Spaghetti', type: 'Food'}
+]
+
 // Function to select a random word from the list
-function getRandomWord() {
-    const randomIndex = Math.floor(Math.random() * wordsList.length);
-    return wordsList[randomIndex];
+function getPromptObject() {
+    const randomIndex = Math.floor(Math.random() * promptList.length); // get index for random prompt object
+    const promptObject = promptList[randomIndex]; // get random prompt object
+
+    return promptObject;
 }
 
+// Function to form the path to the image
+function getPath(promptObject){
+    // Get random number to append for the image associated for the prompt 
+    let randomImgNumber = Math.floor(Math.random() * imagesPerPrompt) + 1;
+
+    // Ensure the image name is in all lowercase and append the number 
+    // Images follow this format: "1image.png", "2image.png", ...
+    lowerCaseWord = randomImgNumber + promptObject.word.toLowerCase();
+
+    // Assemble the path
+    path = 'promptImages/' + promptObject.type + '/' + promptObject.word + '/' + lowerCaseWord + '.png';
+
+    // for testing
+    console.log(path);
+
+    return path;
+}
 
 // Event listener for new socket connections
 io.on('connection', (socket) => {
@@ -60,13 +112,19 @@ io.on('connection', (socket) => {
     //assign drawer if there isn't one
     if (!currentDrawerID){
         currentDrawerID = socket.id; //makes this user the drawer
-        currentPrompt = getRandomWord(); // Get a random word for the drawer
+        let currentPromptObject = getPromptObject(); //get a random prompt object
+        let pathToImage = getPath(currentPromptObject); //form the path to the image based on the prompt
 
         // Send "you-are-drawer" and  randomly selected word to the new drawer
-        socket.emit('you-are-drawer', { word: currentPrompt });
+        socket.emit('you-are-drawer', 
+             {
+                word: currentPromptObject.word, 
+                path: pathToImage
+             });
         console.log(`FIRST DRAWER: User ${socket.id} is the drawer with word: ${currentPrompt}`);
 
     }*/
+  
     const SocketHandler = new SocketHandlerClass(io, socket, GameSessionDB)
     SocketHandler.createGame()
     SocketHandler.onPlayerJoin()
@@ -93,6 +151,7 @@ io.on('connection', (socket) => {
     //     console.log(`(1)User ${socket.id} is the drawer with word: ${currentPrompt}`);
     //     console.log("games session data: " + gamesessions[gameSessionData.sessionID].toString())
     // }
+
 
     socket.on("draw_data", (data) => {
         console.log("draw_data log")
