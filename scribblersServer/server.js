@@ -22,8 +22,7 @@ let correctGuesses = 0; //tracks how many have guessed correctly in a round
 let playersQueue = []; //queue of players by socket ID
 const maxCycles = 10; //number of cycles (how many times each player draws)
 let currentCycle = 0; //tracks cycle number
-let timerInterval = null;
-let timerLength = 0;
+const activeTimers = new Map();
 
 //drawing prompt word list
 const wordsList = [
@@ -152,23 +151,26 @@ io.on('connection', (socket) => {
     });
 
     //  Listener for timer
-    socket.on("timer-start", (length) => {
-        if (timerLength != 0) return;
-        timerInterval = setInterval(updateTimer, 1000);
-        timerLength = length;
+    socket.on("timer-start", (room, length) => {
+        const gameTimer = {
+            timerID: setInterval(updateTimer, 1000, room), 
+            timerValue: length};
+        activeTimers.set(room, gameTimer);
     });
 
     //  Handles timer functionality
-    function updateTimer(){
-        io.emit("timer-update", timerLength);
+    function updateTimer(room){
+        io.in(room).emit("timer-update", activeTimers.get(room).timerValue);
         
-        if (timerLength == 0)
-            clearInterval(timerInterval);
+        if (activeTimers.get(room).timerValue == 0) {
+            clearInterval(activeTimers.get(room).timerID);
+            activeTimers.delete(room);
+        }
         else
-            timerLength--;
+            activeTimers.get(room).timerValue--;
     }
     
-    // Listener for socket disconnection
+    // Listener for socket disconnections
     socket.on('disconnect', () => {
         console.log(`(2)User ${socket.id} disconnected`); // Logs when a user disconnects
 

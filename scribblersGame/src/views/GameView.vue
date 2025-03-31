@@ -147,7 +147,8 @@ export default {
 
         //  Send request to start server timer
         sendTimerStart(length){
-            this.socketInstance.emit('timer-start', length);
+            if (this.roundTimer != 0) return;
+            this.socketInstance.emit('timer-start', this.roomCodeStr, length);
         }
     },
     // Automatically connect to the WebSocket server when the component is mounted
