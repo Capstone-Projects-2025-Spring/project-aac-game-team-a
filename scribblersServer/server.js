@@ -27,10 +27,8 @@ let correctGuesses = 0; //tracks how many have guessed correctly in a round
 let playersQueue = []; //queue of players by socket ID
 const maxCycles = 10; //number of cycles (how many times each player draws)
 let currentCycle = 0; //tracks cycle number
-// console.log("games session type: " + typeof GameSessionsDBClass)
+const activeTimers = new Map();
 const GameSessionDB = new GameSessionsDBClass()
-let timerInterval = null;
-let timerLength = 0;
 
 
 //drawing prompt word list
@@ -49,7 +47,10 @@ function getRandomWord() {
 
 // Event listener for new socket connections
 io.on('connection', (socket) => {
-    console.log(`User ${socket.id} is connected`); // Logs when a new user connects
+    socket.on('join-room', (code)  => {
+        socket.join(code);
+        console.log(`User ${socket.id} is connected to room ${code}`); // Logs when a new user connects
+    })
     playerCount++;
 
     //add player to the queue
@@ -106,7 +107,7 @@ io.on('connection', (socket) => {
     });
 
     // Listener for 'message' events from the client
-    socket.on('message', (data) => {
+    socket.on('message', (data, room) => {
         //console.log('message received:', data); 
 
         //process guesses made by non drawing players
@@ -122,7 +123,7 @@ io.on('connection', (socket) => {
                 data.text = 'Guessed Correctly!';
 
                 
-                socket.emit('message:received', data); // Broadcasts received messages to all other clients, including player who guesesd correct
+                io.in(room).emit('message:received', data); // Broadcasts received messages to all other clients, including player who guesesd correct
                 correctGuesses++;
 
                 //check if all guessers ahve guessed correctly
@@ -150,49 +151,52 @@ io.on('connection', (socket) => {
                 }
 
             }
-            socket.broadcast.emit('message:received', data); // Broadcasts received messages to all other clients
+            socket.to(room).emit('message:received', data); // Broadcasts received messages to all other clients
         }
     });
     
     //  Listeners for handling drawing data
-    socket.on("draw-init", (x, y, draw_color, draw_width, context) => {
-        socket.broadcast.emit("cast-draw-init", x, y, draw_color, draw_width, context);
+    socket.on("draw-init", (room, x, y, draw_color, draw_width, context) => {
+        socket.to(room).emit("cast-draw-init", x, y, draw_color, draw_width, context);
     });
 
-    socket.on("draw", (x, y) => {
-        socket.broadcast.emit("cast-draw", x, y);
+    socket.on("draw", (room, x, y) => {
+        socket.to(room).emit("cast-draw", x, y);
     });
 
-    socket.on("draw-end", () => {
-        socket.broadcast.emit("cast-draw-end");
+    socket.on("draw-end", (room) => {
+        socket.to(room).emit("cast-draw-end");
     });
 
-    socket.on("draw-clear", () => {
-        socket.broadcast.emit("cast-draw-clear");
+    socket.on("draw-clear", (room) => {
+        socket.to(room).emit("cast-draw-clear");
     });
 
-    socket.on("draw-undo", () => {
-        socket.broadcast.emit("cast-draw-undo", previousState);
+    socket.on("draw-undo", (room) => {
+        socket.to(room).emit("cast-draw-undo");
     });
 
     //  Listener for timer
-    socket.on("timer-start", (length) => {
-        if (timerLength != 0) return;
-        timerInterval = setInterval(updateTimer, 1000);
-        timerLength = length;
+    socket.on("timer-start", (room, length) => {
+        const gameTimer = {
+            timerID: setInterval(updateTimer, 1000, room), 
+            timerValue: length};
+        activeTimers.set(room, gameTimer);
     });
 
     //  Handles timer functionality
-    function updateTimer(){
-        io.emit("timer-update", timerLength);
+    function updateTimer(room){
+        io.in(room).emit("timer-update", activeTimers.get(room).timerValue);
         
-        if (timerLength == 0)
-            clearInterval(timerInterval);
+        if (activeTimers.get(room).timerValue == 0) {
+            clearInterval(activeTimers.get(room).timerID);
+            activeTimers.delete(room);
+        }
         else
-            timerLength--;
+            activeTimers.get(room).timerValue--;
     }
     
-    // Listener for socket disconnection
+    // Listener for socket disconnections
     socket.on('disconnect', () => {
         console.log(`(2)User ${socket.id} disconnected`); // Logs when a user disconnects
 

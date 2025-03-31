@@ -1,6 +1,5 @@
 <script>
-// Import the socket.io-client library to enable WebSocket communication
-import io from "socket.io-client";
+import io from "socket.io-client"; // Import the socket.io-client library to enable WebSocket communication
 import AacBoard from '../components/aacBoard.vue'; //import AACBoard component
 import DrawingBoard from '../components/DrawingBoard.vue'; // import Drawing board component
 
@@ -12,14 +11,16 @@ export default {
     data() {
         return {
             currentUser: this.$route.query.user || "", // Stores the username entered by the user
-            currentUserAvatar:  this.$route.query.avatar || "", // Stores the username entered by the user
+            currentUserAvatar: this.$route.query.avatar || "", // Stores the username entered by the user
             text: "", // Stores the message typed by the user
             messages: [], // Array to store all received messages
             isDrawer: false, //track if user is the drawer
             promptWord: "", //store the random drawing prompt word
             context: CanvasRenderingContext2D, // stores drawing context for drawing broadcasted data
             roundLength: 10, // how many seconds each round will last
-            roundTimer: 0,  //  tracks counter state
+            roundTimer: 0,  // tracks counter state
+            roomCodeArr: this.$route.query.roomCode, // stores room code for game as array of numbers
+            roomCodeStr: this.$route.query.roomCode.join(''), // stores room code for game as string of numbers
             AACButtons: [// Buttons for game AAC board with associated images and labels
                 {id: 1, imgSrc: 'lion.png', label: 'Lion'},
                 {id: 2, imgSrc: 'tiger.webp', label: 'Tiger'},
@@ -33,6 +34,8 @@ export default {
             // Establish connection to the WebSocket server
             this.socketInstance = io("http://localhost:3001"); // CHANGE THIS WHEN YOU WANT THE SERVER TO BE PUBLIC
             // this.socketInstance = io("http://[YOUR IP HERE]:3000");
+
+            this.socketInstance.emit('join-room', this.roomCodeStr);
 
             // Listen for incoming messages from the server and update messages array
             this.socketInstance.on("message:received", (data) => {
@@ -107,7 +110,7 @@ export default {
           this.messages = this.messages.concat(message);
           
           // Send the message to the server via WebSocket
-          this.socketInstance.emit('message', message);
+          this.socketInstance.emit('message', message, this.roomCodeStr);
         },
         
         //Function that handles a word selection on the AAC board 
@@ -119,32 +122,33 @@ export default {
 
         //  Handles sending initial drawing data to observer canvases (on mouse click)
         sendDrawDataInit(x, y, draw_color, draw_width) {
-            this.socketInstance.emit('draw-init', x, y, draw_color, draw_width);
+            this.socketInstance.emit('draw-init', this.roomCodeStr, x, y, draw_color, draw_width);
         },
 
         //  Handles sending drawing data to observer canvases (on mouse move)
         sendDrawData(x, y) {
-            this.socketInstance.emit('draw', x, y);
+            this.socketInstance.emit('draw', this.roomCodeStr, x, y);
         },
 
         //  Handles sending final drawing data to observer canvases (on mouse up)
         sendDrawDataEnd() {
-            this.socketInstance.emit('draw-end');
+            this.socketInstance.emit('draw-end', this.roomCodeStr);
         },
 
         //  Handles sending request to clear canvas
         sendDrawDataClear() {
-            this.socketInstance.emit('draw-clear');
+            this.socketInstance.emit('draw-clear', this.roomCodeStr);
         },
 
         //  Handles sending request to clear undo canvas
-        sendDrawDataUndo(previousState) {
-            this.socketInstance.emit('draw-undo', previousState);
+        sendDrawDataUndo() {
+            this.socketInstance.emit('draw-undo', this.roomCodeStr);
         },
 
         //  Send request to start server timer
         sendTimerStart(length){
-            this.socketInstance.emit('timer-start', length);
+            if (this.roundTimer != 0) return;
+            this.socketInstance.emit('timer-start', this.roomCodeStr, length);
         }
     },
     // Automatically connect to the WebSocket server when the component is mounted
@@ -166,8 +170,7 @@ export default {
 
             <!-- Display Drawing board -->
             <div class="drawing-box">
-                <!-- handles emit statements in DrawingBoard.vue -->
-                <DrawingBoard 
+                <DrawingBoard
                     @startDrawData="sendDrawDataInit" 
                     @addDrawData="sendDrawData" 
                     @endDrawData="sendDrawDataEnd"

@@ -54,7 +54,7 @@
     <RouterLink 
     :to="{
         path: '/game', // Navigates to the game route
-        query: { user: currentUser, avatar: currentUserAvatar} // Passes selected user data as query params
+        query: { user: currentUser, avatar: currentUserAvatar, roomCode: roomCodeArr} // Passes selected user data as query params
     }"
     class="join-btn" 
     @click="joinLobby">
@@ -87,6 +87,8 @@ function selectShape(shape) {
   if (index !== -1) {
     selectedShapes.value[index] = shape.imgSrc
   }
+  roomCodeArr.value = selectedShapes.value
+    .map((shapeImg) => shapes.find((s) => s.imgSrc === shapeImg)?.value || '')
 }
 
 // Function to undo the last selected shape
@@ -105,6 +107,7 @@ function clearShapes() {
 // Reactive state for user information
 const currentUser = ref('')
 const currentUserAvatar = ref('')
+const roomCodeArr = ref('')
 
 // List of available avatars
 const avatarButtons = [
@@ -130,10 +133,7 @@ function joinLobby() {
     alert('Please select all 4 shapes and an avatar.')
     return
   }
-  const roomCode = selectedShapes.value
-    .map((shapeImg) => shapes.find((s) => s.imgSrc === shapeImg)?.value || '')
-    .join('')
-  alert(`Joining room ${roomCode} as ${currentUser.value}`)
+  alert(`Joining room ${roomCodeArr.value.join('')} as ${currentUser.value}`)
 }
 </script>
 
