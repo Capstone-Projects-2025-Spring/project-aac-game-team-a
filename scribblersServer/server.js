@@ -1,6 +1,7 @@
 const exp = require('constants'); // Importing constants module (not needed in this case)
 const express = require('express'); // Importing Express.js to create the server
 const http = require('http'); // Importing HTTP module to create an HTTP server
+const { runMain } = require('module');
 const { Server } = require('socket.io'); // Importing the Server class from socket.io
 
 const app = express(); // Initializing an Express application
@@ -24,6 +25,7 @@ const maxCycles = 10; //number of cycles (how many times each player draws)
 let currentCycle = 0; //tracks cycle number
 let timerInterval = null;
 let timerLength = 0;
+let imagesPerPrompt = 3; // represents the amount of images to choose from per prompt
 
 //drawing prompt word list
 const wordsList = [
@@ -33,41 +35,60 @@ const wordsList = [
     'apple', 'banana', 'carrot', 'grapes', 'pizza', 'spaghetti'
 ];
 
-// drawing prompt with word and filepath to image
+// drawing prompt objects
 const promptList = [
-    {word: 'Eat', path: 'aacSymbols/Actions/eat.png'},
-    {word: 'Jump', path: 'aacSymbols/Actions/jump.png'},
-    {word: 'Run', path: 'aacSymbols/Actions/run.png'},
-    {word: 'Sleep', path: 'aacSymbols/Actions/sleep.png'},
+    {word: 'Eat', type: 'Actions'},
+    {word: 'Jump', type: 'Actions'},
+    {word: 'Run', type: 'Actions'},
+    {word: 'Sleep', type: 'Actions'},
 
-    {word: 'Bird', path: 'aacSymbols/Animals/bird.png'},
-    {word: 'Cat', path: 'aacSymbols/Animals/cat.png'},
-    {word: 'Dog', path: 'aacSymbols/Animals/dog.png'},
-    {word: 'Elephant', path: 'aacSymbols/Animals/elephant.png'},
-    {word: 'Horse', path: 'aacSymbols/Animals/horse.png'},
-    {word: 'Mouse', path: 'aacSymbols/Animals/mouse.png'},
+    {word: 'Bird', type: 'Animals'},
+    {word: 'Cat', type: 'Animals'},
+    {word: 'Dog', type: 'Animals'},
+    {word: 'Elephant', type: 'Animals'},
+    {word: 'Horse', type: 'Animals'},
+    {word: 'Mouse', type: 'Animals'},
 
-    {word: 'Glasses', path: 'aacSymbols/Clothing/glasses.png'},
-    {word: 'Glove', path: 'aacSymbols/Clothing/glove.png'},
-    {word: 'Hat', path: 'aacSymbols/Clothing/hat.png'},
-    {word: 'Pants', path: 'aacSymbols/Clothing/pants.png'},
-    {word: 'Shirt', path: 'aacSymbols/Clothing/shirt.png'},
-    {word: 'Shoe', path: 'aacSymbols/Clothing/shoe.png'},
+    {word: 'Glasses', type: 'Clothing'},
+    {word: 'Gloves', type: 'Clothing'},
+    {word: 'Hat', type: 'Clothing'},
+    {word: 'Pants', type: 'Clothing'},
+    {word: 'Shirt', type: 'Clothing'},
+    {word: 'Shoe', type: 'Clothing'},
 
-    {word: 'Apple', path: 'aacSymbols/Food/apple.png'},
-    {word: 'Banana', path: 'aacSymbols/Food/banana.png'},
-    {word: 'Carrot', path: 'aacSymbols/Food/carrot.png'},
-    {word: 'Grapes', path: 'aacSymbols/Food/grapes.png'},
-    {word: 'Pizza', path: 'aacSymbols/Food/pizza.png'},
-    {word: 'Spaghetti', path: 'aacSymbols/Food/spaghetti.png'},
+    {word: 'Apple', type: 'Food'},
+    {word: 'Banana', type: 'Food'},
+    {word: 'Carrot', type: 'Food'},
+    {word: 'Grapes', type: 'Food'},
+    {word: 'Pizza', type: 'Food'},
+    {word: 'Spaghetti', type: 'Food'}
 ]
 
 // Function to select a random word from the list
-function getRandomWord() {
-    const randomIndex = Math.floor(Math.random() * promptList.length);
-    return promptList[randomIndex];
+function getPromptObject() {
+    const randomIndex = Math.floor(Math.random() * promptList.length); // get index for random prompt object
+    const promptObject = promptList[randomIndex]; // get random prompt object
+
+    return promptObject;
 }
 
+// Function to form the path to the image
+function getPath(promptObject){
+    // Get random number to append for the image associated for the prompt 
+    let randomImgNumber = Math.floor(Math.random() * imagesPerPrompt) + 1;
+
+    // Ensure the image name is in all lowercase and append the number 
+    // Images follow this format: "1image.png", "2image.png", ...
+    lowerCaseWord = randomImgNumber + promptObject.word.toLowerCase();
+
+    // Assemble the path
+    path = 'promptImages/' + promptObject.type + '/' + promptObject.word + '/' + lowerCaseWord + '.png';
+
+    // for testing
+    console.log(path);
+
+    return path;
+}
 
 // Event listener for new socket connections
 io.on('connection', (socket) => {
@@ -91,13 +112,16 @@ io.on('connection', (socket) => {
 
     if(currentDrawerIndex === 0 && !currentDrawerID) {
         currentDrawerID = socket.id; //assigns first user to join's ID to currentDrawerID
-        currentPrompt = getRandomWord();
+        let currentPromptObject = getPromptObject(); //get a random prompt object
+        let pathToImage = getPath(currentPromptObject); //form the path to the image based on the prompt
+
+        // send the prompt info
         io.to(playersQueue[currentDrawerIndex]).emit('you-are-drawer', 
             {
-                word: currentPrompt.word, 
-                path: currentPrompt.path
+                word: currentPromptObject.word, 
+                path: pathToImage
             });
-        console.log(`(1)User ${socket.id} is the drawer with word: ${currentPrompt.word}`);
+        console.log(`(1)User ${socket.id} is the drawer with word: ${currentPromptObject.word}, using image ${pathToImage}`);
     }
 
     socket.on("draw_data", (data) => {
