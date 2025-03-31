@@ -7,6 +7,11 @@ const { Server } = require('socket.io'); // Importing the Server class from sock
 const app = express(); // Initializing an Express application
 const server = http.createServer(app); // Creating an HTTP server using Express
 
+const GameSessionClass = require("./objects/GameSessionClass")
+const SocketHandlerClass = require("./objects/SocketHandler")
+const GameSessionsDBClass = require("./Database/GameSessions.js")
+
+
 // Initializing a new Socket.io server instance and configuring CORS
 const io = new Server(server, {
     cors: {
@@ -23,9 +28,11 @@ let correctGuesses = 0; //tracks how many have guessed correctly in a round
 let playersQueue = []; //queue of players by socket ID
 const maxCycles = 10; //number of cycles (how many times each player draws)
 let currentCycle = 0; //tracks cycle number
-let timerInterval = null;
-let timerLength = 0;
 let imagesPerPrompt = 3; // represents the amount of images to choose from per prompt
+
+const activeTimers = new Map();
+const GameSessionDB = new GameSessionsDBClass()
+
 
 //drawing prompt word list
 const wordsList = [
@@ -92,7 +99,10 @@ function getPath(promptObject){
 
 // Event listener for new socket connections
 io.on('connection', (socket) => {
-    console.log(`User ${socket.id} is connected`); // Logs when a new user connects
+    socket.on('join-room', (code)  => {
+        socket.join(code);
+        console.log(`User ${socket.id} is connected to room ${code}`); // Logs when a new user connects
+    })
     playerCount++;
 
     //add player to the queue
@@ -102,27 +112,46 @@ io.on('connection', (socket) => {
     //assign drawer if there isn't one
     if (!currentDrawerID){
         currentDrawerID = socket.id; //makes this user the drawer
-        currentPrompt = getRandomWord(); // Get a random word for the drawer
-
-        // Send "you-are-drawer" and  randomly selected word to the new drawer
-        socket.emit('you-are-drawer', { word: currentPrompt });
-        console.log(`FIRST DRAWER: User ${socket.id} is the drawer with word: ${currentPrompt}`);
-
-    }*/
-
-    if(currentDrawerIndex === 0 && !currentDrawerID) {
-        currentDrawerID = socket.id; //assigns first user to join's ID to currentDrawerID
         let currentPromptObject = getPromptObject(); //get a random prompt object
         let pathToImage = getPath(currentPromptObject); //form the path to the image based on the prompt
 
-        // send the prompt info
-        io.to(playersQueue[currentDrawerIndex]).emit('you-are-drawer', 
-            {
+        // Send "you-are-drawer" and  randomly selected word to the new drawer
+        socket.emit('you-are-drawer', 
+             {
                 word: currentPromptObject.word, 
                 path: pathToImage
-            });
-        console.log(`(1)User ${socket.id} is the drawer with word: ${currentPromptObject.word}, using image ${pathToImage}`);
-    }
+             });
+        console.log(`FIRST DRAWER: User ${socket.id} is the drawer with word: ${currentPrompt}`);
+
+    }*/
+  
+    const SocketHandler = new SocketHandlerClass(io, socket, GameSessionDB)
+    SocketHandler.createGame()
+    SocketHandler.onPlayerJoin()
+    SocketHandler.onRoundStart()
+
+    // if(currentDrawerIndex === 0 && !currentDrawerID) {
+    //     // Generating game code 
+    //     const randomNumbers = Array.from({ length: 4 }, () => Math.floor(Math.random() * 9));
+    //     const randomInteger = parseInt(randomNumbers.join(""), 10);
+    //     console.log(randomInteger);
+
+    //     // grab number of players
+    //     let numbPlayers = 4
+    //     // grab number of rounds
+    //     let numbRounds = 3
+    //     // grab the a player
+    //     currentDrawerID = socket.id; //assigns first user to join's ID to currentDrawerID
+    //     // Generating game session data
+    //     let gameSessionData = new GameSessionClass(randomInteger,[currentDrawerID], numbRounds, numbPlayers, null)
+    //     gamesessions[gameSessionData.sessionID] = gameSessionData
+
+    //     currentPrompt = getRandomWord();
+    //     io.to(playersQueue[currentDrawerIndex]).emit('you-are-drawer', {word: currentPrompt});
+    //     console.log(`(1)User ${socket.id} is the drawer with word: ${currentPrompt}`);
+    //     console.log("games session data: " + gamesessions[gameSessionData.sessionID].toString())
+    // }
+
 
     socket.on("draw_data", (data) => {
         console.log("draw_data log")
@@ -137,7 +166,7 @@ io.on('connection', (socket) => {
     });
 
     // Listener for 'message' events from the client
-    socket.on('message', (data) => {
+    socket.on('message', (data, room) => {
         //console.log('message received:', data); 
 
         //process guesses made by non drawing players
@@ -153,7 +182,7 @@ io.on('connection', (socket) => {
                 data.text = 'Guessed Correctly!';
 
                 
-                socket.emit('message:received', data); // Broadcasts received messages to all other clients, including player who guesesd correct
+                io.in(room).emit('message:received', data); // Broadcasts received messages to all other clients, including player who guesesd correct
                 correctGuesses++;
 
                 //check if all guessers ahve guessed correctly
@@ -181,49 +210,52 @@ io.on('connection', (socket) => {
                 }
 
             }
-            socket.broadcast.emit('message:received', data); // Broadcasts received messages to all other clients
+            socket.to(room).emit('message:received', data); // Broadcasts received messages to all other clients
         }
     });
     
     //  Listeners for handling drawing data
-    socket.on("draw-init", (x, y, draw_color, draw_width, context) => {
-        socket.broadcast.emit("cast-draw-init", x, y, draw_color, draw_width, context);
+    socket.on("draw-init", (room, x, y, draw_color, draw_width, context) => {
+        socket.to(room).emit("cast-draw-init", x, y, draw_color, draw_width, context);
     });
 
-    socket.on("draw", (x, y) => {
-        socket.broadcast.emit("cast-draw", x, y);
+    socket.on("draw", (room, x, y) => {
+        socket.to(room).emit("cast-draw", x, y);
     });
 
-    socket.on("draw-end", () => {
-        socket.broadcast.emit("cast-draw-end");
+    socket.on("draw-end", (room) => {
+        socket.to(room).emit("cast-draw-end");
     });
 
-    socket.on("draw-clear", () => {
-        socket.broadcast.emit("cast-draw-clear");
+    socket.on("draw-clear", (room) => {
+        socket.to(room).emit("cast-draw-clear");
     });
 
-    socket.on("draw-undo", () => {
-        socket.broadcast.emit("cast-draw-undo", previousState);
+    socket.on("draw-undo", (room) => {
+        socket.to(room).emit("cast-draw-undo");
     });
 
     //  Listener for timer
-    socket.on("timer-start", (length) => {
-        if (timerLength != 0) return;
-        timerInterval = setInterval(updateTimer, 1000);
-        timerLength = length;
+    socket.on("timer-start", (room, length) => {
+        const gameTimer = {
+            timerID: setInterval(updateTimer, 1000, room), 
+            timerValue: length};
+        activeTimers.set(room, gameTimer);
     });
 
     //  Handles timer functionality
-    function updateTimer(){
-        io.emit("timer-update", timerLength);
+    function updateTimer(room){
+        io.in(room).emit("timer-update", activeTimers.get(room).timerValue);
         
-        if (timerLength == 0)
-            clearInterval(timerInterval);
+        if (activeTimers.get(room).timerValue == 0) {
+            clearInterval(activeTimers.get(room).timerID);
+            activeTimers.delete(room);
+        }
         else
-            timerLength--;
+            activeTimers.get(room).timerValue--;
     }
     
-    // Listener for socket disconnection
+    // Listener for socket disconnections
     socket.on('disconnect', () => {
         console.log(`(2)User ${socket.id} disconnected`); // Logs when a user disconnects
 

@@ -48,7 +48,7 @@
     <RouterLink 
     :to="{
         path: '/game', // Navigates to the game route
-        query: { user: currentUser, avatar: currentUserAvatar} // Passes selected user data as query params
+        query: { user: currentUser, avatar: currentUserAvatar, roomCode: randomCodeDigits} // Passes selected user data as query params
     }"
     class="launch-btn" 
     @click="launchRoom">
