@@ -16,6 +16,7 @@ export default {
             messages: [], // Array to store all received messages
             isDrawer: false, //track if user is the drawer
             promptWord: "", //store the random drawing prompt word
+            promptImgPath: "", // store the path to the image to be referenced for prompt
             context: CanvasRenderingContext2D, // stores drawing context for drawing broadcasted data
             roundLength: 10, // how many seconds each round will last
             roundTimer: 0,  // tracks counter state
@@ -47,6 +48,7 @@ export default {
                 console.log('you are the drawer now');
                 this.isDrawer = true;
                 this.promptWord = data.word;
+                this.promptImgPath = data.path;
             });
 
             //Listen for 'you-are-guesser' message when drawing is done
@@ -166,6 +168,7 @@ export default {
             <!--Display drawing prompt for drawer-->
             <div v-if="isDrawer" class="draw-prompt">
                 <h2>DRAW: {{ promptWord }}</h2>
+                <img class='prompt-image' :src=promptImgPath :alt=promptWord >
             </div>
 
             <!-- Display Drawing board -->
@@ -226,11 +229,21 @@ export default {
 
   .draw-prompt {
     background-color: #ffcc00; /* Light yellow background */
-      padding: 10px;
-      text-align: center;
-      font-size: 24px;
-      font-weight: bold;
-      margin-bottom: 20px; /* Space between prompt and drawing area */
+    border-radius: 25px;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px; /* Space between prompt and drawing area */
+  }
+
+  .prompt-image {
+    height: auto; 
+    width: auto; 
+    max-width: 100px; 
+    max-height: 100px;
   }
 
   .drawing-box {
