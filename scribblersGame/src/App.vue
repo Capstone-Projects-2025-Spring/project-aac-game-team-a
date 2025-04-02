@@ -5,13 +5,16 @@ import LandingPage from './components/LandingPage.vue'
 
 <template>
   <header>
-
-    <div class="wrapper">
-      <LandingPage msg="Scribblers!" />
+    <LandingPage msg="Scribblers!" />
+    <!-- <div class="wrapper">
+      <body class="body">
+        
+      </body>
+      
       <nav>
-        <!-- <RouterLink to="/">Home</RouterLink> -->
+        <RouterLink to="/">Home</RouterLink>
       </nav>
-    </div>
+    </div> -->
   </header>
 
   <RouterView />

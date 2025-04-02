@@ -2,6 +2,7 @@
 
 <template>
   <div class="greetings">
+    <!-- <img class="icon" src="/scribblersIcon.png" alt="scribblersIcon"> -->
     <RouterLink to="/" class="title-button">Scribblers!</RouterLink>
   </div>
 </template>
@@ -10,12 +11,8 @@
 
 .title-button {
   font-weight: 500;
-  /* font-size: 2.6rem; */
   position: relative;
-  /* top: 75px;
-  left: 100px; */
   text-decoration: none;
-  margin-bottom: 0px; /* Adds some space between the title and choose string */
   font-size: 50px;
   font-weight: bold;
   font-family: 'Segoe UI', sans-serif;
@@ -29,8 +26,18 @@
 
 .greetings{
   margin: auto;
-  width: 50%;
   padding: 10px;
+  background-color: white;
+  border-radius: 25px;
+  border-style: solid;
+  border-color: #000;
+  border-width: 7px;
+}
+
+.icon {
+  position: relative;
+  width:50px; /* you can use % */
+  height: auto;
 }
 
 </style>

@@ -27,23 +27,74 @@ let correctGuesses = 0; //tracks how many have guessed correctly in a round
 let playersQueue = []; //queue of players by socket ID
 const maxCycles = 10; //number of cycles (how many times each player draws)
 let currentCycle = 0; //tracks cycle number
+let imagesPerPrompt = 3; // represents the amount of images to choose from per prompt
+
 const activeTimers = new Map();
 const GameSessionDB = new GameSessionsDBClass()
 
 
 //drawing prompt word list
+// NOT BEING USED
 const wordsList = [
     'eat', 'jump', 'run', 'sleep', 'bird', 'cat', 'dog', 'elephant', 
     'horse', 'mouse', 'glasses', 'glove', 'hat', 'pants', 'shirt', 
     'shoe', 'apple', 'banana', 'carrot', 'grapes', 'pizza', 'spaghetti'
 ];
 
+// drawing prompt objects
+const promptList = [
+    {word: 'Eat', type: 'Actions'},
+    {word: 'Jump', type: 'Actions'},
+    {word: 'Run', type: 'Actions'},
+    {word: 'Sleep', type: 'Actions'},
+
+    {word: 'Bird', type: 'Animals'},
+    {word: 'Cat', type: 'Animals'},
+    {word: 'Dog', type: 'Animals'},
+    {word: 'Elephant', type: 'Animals'},
+    {word: 'Horse', type: 'Animals'},
+    {word: 'Mouse', type: 'Animals'},
+
+    {word: 'Glasses', type: 'Clothing'},
+    {word: 'Gloves', type: 'Clothing'},
+    {word: 'Hat', type: 'Clothing'},
+    {word: 'Pants', type: 'Clothing'},
+    {word: 'Shirt', type: 'Clothing'},
+    {word: 'Shoe', type: 'Clothing'},
+
+    {word: 'Apple', type: 'Food'},
+    {word: 'Banana', type: 'Food'},
+    {word: 'Carrot', type: 'Food'},
+    {word: 'Grapes', type: 'Food'},
+    {word: 'Pizza', type: 'Food'},
+    {word: 'Spaghetti', type: 'Food'}
+]
+
 // Function to select a random word from the list
-function getRandomWord() {
-    const randomIndex = Math.floor(Math.random() * wordsList.length);
-    return wordsList[randomIndex];
+function getPromptObject() {
+    const randomIndex = Math.floor(Math.random() * promptList.length); // get index for random prompt object
+    const promptObject = promptList[randomIndex]; // get random prompt object
+
+    return promptObject;
 }
 
+// Function to form the path to the image
+function getPath(promptObject){
+    // Get random number to append for the image associated for the prompt 
+    let randomImgNumber = Math.floor(Math.random() * imagesPerPrompt) + 1;
+
+    // Ensure the image name is in all lowercase and append the number 
+    // Images follow this format: "1image.png", "2image.png", ...
+    lowerCaseWord = randomImgNumber + promptObject.word.toLowerCase();
+
+    // Assemble the path
+    path = 'promptImages/' + promptObject.type + '/' + promptObject.word + '/' + lowerCaseWord + '.png';
+
+    // for testing
+    console.log(path);
+
+    return path;
+}
 
 // Event listener for new socket connections
 io.on('connection', (socket) => {
@@ -72,27 +123,32 @@ io.on('connection', (socket) => {
     SocketHandler.onPlayerJoin()
     SocketHandler.onRoundStart()
 
-    // if(currentDrawerIndex === 0 && !currentDrawerID) {
-    //     // Generating game code 
-    //     const randomNumbers = Array.from({ length: 4 }, () => Math.floor(Math.random() * 9));
-    //     const randomInteger = parseInt(randomNumbers.join(""), 10);
-    //     console.log(randomInteger);
+    if(currentDrawerIndex === 0 && !currentDrawerID) {
+        // Generating game code 
+        const randomNumbers = Array.from({ length: 4 }, () => Math.floor(Math.random() * 9));
+        const randomInteger = parseInt(randomNumbers.join(""), 10);
+        console.log(randomInteger);
 
-    //     // grab number of players
-    //     let numbPlayers = 4
-    //     // grab number of rounds
-    //     let numbRounds = 3
-    //     // grab the a player
-    //     currentDrawerID = socket.id; //assigns first user to join's ID to currentDrawerID
-    //     // Generating game session data
-    //     let gameSessionData = new GameSessionClass(randomInteger,[currentDrawerID], numbRounds, numbPlayers, null)
-    //     gamesessions[gameSessionData.sessionID] = gameSessionData
+        // // grab number of players
+        // let numbPlayers = 4
+        // // grab number of rounds
+        // let numbRounds = 3
+        // // grab the a player
+        // currentDrawerID = socket.id; //assigns first user to join's ID to currentDrawerID
+        // // Generating game session data
+        // let gameSessionData = new GameSessionClass(randomInteger,[currentDrawerID], numbRounds, numbPlayers, null)
+        // gamesessions[gameSessionData.sessionID] = gameSessionData
 
-    //     currentPrompt = getRandomWord();
-    //     io.to(playersQueue[currentDrawerIndex]).emit('you-are-drawer', {word: currentPrompt});
-    //     console.log(`(1)User ${socket.id} is the drawer with word: ${currentPrompt}`);
-    //     console.log("games session data: " + gamesessions[gameSessionData.sessionID].toString())
-    // }
+        let currentPromptObject = getPromptObject();
+        let currentPromptImgPath = getPath(currentPromptObject);
+        io.to(playersQueue[currentDrawerIndex]).emit('you-are-drawer', 
+            {
+                word: currentPromptObject.word,
+                path: currentPromptImgPath
+            });
+        console.log(`(1)User ${socket.id} is the drawer with word: ${currentPromptObject.word} with path ${currentPromptImgPath}`);
+        // console.log("games session data: " + gamesessions[gameSessionData.sessionID].toString())
+    }
 
     socket.on("draw_data", (data) => {
         console.log("draw_data log")
