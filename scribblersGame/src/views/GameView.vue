@@ -237,9 +237,11 @@ export default {
     font-size: 24px;
     font-weight: bold;
     margin-bottom: 20px; /* Space between prompt and drawing area */
+    gap: 20px; /* Space between flex items */
   }
 
   .prompt-image {
+    border-radius: 25px;
     height: auto; 
     width: auto; 
     max-width: 100px; 
