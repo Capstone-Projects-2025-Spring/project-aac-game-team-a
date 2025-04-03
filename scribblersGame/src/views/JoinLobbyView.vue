@@ -144,6 +144,9 @@ function joinLobby() {
   padding: 40px;
   background-color: #fff;
   border-radius: 20px;
+  border-style: solid;
+  border-color: black;
+  border-width: 3px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
   text-align: center;
   font-family: 'Segoe UI', sans-serif;

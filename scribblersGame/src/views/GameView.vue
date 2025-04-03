@@ -173,7 +173,8 @@ export default {
 
             <!-- Display Drawing board -->
             <div class="drawing-box">
-                <DrawingBoard
+                <DrawingBoard 
+                    class="drawing-board"
                     @startDrawData="sendDrawDataInit" 
                     @addDrawData="sendDrawData" 
                     @endDrawData="sendDrawDataEnd"
@@ -206,92 +207,103 @@ export default {
 
 <style>
 @media (min-width: 1024px) {
-  .game {
-    min-height: 100vh;
-    /* display: flex; */
-    align-items: center;
-  }
+    .game {
+        min-height: 100vh;
+        /* display: flex; */
+        align-items: center;
+    }
 
-  .game-container{
-    display: flex;
-    flex-direction: row;
-    justify-content: space-evenly; /* Space between left and right containers */
-    height: 90vh; /* Full height of the viewport */
-  }
+    .game-container{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-evenly; /* Space between left and right containers */
+        height: 90vh; /* Full height of the viewport */
+    }
 
-  .left-container {
-      width: 80%; /* Takes 80% of the page width */
-      height: 100vh; /* Takes full height of the page */
-      display: flex;
-      flex-direction: column; /* Stack the boxes vertically */
-      justify-content: flex-start;
-  }
+    .left-container {
+        width: 80%; /* Takes 80% of the page width */
+        height: 100vh; /* Takes full height of the page */
+        display: flex;
+        flex-direction: column; /* Stack the boxes vertically */
+        justify-content: flex-start;
+    }
 
-  .draw-prompt {
-    background-color: #ffcc00; /* Light yellow background */
-    border-radius: 25px;
-    margin: auto;
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 20px; /* Space between prompt and drawing area */
-    gap: 20px; /* Space between flex items */
-  }
+    .draw-prompt {
+        background-color: #ffcc00; /* Light yellow background */
+        border-radius: 25px;
+        margin: auto;
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px; /* Space between prompt and drawing area */
+        gap: 20px; /* Space between flex items */
+    }
 
-  .prompt-image {
-    border-radius: 25px;
-    height: auto; 
-    width: auto; 
-    max-width: 100px; 
-    max-height: 100px;
-  }
+    .prompt-image {
+        border-radius: 25px;
+        height: auto; 
+        width: auto; 
+        max-width: 100px; 
+        max-height: 100px;
+    }
 
-  .drawing-box {
-      width: 100%;
-      height: 65%; /* Takes 60% of the page height */
-      border: 5px solid brown; /* Border for the drawing area */
-      background-color: #f0f0f0; /* Light background for the drawing box */
-      margin-bottom: 20px; /* Space between the drawing box and the button box */
-  }
+    .drawing-box {
+        height: 60vh;
+        border-radius: 25px;
 
-  .aac-board-box {
-      width: 100%;
-      height: 25%; /* Takes 20% of the page height */
-      border: 5px solid blue; /* Border for the button area */
-      background-color: #e0e0e0; /* Light background for the button box */
-  }
+        background-image: url("whiteBoard.jpg");
+        background-position: center;
+        background-size: 100% 100%;
 
-  .aac-buttons{
-      margin: 10px; /* Adds space between buttons */
-      background: white;
-      border: 1px bold black;
-      padding: 10px;
-      cursor: pointer;
-  }
+        display: flex;
+        align-items: center;
+        background-color: transparent; /* Light background for the drawing box */
+    }
+    
+    .drawing-board {
+        position: relative;
+        bottom: 6px;
+        left: 25px;
+    }
 
-  .right-container{
-      height: 100vh; /* Takes full height of the page */
-      display: flex;
-      justify-content: flex-end; /* Aligns the chat to the right */
-  }
+    .aac-board-box {
+        width: 100%;
+        height: 25%; /* Takes 20% of the page height */
+        border: 5px solid blue; /* Border for the button area */
+        background-color: #e0e0e0; /* Light background for the button box */
+    }
 
-  .chat-container {            
-      height: 94.5%;             /* Takes up the full height of the viewport */
-      position: relative;        /* Ensures the text input stays at the bottom */
-      overflow-y: auto;          /* Enables scrolling if messages exceed height */
-      background-color: #c9c6c6; /* Optional background color */
-      box-sizing: border-box;    /* Ensures padding is included in width/height */
-      border: 5px solid black;
-      resize: none;
-      width: 150px;
-  }
+    .aac-buttons{
+        margin: 10px; /* Adds space between buttons */
+        background: white;
+        border: 1px bold black;
+        padding: 10px;
+        cursor: pointer;
+    }
 
-  .game-avatar-image {
-      width: 30px; /* Adjust the image size */
-      height: 30px;
-  }
+    .right-container{
+        height: 100vh; /* Takes full height of the page */
+        display: flex;
+        justify-content: flex-end; /* Aligns the chat to the right */
+    }
+
+    .chat-container {            
+        height: 94.5%;             /* Takes up the full height of the viewport */
+        position: relative;        /* Ensures the text input stays at the bottom */
+        overflow-y: auto;          /* Enables scrolling if messages exceed height */
+        background-color: #c9c6c6; /* Optional background color */
+        box-sizing: border-box;    /* Ensures padding is included in width/height */
+        border: 5px solid black;
+        resize: none;
+        width: 150px;
+    }
+
+    .game-avatar-image {
+        width: 30px; /* Adjust the image size */
+        height: 30px;
+    }
   
 }
 </style>

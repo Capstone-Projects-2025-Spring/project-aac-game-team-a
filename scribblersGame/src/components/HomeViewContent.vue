@@ -14,10 +14,14 @@
 <style scoped>
 .home-elements {
   max-width: 500px;
-  margin: 80px auto;
+  margin: 200px auto;
+  width: 50%;
   padding: 40px;
   background-color: #fff;
   border-radius: 20px;
+  border-color: black;
+  border-style: solid;
+  border-width: 3px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
   text-align: center;
   font-family: 'Segoe UI', sans-serif;
@@ -73,14 +77,6 @@
 
 .welcome-text {
   position: relative;
-
-}
-
-@media (min-width: 1024px){
-  .lobby-buttons{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
+  font-size: 3rem;
 }
 </style>
