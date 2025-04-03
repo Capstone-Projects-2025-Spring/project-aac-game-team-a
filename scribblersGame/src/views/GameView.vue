@@ -165,6 +165,12 @@ export default {
     <div class="game-container"> 
         <!-- Left side: Drawing canvas and button box -->
         <div class="left-container">
+            <RouterLink 
+            :to="{
+                path: '/', // Navigates to the home route
+            }"
+            class="quit-btn">
+            QUIT</RouterLink>
             <!--Display drawing prompt for drawer-->
             <div v-if="isDrawer" class="draw-prompt">
                 <h2>DRAW: {{ promptWord }}</h2>
@@ -221,11 +227,11 @@ export default {
     }
 
     .left-container {
-        width: 80%; /* Takes 80% of the page width */
         height: 100vh; /* Takes full height of the page */
-        display: flex;
+        /* display: flex; */
         flex-direction: column; /* Stack the boxes vertically */
         justify-content: flex-start;
+        gap: 100px;
     }
 
     .draw-prompt {
@@ -250,6 +256,7 @@ export default {
     }
 
     .drawing-box {
+        width: 100%; 
         height: 60vh;
         border-radius: 25px;
 
@@ -304,6 +311,26 @@ export default {
         width: 30px; /* Adjust the image size */
         height: 30px;
     }
-  
+
+    .quit-btn{
+        padding-bottom: 100px;
+        padding: 12px 20px;
+        font-size: 1.1rem;
+        background-color: #1929a0;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        text-decoration: none;
+        cursor: pointer;
+        box-shadow: 0 5px 15px rgba(0, 123, 255, 0.2);
+        transition: background-color 0.3s, transform 0.1s;
+        font-family: 'Segoe UI', sans-serif;
+        font-weight: bold;
+    }
+
+    .quit-btn:hover {
+        background-color: #111d76;
+        transform: translateY(-2px);
+    }
 }
 </style>

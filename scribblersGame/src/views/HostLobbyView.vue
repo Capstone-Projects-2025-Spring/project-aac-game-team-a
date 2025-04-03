@@ -43,16 +43,21 @@
       </div>
     </div>
 
-    <!-- Launch room button -->
-    <!-- <button class="launch-btn" @click="launchRoom">Launch Room</button> -->
-    <RouterLink 
-    :to="{
-        path: '/game', // Navigates to the game route
-        query: { user: currentUser, avatar: currentUserAvatar, roomCode: randomCodeDigits} // Passes selected user data as query params
-    }"
-    class="launch-btn" 
-    @click="launchRoom">
-        Launch Room</RouterLink>
+    <div class="bottom-buttons">
+      <RouterLink 
+      :to="{
+          path: '/game', // Navigates to the game route
+          query: { user: currentUser, avatar: currentUserAvatar, roomCode: randomCodeDigits} // Passes selected user data as query params
+      }"
+      class="launch-btn" 
+      @click="launchRoom">Launch Room</RouterLink>
+      
+      <RouterLink 
+      :to="{
+          path: '/', // Navigates to the home route
+      }"
+      class="back-btn">Back</RouterLink>
+      </div>
   </div>
 </template>
 
@@ -233,6 +238,11 @@ input:focus {
   outline: none;
 }
 
+.bottom-buttons{
+  display: flex;
+  flex-direction: column;
+}
+
 .launch-btn {
   margin-top: 25px;
   padding: 12px 20px;
@@ -249,6 +259,25 @@ input:focus {
 
 .launch-btn:hover {
   background-color: #1c7c31;
+  transform: translateY(-2px);
+}
+
+.back-btn{
+  margin-top: 25px;
+  padding: 12px 20px;
+  font-size: 1.1rem;
+  background-color: #d01912;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(0, 123, 255, 0.2);
+  transition: background-color 0.3s, transform 0.1s;
+}
+
+.back-btn:hover {
+  background-color: #881915;
   transform: translateY(-2px);
 }
 </style>
