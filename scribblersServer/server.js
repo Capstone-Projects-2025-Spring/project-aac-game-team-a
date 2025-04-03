@@ -21,13 +21,14 @@ const io = new Server(server, {
 
 let currentDrawerID = null; //keeps track of current drawer (by socket ID)
 let currentDrawerIndex = 0; //index in queue of current drawer
-let currentPrompt = null; //keeps track of current prompt
+// let currentPrompt = null; //keeps track of current prompt
 let playerCount = 0; //number of player that have joined
 let correctGuesses = 0; //tracks how many have guessed correctly in a round
 let playersQueue = []; //queue of players by socket ID
 const maxCycles = 10; //number of cycles (how many times each player draws)
 let currentCycle = 0; //tracks cycle number
 let imagesPerPrompt = 3; // represents the amount of images to choose from per prompt
+let currentPromptObject = null;
 
 const activeTimers = new Map();
 const GameSessionDB = new GameSessionsDBClass()
@@ -80,6 +81,9 @@ function getPromptObject() {
 
 // Function to form the path to the image
 function getPath(promptObject){
+    if(promptObject == null){
+        
+    }
     // Get random number to append for the image associated for the prompt 
     let randomImgNumber = Math.floor(Math.random() * imagesPerPrompt) + 1;
 
@@ -111,11 +115,11 @@ io.on('connection', (socket) => {
     //assign drawer if there isn't one
     if (!currentDrawerID){
         currentDrawerID = socket.id; //makes this user the drawer
-        currentPrompt = getRandomWord(); // Get a random word for the drawer
+        currentPromptObject.word = getPromptObject(); // Get a random word for the drawer
 
         // Send "you-are-drawer" and  randomly selected word to the new drawer
-        socket.emit('you-are-drawer', { word: currentPrompt });
-        console.log(`FIRST DRAWER: User ${socket.id} is the drawer with word: ${currentPrompt}`);
+        socket.emit('you-are-drawer', { word: currentPromptObject.word });
+        console.log(`FIRST DRAWER: User ${socket.id} is the drawer with word: ${currentPromptObject.word}`);
 
     }*/
     const SocketHandler = new SocketHandlerClass(io, socket, GameSessionDB)
@@ -139,7 +143,7 @@ io.on('connection', (socket) => {
         // let gameSessionData = new GameSessionClass(randomInteger,[currentDrawerID], numbRounds, numbPlayers, null)
         // gamesessions[gameSessionData.sessionID] = gameSessionData
 
-        let currentPromptObject = getPromptObject();
+        currentPromptObject = getPromptObject();
         let currentPromptImgPath = getPath(currentPromptObject);
         io.to(playersQueue[currentDrawerIndex]).emit('you-are-drawer', 
             {
@@ -169,7 +173,7 @@ io.on('connection', (socket) => {
         //process guesses made by non drawing players
         //console.log(`guess incoming from socket.id: ${socket.id}, currentDrawerID: ${currentDrawerID}`);
         if(socket.id !== currentDrawerID) {
-            if (data.text.toLowerCase() === currentPrompt.toLowerCase()) {
+            if (data.text.toLowerCase() === currentPromptObject.word.toLowerCase()) {
                 console.log(`Player ${socket.id} guessed correctly!`);
 
                 /*
@@ -188,7 +192,7 @@ io.on('connection', (socket) => {
 
                     //next drawer
                     currentDrawerIndex = (currentDrawerIndex + 1) % playersQueue.length;
-                    currentPrompt = getRandomWord();
+                    currentPromptObject.word = getPromptObject();
 
                     //notify the previous drawer that they are guessing
                     const previousDrawerIndex = (currentDrawerIndex - 1 + playersQueue.length) % playersQueue.length;
@@ -198,9 +202,9 @@ io.on('connection', (socket) => {
                 //check if max cycles have been reached
                 if (currentCycle < maxCycles) {
                     currentCycle++;
-                    io.to(playersQueue[currentDrawerIndex]).emit('you-are-drawer', {word: currentPrompt});
+                    io.to(playersQueue[currentDrawerIndex]).emit('you-are-drawer', {word: currentPromptObject.word});
                     currentDrawerID = playersQueue[currentDrawerIndex];
-                    //console.log(`User ${playersQueue[currentDrawerIndex]} is the drawer with word: ${currentPrompt}, and currentDrawerID is: ${currentDrawerID}`);
+                    //console.log(`User ${playersQueue[currentDrawerIndex]} is the drawer with word: ${currentPromptObject.word}, and currentDrawerID is: ${currentDrawerID}`);
                 } else {
                     console.log("End of game.");
                     //TODO: End of game ***
