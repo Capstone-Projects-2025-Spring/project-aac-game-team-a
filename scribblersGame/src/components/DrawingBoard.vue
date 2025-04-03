@@ -177,11 +177,15 @@ function undo_action() {
     }
 
     body {
-        margin: 0;
+        /* margin: inherit; */
+        height: 88%;
+        width: 93%;
         display: flex;
         place-items: top center;
-        min-width: 320px;
-        min-height: 100vh;
+        /* 
+        min-height: 100vh; */
+        border: solid black;
+        border-radius: 25px;
     }
 
     h1 {
@@ -213,10 +217,7 @@ function undo_action() {
     }
 
     #app {
-        max-width: 1280px;
-        margin: 0 auto;
-        padding: 2rem;
-        text-align: center;
+        margin: inherit;
     }
 
     @media (prefers-color-scheme: light) {
@@ -234,9 +235,10 @@ function undo_action() {
 
     /* style for canvas */
     canvas {
-        /*box-shadow: -3px 2px 9px 6px black;*/
-        border: 2px solid #05080b;
-        border-color: #05080b;
+        width: 100%;
+        border: 10px solid #0481ff;
+        border-radius: 25px;
+        border-color: #1676d6;
         cursor: pointer;
         background-color: white;
     }

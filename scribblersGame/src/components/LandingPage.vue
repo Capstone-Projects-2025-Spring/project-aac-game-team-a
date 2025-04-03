@@ -1,11 +1,11 @@
 <!-- Used by App.vue -->
 
-<template>
+<!-- <template>
   <div class="greetings">
-    <!-- <img class="icon" src="/scribblersIcon.png" alt="scribblersIcon"> -->
+    <img class="icon" src="/scribblersIcon.png" alt="scribblersIcon">
     <RouterLink to="/" class="title-button">Scribblers!</RouterLink>
   </div>
-</template>
+</template> -->
 
 <style scoped>
 

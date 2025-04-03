@@ -3,7 +3,5 @@ import HomeContent from '../components/HomeViewContent.vue'
 </script>
 
 <template>
-  <main>
-    <HomeContent />
-  </main>
+  <HomeContent />
 </template>
