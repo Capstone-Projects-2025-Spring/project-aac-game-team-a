@@ -50,15 +50,23 @@
       </div>
     </div>
 
-    <!-- Button to join the lobby with the selected configurations -->
-    <RouterLink 
-    :to="{
-        path: '/game', // Navigates to the game route
-        query: { user: currentUser, avatar: currentUserAvatar, roomCode: roomCodeArr} // Passes selected user data as query params
-    }"
-    class="join-btn" 
-    @click="joinLobby">
-      Join Lobby</RouterLink>
+    <div class="bottom-buttons">
+      <!-- Button to join the lobby with the selected configurations -->
+      <RouterLink 
+      :to="{
+          path: '/game', // Navigates to the game route
+          query: { user: currentUser, avatar: currentUserAvatar, roomCode: roomCodeArr} // Passes selected user data as query params
+      }"
+      class="join-btn" 
+      @click="joinLobby">
+        Join Lobby</RouterLink>
+
+      <RouterLink 
+      :to="{
+          path: '/', // Navigates to the home route
+      }"
+      class="back-btn">Back</RouterLink>
+    </div>
   </div>
 </template>
 
@@ -286,9 +294,15 @@ h1 {
   transform: scale(1.05);
 }
 
+
 .avatar-button.selected {
   border-color: #007bff;
   background-color: #f0f8ff;
+}
+
+.bottom-buttons{
+  display: flex;
+  flex-direction: column;
 }
 
 .join-btn {
@@ -306,6 +320,25 @@ h1 {
 
 .join-btn:hover {
   background-color: #1c7c31;
+  transform: translateY(-2px);
+}
+
+.back-btn{
+  margin-top: 25px;
+  padding: 12px 20px;
+  font-size: 1.1rem;
+  background-color: #d01912;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(0, 123, 255, 0.2);
+  transition: background-color 0.3s, transform 0.1s;
+}
+
+.back-btn:hover {
+  background-color: #881915;
   transform: translateY(-2px);
 }
 </style>
