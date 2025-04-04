@@ -33,7 +33,7 @@ export default {
         // Connect to the server
         serverConnect(){
             // Establish connection to the WebSocket server
-            this.socketInstance = io("http://localhost:3001"); // CHANGE THIS WHEN YOU WANT THE SERVER TO BE PUBLIC
+            this.socketInstance = this.$socket; // CHANGE THIS WHEN YOU WANT THE SERVER TO BE PUBLIC
             // this.socketInstance = io("http://[YOUR IP HERE]:3000");
 
             this.socketInstance.emit('join-room', this.roomCodeStr);
@@ -90,12 +90,11 @@ export default {
 
             // Listen for broadcasted timer update from server
             this.socketInstance.on("timer-update", (serverTime) => {
-                this.roundTimer = serverTime;
-                /*
+                this.roundTimer = serverTime
                 if (serverTime == 0){
-                    HANDLE END OF ROUND LOGIC HERE
+                    this.socketInstance.emit("on_round_start", {sessionID: parseInt(this.roomCodeStr)})
                 }
-                */
+                
             });
         },
       

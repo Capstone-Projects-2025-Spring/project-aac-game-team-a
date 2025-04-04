@@ -71,10 +71,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, inject } from 'vue'
 
 // Reactive state for storing selected shapes
 const selectedShapes = ref([null, null, null, null])
+
+// creates an instance of the socket client
+const socketInstance = inject("socket");
 
 // List of available shapes
 const shapes = [
@@ -141,8 +144,13 @@ function joinLobby() {
     alert('Please select all 4 shapes and an avatar.')
     return
   }
+  socketInstance.emit("join_a_room", {
+    sessionID: parseInt(codeString),
+  })
   alert(`Joining room ${roomCodeArr.value.join('')} as ${currentUser.value}`)
 }
+
+//this.socketInstance.on("")
 </script>
 
 <style scoped>

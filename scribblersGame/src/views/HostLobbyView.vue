@@ -62,7 +62,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, inject } from 'vue'
 
 // Room setup state
 const visibility = ref('public')
@@ -71,6 +71,7 @@ const rounds = ref(3)
 const randomCodeDigits = ref([])
 const currentUser = ref('')
 const currentUserAvatar = ref('')
+const socketInstance = inject("socket");
 
 // Shape mapping
 const shapes = [
@@ -121,6 +122,11 @@ function selectAvatar(button) {
 
 function launchRoom() {
   const codeString = randomCodeDigits.value.join('')
+  socketInstance.emit("create_game", {
+    sessionID: parseInt(codeString),
+    playersNum: maxPlayers.value,
+    roundsNum: rounds.value
+  })
   alert(
     `Hosting room ${codeString} (${visibility.value}) with max ${maxPlayers.value} players and ${rounds.value} rounds`
   )

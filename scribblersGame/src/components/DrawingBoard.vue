@@ -11,6 +11,7 @@ let draw_color = "black";
 let is_drawing = false;
 let draw_width = 1;
 const start_background_color = "white";
+let canDraw = ref(true);
 
 onMounted(() => {
     const canvas = canvasRef.value;
@@ -59,7 +60,7 @@ function saveState() {
 
 //  Start new drawing stroke
 function start(event) {
-    if (!context) return;
+    if (!context || !canDraw.value) return;
 
     const rect = canvasRef.value.getBoundingClientRect();
     const x = event.clientX - rect.left;
@@ -126,6 +127,9 @@ function undo_action() {
     <body>
         <div class="field" >
             <canvas id="canvas" ref="canvasRef"></canvas>
+            <button @click="canDraw = !canDraw">
+                {{ canDraw ? 'Disable' : 'Enable' }} Drawing
+            </button>
             <div class="tools"> 
                 <!--creates buttons for undo and clear-->
                 <button type="Ubutton" class="Ubutton">Undo</button>

@@ -106,10 +106,10 @@ io.on('connection', (socket) => {
         socket.join(code);
         console.log(`User ${socket.id} is connected to room ${code}`); // Logs when a new user connects
     })
-    playerCount++;
+    // playerCount++;
 
     //add player to the queue
-    playersQueue.push(socket.id);
+    // playersQueue.push(socket.id);
 
     /*
     //assign drawer if there isn't one
@@ -123,36 +123,36 @@ io.on('connection', (socket) => {
 
     }*/
     const SocketHandler = new SocketHandlerClass(io, socket, GameSessionDB)
-    SocketHandler.createGame()
-    SocketHandler.onPlayerJoin()
-    SocketHandler.onRoundStart()
+    SocketHandler.createGame() // Creates the game
+    SocketHandler.onPlayerJoin() // Allows each player to join a game
+    SocketHandler.onRoundStart() // Starts a new round
 
-    if(currentDrawerIndex === 0 && !currentDrawerID) {
-        // Generating game code 
-        const randomNumbers = Array.from({ length: 4 }, () => Math.floor(Math.random() * 9));
-        const randomInteger = parseInt(randomNumbers.join(""), 10);
-        console.log(randomInteger);
+    // if(currentDrawerIndex === 0 && !currentDrawerID) {
+    //     // Generating game code 
+    //     const randomNumbers = Array.from({ length: 4 }, () => Math.floor(Math.random() * 9));
+    //     const randomInteger = parseInt(randomNumbers.join(""), 10);
+    //     console.log(randomInteger);
 
-        // // grab number of players
-        // let numbPlayers = 4
-        // // grab number of rounds
-        // let numbRounds = 3
-        // // grab the a player
-        // currentDrawerID = socket.id; //assigns first user to join's ID to currentDrawerID
-        // // Generating game session data
-        // let gameSessionData = new GameSessionClass(randomInteger,[currentDrawerID], numbRounds, numbPlayers, null)
-        // gamesessions[gameSessionData.sessionID] = gameSessionData
+    //     // // grab number of players
+    //     // let numbPlayers = 4
+    //     // // grab number of rounds
+    //     // let numbRounds = 3
+    //     // // grab the a player
+    //     // currentDrawerID = socket.id; //assigns first user to join's ID to currentDrawerID
+    //     // // Generating game session data
+    //     // let gameSessionData = new GameSessionClass(randomInteger,[currentDrawerID], numbRounds, numbPlayers, null)
+    //     // gamesessions[gameSessionData.sessionID] = gameSessionData
 
-        currentPromptObject = getPromptObject();
-        let currentPromptImgPath = getPath(currentPromptObject);
-        io.to(playersQueue[currentDrawerIndex]).emit('you-are-drawer', 
-            {
-                word: currentPromptObject.word,
-                path: currentPromptImgPath
-            });
-        console.log(`(1)User ${socket.id} is the drawer with word: ${currentPromptObject.word} with path ${currentPromptImgPath}`);
-        // console.log("games session data: " + gamesessions[gameSessionData.sessionID].toString())
-    }
+    //     currentPromptObject = getPromptObject();
+    //     let currentPromptImgPath = getPath(currentPromptObject);
+    //     io.to(playersQueue[currentDrawerIndex]).emit('you-are-drawer', 
+    //         {
+    //             word: currentPromptObject.word,
+    //             path: currentPromptImgPath
+    //         });
+    //     console.log(`(1)User ${socket.id} is the drawer with word: ${currentPromptObject.word} with path ${currentPromptImgPath}`);
+    //     // console.log("games session data: " + gamesessions[gameSessionData.sessionID].toString())
+    // }
 
     socket.on("draw_data", (data) => {
         console.log("draw_data log")
@@ -258,7 +258,7 @@ io.on('connection', (socket) => {
     
     // Listener for socket disconnections
     socket.on('disconnect', () => {
-        console.log(`(2)User ${socket.id} disconnected`); // Logs when a user disconnects
+        console.log(`User ${socket.id} disconnected`); // Logs when a user disconnects
 
         //TODO: at some point, handle people disconnecting
     });
