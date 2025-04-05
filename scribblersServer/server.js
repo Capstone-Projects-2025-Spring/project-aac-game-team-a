@@ -193,6 +193,7 @@ io.on('connection', (socket) => {
                     //next drawer
                     currentDrawerIndex = (currentDrawerIndex + 1) % playersQueue.length;
                     currentPromptObject = getPromptObject();
+                    currentPromptImgPath = getPath(currentPromptObject);
 
                     //notify the previous drawer that they are guessing
                     const previousDrawerIndex = (currentDrawerIndex - 1 + playersQueue.length) % playersQueue.length;
@@ -204,7 +205,7 @@ io.on('connection', (socket) => {
                     currentCycle++;
                     io.to(playersQueue[currentDrawerIndex]).emit('you-are-drawer', {
                         word: currentPromptObject.word,
-                        //path: currentPromptImgPath //ken, do we update this appropriately?
+                        path: currentPromptImgPath //ken, do we update this appropriately?
                     });
                     currentDrawerID = playersQueue[currentDrawerIndex];
                     //console.log(`User ${playersQueue[currentDrawerIndex]} is the drawer with word: ${currentPromptObject.word}, and currentDrawerID is: ${currentDrawerID}`);
