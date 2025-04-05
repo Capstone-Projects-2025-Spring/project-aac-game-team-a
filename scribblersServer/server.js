@@ -57,7 +57,7 @@ const promptList = [
     {word: 'Mouse', type: 'Animals'},
 
     {word: 'Glasses', type: 'Clothing'},
-    {word: 'Gloves', type: 'Clothing'},
+    {word: 'Glove', type: 'Clothing'},
     {word: 'Hat', type: 'Clothing'},
     {word: 'Pants', type: 'Clothing'},
     {word: 'Shirt', type: 'Clothing'},
@@ -192,7 +192,7 @@ io.on('connection', (socket) => {
 
                     //next drawer
                     currentDrawerIndex = (currentDrawerIndex + 1) % playersQueue.length;
-                    currentPromptObject.word = getPromptObject();
+                    currentPromptObject = getPromptObject();
 
                     //notify the previous drawer that they are guessing
                     const previousDrawerIndex = (currentDrawerIndex - 1 + playersQueue.length) % playersQueue.length;
@@ -202,7 +202,10 @@ io.on('connection', (socket) => {
                 //check if max cycles have been reached
                 if (currentCycle < maxCycles) {
                     currentCycle++;
-                    io.to(playersQueue[currentDrawerIndex]).emit('you-are-drawer', {word: currentPromptObject.word});
+                    io.to(playersQueue[currentDrawerIndex]).emit('you-are-drawer', {
+                        word: currentPromptObject.word,
+                        //path: currentPromptImgPath //ken, do we update this appropriately?
+                    });
                     currentDrawerID = playersQueue[currentDrawerIndex];
                     //console.log(`User ${playersQueue[currentDrawerIndex]} is the drawer with word: ${currentPromptObject.word}, and currentDrawerID is: ${currentDrawerID}`);
                 } else {

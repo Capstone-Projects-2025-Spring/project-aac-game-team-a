@@ -48,6 +48,7 @@ export default {
                 console.log('you are the drawer now');
                 this.isDrawer = true;
                 this.promptWord = data.word;
+                console.log(this.promptWord);
                 this.promptImgPath = data.path;
             });
 
