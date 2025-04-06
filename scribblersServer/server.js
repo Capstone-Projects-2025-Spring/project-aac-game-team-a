@@ -184,6 +184,7 @@ io.on('connection', (socket) => {
                 
                 //message that will show up in the chat upon correct message
                 data.text = 'Guessed Correctly!';
+                data.imagePath = null;
 
                 
                 io.in(room).emit('message:received', data); // Broadcasts received messages to all other clients, including player who guesesd correct

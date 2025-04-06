@@ -57,8 +57,9 @@ const getItemImage = (category, item) => {
 
 //Function that emits an event from this component when user selects a word
 const selectItem = (item) => {
-    //Emit an event with the selected aac word
-    emit('itemSelected', item);
+    //Emit an event with the selected aac word and path to image
+    const imagePath = getItemImage(currentCategory.value, item);
+    emit('itemSelected', {item, imagePath});
 };
 
 </script>
