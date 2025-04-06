@@ -173,6 +173,7 @@ io.on('connection', (socket) => {
         //process guesses made by non drawing players
         //console.log(`guess incoming from socket.id: ${socket.id}, currentDrawerID: ${currentDrawerID}`);
         if(socket.id !== currentDrawerID) {
+            //correct guess?
             if (data.text.toLowerCase() === currentPromptObject.word.toLowerCase()) {
                 console.log(`Player ${socket.id} guessed correctly!`);
 
@@ -180,13 +181,15 @@ io.on('connection', (socket) => {
                 socket.emit('correct-guess', {
                     user: data.user
                 }); */
+                
+                //message that will show up in the chat upon correct message
                 data.text = 'Guessed Correctly!';
 
                 
                 io.in(room).emit('message:received', data); // Broadcasts received messages to all other clients, including player who guesesd correct
                 correctGuesses++;
 
-                //check if all guessers ahve guessed correctly
+                //check if all guessers have guessed correctly
                 if (correctGuesses === playerCount - 1) {
                     correctGuesses = 0;
 
@@ -200,12 +203,13 @@ io.on('connection', (socket) => {
                     io.to(playersQueue[previousDrawerIndex]).emit('you-are-guesser');
                 }
 
-                //check if max cycles have been reached
+                //if game isn't over, then assign new drawer
                 if (currentCycle < maxCycles) {
                     currentCycle++;
+                    console.log(`Cycle number: ${currentCycle}`);
                     io.to(playersQueue[currentDrawerIndex]).emit('you-are-drawer', {
                         word: currentPromptObject.word,
-                        path: currentPromptImgPath //ken, do we update this appropriately?
+                        path: currentPromptImgPath 
                     });
                     currentDrawerID = playersQueue[currentDrawerIndex];
                     //console.log(`User ${playersQueue[currentDrawerIndex]} is the drawer with word: ${currentPromptObject.word}, and currentDrawerID is: ${currentDrawerID}`);
