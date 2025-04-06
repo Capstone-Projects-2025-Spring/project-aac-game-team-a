@@ -13,6 +13,7 @@ export default {
             currentUser: this.$route.query.user || "", // Stores the username entered by the user
             currentUserAvatar: this.$route.query.avatar || "", // Stores the username entered by the user
             text: "", // Stores the message typed by the user
+            selectedImagePath: "", //path to current AAC image selected
             messages: [], // Array to store all received messages
             isDrawer: false, //track if user is the drawer
             promptWord: "", //store the random drawing prompt word
@@ -48,6 +49,7 @@ export default {
                 console.log('you are the drawer now');
                 this.isDrawer = true;
                 this.promptWord = data.word;
+                console.log(this.promptWord);
                 this.promptImgPath = data.path;
             });
 
@@ -106,6 +108,7 @@ export default {
               text: this.text, // Stores the message content
               user: this.currentUser, // Stores the username
               avatar: this.currentUserAvatar, // Stores the avatar URL
+              imagePath: this.selectedImagePath //Stores AAC image path
           };
           
           // Add message to the local messages array
@@ -116,9 +119,10 @@ export default {
         },
         
         //Function that handles a word selection on the AAC board 
-        handleItemSelected(item) {
+        handleItemSelected({item, imagePath}) {
             console.log('Item selected:', item); //logs selected item
             this.text = item; //stores aac button selected by user
+            this.selectedImagePath = imagePath;
             this.addMessage(); //sends websocket message
         },
 
@@ -202,9 +206,15 @@ export default {
                 <button type="test" class="test" @click="sendTimerStart(roundLength)">test</button>
                 
                 <!-- Loop through messages array and display each message -->
-                <div v-for="message in messages" :key="message.id">
-                    <img :src="message.avatar" :alt="message.user" class="game-avatar-image"/>
-                    {{ message.text }}
+                <div v-for="message in messages" :key="message.id" class="chat-message">
+                    <img :src="message.avatar" :alt="message.user" class="game-avatar-image" />
+                    <span>{{ message.text }}</span>
+                    <img 
+                        v-if="message.imagePath" 
+                        :src="message.imagePath" 
+                        alt="Symbol" 
+                        class="message-symbol" 
+                    />
                 </div>
             </div>
         </div>
@@ -310,6 +320,12 @@ export default {
     .game-avatar-image {
         width: 30px; /* Adjust the image size */
         height: 30px;
+    }
+
+    .message-symbol {
+    width: 50px;
+    height: 50px;
+    margin-left: auto;
     }
 
     .quit-btn{

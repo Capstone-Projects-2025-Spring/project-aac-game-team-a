@@ -1,20 +1,21 @@
 <template>
     <div class="aac-board">
-        <!--back button-->
-        <button v-if="currentCategory" @click="currentCategory = null" class="back-button">Back</button> 
-
         <!-- Grid for categories. -->
         <div v-if="!currentCategory" class="grid">
-
             <button v-for="(items, category) in categories" :key="category" @click="currentCategory = category">
-                <!-- image display for category -->
                 <img :src="getCategoryImage(category)" :alt="category" class="category-image"/>
                 <p>{{category}}</p>
             </button>
         </div>
 
-        <!-- Grid for items in a category. -->
+        <!-- Back button + Grid for items in a category -->
         <div v-else class="grid">
+            <!-- Back button as first item in the grid -->
+            <button class="back-button-grid" @click="currentCategory = null">
+                <img src="/aacSymbols/back.png" alt="Back" class="item-image" />
+                <p>Back</p>
+            </button>
+
             <button v-for="item in categories[currentCategory]" :key="item" @click="selectItem(item)">
                 <img :src="getItemImage(currentCategory, item)" :alt="item" class="item-image"/>
                 <p>{{item}}</p>
@@ -56,8 +57,9 @@ const getItemImage = (category, item) => {
 
 //Function that emits an event from this component when user selects a word
 const selectItem = (item) => {
-    //Emit an event with the selected aac word
-    emit('itemSelected', item);
+    //Emit an event with the selected aac word and path to image
+    const imagePath = getItemImage(currentCategory.value, item);
+    emit('itemSelected', {item, imagePath});
 };
 
 </script>
@@ -94,16 +96,4 @@ button {
     margin-bottom: 0px;
 }
 
-.back-button {
-    position: absolute;
-    top: 850px; /* Adjust top position as needed */
-    left: 100px; /* Move the back button to the left */
-    padding: 70px 50px;
-    font-size: 30px;
-    background-color: #4CAF50; /* Green background */
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
 </style>
