@@ -9,12 +9,23 @@ export default {
         DrawingBoard, //register drawing board as a component
     },
     data() {
+        const user = this.$route.query.user || ""; // Stores the username entered by the user
+        const avatar = this.$route.query.avatar || ""; // Stores the username entered by the user
+
+        let currentUserMessage = { // Holds all the user message info being sent back and forth between client and server
+            id: 0,
+            avatar: avatar,
+            user: user,
+            text: "",
+            imagePath: ""
+        };
+
         return {
-            currentUser: this.$route.query.user || "", // Stores the username entered by the user
-            currentUserAvatar: this.$route.query.avatar || "", // Stores the username entered by the user
-            text: "", // Stores the message typed by the user
             selectedImagePath: "", //path to current AAC image selected
-            messages: [], // Array to store all received messages
+            currentUserMessage,
+            messageBoard: [
+                currentUserMessage
+            ], // Array to store all received users in message board
             isDrawer: false, //track if user is the drawer
             promptWord: "", //store the random drawing prompt word
             promptImgPath: "", // store the path to the image to be referenced for prompt
@@ -37,11 +48,31 @@ export default {
             this.socketInstance = io("http://localhost:3001"); // CHANGE THIS WHEN YOU WANT THE SERVER TO BE PUBLIC
             // this.socketInstance = io("http://[YOUR IP HERE]:3000");
 
+            // 
             this.socketInstance.emit('join-room', this.roomCodeStr);
 
+            // Listen for the player count from the server
+            this.socketInstance.on("player-count-update", (count) => {
+                this.playerCount = count;
+                console.log("Updated player count:", count);
+            });
+
+            // Signal backend to add user to the message board
+            this.socketInstance.emit('message', this.currentUserMessage, this.roomCodeStr);
+
+            // Listen for "message" array update and update the message
+            this.socketInstance.on('update-user-message-board', (data) => {
+                for(let i=0; i<data.length; i++){
+                    console.log("user: " + data[i].user);
+                }
+                // Re-assign the message board
+                this.messageBoard = data;
+            });
+
+            // NOT BEING USED
             // Listen for incoming messages from the server and update messages array
             this.socketInstance.on("message:received", (data) => {
-                this.messages = this.messages.concat(data); // Append received message to messages array
+                this.messageBoard = this.messageBoard.concat(data); // Append received message to messages array
             });
 
             //Listen for 'you-are-drawer' message and random prompt word
@@ -101,6 +132,7 @@ export default {
             });
         },
       
+        // NOT BEING USED
         // Adds the user's message to the messages array and sends it to the server
         addMessage(){
           const message = {
@@ -112,18 +144,37 @@ export default {
           };
           
           // Add message to the local messages array
-          this.messages = this.messages.concat(message);
+          this.messageBoard = this.messageBoard.concat(message);
           
           // Send the message to the server via WebSocket
           this.socketInstance.emit('message', message, this.roomCodeStr);
+        },
+
+        // Disconnects the user when called
+        serverDisconnect(){
+            try {
+                this.playerCount = 0;
+
+                // Check if socket exists and is connected
+                if (this.socketInstance && this.socketInstance.connected) {
+                    // disconnect from server
+                    this.socketInstance.disconnect(); // works like how "this.socketInstance.emit('disconnect')" should work
+                    console.log("Disconnected from server.");
+                } else {
+                    console.warn("Socket is not connected or already null.");
+                }
+            } catch (error) {
+                console.error("Error during disconnection:", error.message || error);
+            }
         },
         
         //Function that handles a word selection on the AAC board 
         handleItemSelected({item, imagePath}) {
             console.log('Item selected:', item); //logs selected item
-            this.text = item; //stores aac button selected by user
-            this.selectedImagePath = imagePath;
-            this.addMessage(); //sends websocket message
+            this.currentUserMessage.text = item; //stores aac button selected by user
+            this.currentUserMessage.imagePath = imagePath;
+            // this.addMessage(); //sends websocket message
+            this.socketInstance.emit('message', this.currentUserMessage, this.roomCodeStr); // Change the current user's message and img path
         },
 
         //  Handles sending initial drawing data to observer canvases (on mouse click)
@@ -173,6 +224,7 @@ export default {
             :to="{
                 path: '/', // Navigates to the home route
             }"
+            @click="serverDisconnect"
             class="quit-btn">
             QUIT</RouterLink>
             <!--Display drawing prompt for drawer-->
@@ -205,8 +257,8 @@ export default {
                 <h2>Timer: {{ roundTimer }}</h2>
                 <button type="test" class="test" @click="sendTimerStart(roundLength)">test</button>
                 
-                <!-- Loop through messages array and display each message -->
-                <div v-for="message in messages" :key="message.id" class="chat-message">
+                <!-- Loop through messageBoard array and display each message -->
+                <div v-for="message in messageBoard" :key="message.id" class="chat-message">
                     <img :src="message.avatar" :alt="message.user" class="game-avatar-image" />
                     <span>{{ message.text }}</span>
                     <img 

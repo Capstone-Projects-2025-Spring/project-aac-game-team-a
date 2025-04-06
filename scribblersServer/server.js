@@ -29,20 +29,12 @@ const maxCycles = 10; //number of cycles (how many times each player draws)
 let currentCycle = 0; //tracks cycle number
 let imagesPerPrompt = 3; // represents the amount of images to choose from per prompt
 let currentPromptObject = null;
+let messageBoard = []; // Used to display messages next to avatars in game
 
 const activeTimers = new Map();
 const GameSessionDB = new GameSessionsDBClass()
 
-
-//drawing prompt word list
-// NOT BEING USED
-const wordsList = [
-    'eat', 'jump', 'run', 'sleep', 'bird', 'cat', 'dog', 'elephant', 
-    'horse', 'mouse', 'glasses', 'glove', 'hat', 'pants', 'shirt', 
-    'shoe', 'apple', 'banana', 'carrot', 'grapes', 'pizza', 'spaghetti'
-];
-
-// drawing prompt objects
+// Drawing prompt objects categorized by type
 const promptList = [
     {word: 'Eat', type: 'Actions'},
     {word: 'Jump', type: 'Actions'},
@@ -71,19 +63,14 @@ const promptList = [
     {word: 'Spaghetti', type: 'Food'}
 ]
 
-// Function to select a random word from the list
+// Selects a random prompt object
 function getPromptObject() {
-    const randomIndex = Math.floor(Math.random() * promptList.length); // get index for random prompt object
-    const promptObject = promptList[randomIndex]; // get random prompt object
-
-    return promptObject;
+    const randomIndex = Math.floor(Math.random() * promptList.length);
+    return promptList[randomIndex];
 }
 
 // Function to form the path to the image
 function getPath(promptObject){
-    if(promptObject == null){
-        
-    }
     // Get random number to append for the image associated for the prompt 
     let randomImgNumber = Math.floor(Math.random() * imagesPerPrompt) + 1;
 
@@ -93,9 +80,6 @@ function getPath(promptObject){
 
     // Assemble the path
     path = 'promptImages/' + promptObject.type + '/' + promptObject.word + '/' + lowerCaseWord + '.png';
-
-    // for testing
-    console.log(path);
 
     return path;
 }
@@ -110,6 +94,15 @@ io.on('connection', (socket) => {
 
     //add player to the queue
     playersQueue.push(socket.id);
+
+    // Keeps track of players currently in game (needs to be refined to be room specific)
+    io.emit("player-count-update", { playerCount }); // Notify all players of new count
+
+    // Add players to the message board
+    socket.on('add-user-to-message-board', (data) => {
+        
+
+    })
 
     /*
     //assign drawer if there isn't one
@@ -168,59 +161,89 @@ io.on('connection', (socket) => {
 
     // Listener for 'message' events from the client
     socket.on('message', (data, room) => {
-        //console.log('message received:', data); 
+        if(data.text != ""){
+            //console.log('message received:', data); 
 
-        //process guesses made by non drawing players
-        //console.log(`guess incoming from socket.id: ${socket.id}, currentDrawerID: ${currentDrawerID}`);
-        if(socket.id !== currentDrawerID) {
-            //correct guess?
-            if (data.text.toLowerCase() === currentPromptObject.word.toLowerCase()) {
-                console.log(`Player ${socket.id} guessed correctly!`);
+            //process guesses made by non drawing players
+            //console.log(`guess incoming from socket.id: ${socket.id}, currentDrawerID: ${currentDrawerID}`);
+            if(socket.id !== currentDrawerID) {            
+                //correct guess?
+                if (data.text.toLowerCase() === currentPromptObject.word.toLowerCase()) {
+                    console.log(`Player ${socket.id} guessed correctly!`);
 
-                /*
-                socket.emit('correct-guess', {
-                    user: data.user
-                }); */
-                
-                //message that will show up in the chat upon correct message
-                data.text = 'Guessed Correctly!';
-                data.imagePath = null;
+                    /*
+                    socket.emit('correct-guess', {
+                        user: data.user
+                    }); */
+                    
+                    //message that will show up in the chat upon correct message
+                    for(i=0; i<messageBoard.length; i++){ // Loop through each message object in message board
+                        if(messageBoard[i].id == socket.id){ // Look for the object with the socket id that matches the current user's socket id
+                            messageBoard[i].text = 'Guessed Correctly!'; // Change message to 'Guessed Correctly!'
+                            messageBoard[i].imagePath = null; // change to path to checkmark eventually or something
+                        }
+                    }
+                    // Update the message board for all users
+                    io.in(room).emit('update-user-message-board', messageBoard);
+                    
+                    // io.in(room).emit('message:received', data); // Broadcasts received messages to all other clients, including player who guesesd correct
+                    correctGuesses++;
 
-                
-                io.in(room).emit('message:received', data); // Broadcasts received messages to all other clients, including player who guesesd correct
-                correctGuesses++;
+                    //check if all guessers have guessed correctly
+                    if (correctGuesses === playerCount - 1) {
+                        correctGuesses = 0;
 
-                //check if all guessers have guessed correctly
-                if (correctGuesses === playerCount - 1) {
-                    correctGuesses = 0;
+                        //next drawer
+                        currentDrawerIndex = (currentDrawerIndex + 1) % playersQueue.length;
+                        currentPromptObject = getPromptObject();
+                        currentPromptImgPath = getPath(currentPromptObject);
 
-                    //next drawer
-                    currentDrawerIndex = (currentDrawerIndex + 1) % playersQueue.length;
-                    currentPromptObject = getPromptObject();
-                    currentPromptImgPath = getPath(currentPromptObject);
+                        //notify the previous drawer that they are guessing
+                        const previousDrawerIndex = (currentDrawerIndex - 1 + playersQueue.length) % playersQueue.length;
+                        io.to(playersQueue[previousDrawerIndex]).emit('you-are-guesser');
+                    }
 
-                    //notify the previous drawer that they are guessing
-                    const previousDrawerIndex = (currentDrawerIndex - 1 + playersQueue.length) % playersQueue.length;
-                    io.to(playersQueue[previousDrawerIndex]).emit('you-are-guesser');
-                }
+                    //if game isn't over, then assign new drawer
+                    if (currentCycle < maxCycles) {
+                        currentCycle++;
+                        console.log(`Cycle number: ${currentCycle}`);
+                        io.to(playersQueue[currentDrawerIndex]).emit('you-are-drawer', {
+                            word: currentPromptObject.word,
+                            path: currentPromptImgPath 
+                        });
+                        currentDrawerID = playersQueue[currentDrawerIndex];
+                        //console.log(`User ${playersQueue[currentDrawerIndex]} is the drawer with word: ${currentPromptObject.word}, and currentDrawerID is: ${currentDrawerID}`);
+                    } else {
+                        console.log("End of game.");
+                        //TODO: End of game ***
+                    }
 
-                //if game isn't over, then assign new drawer
-                if (currentCycle < maxCycles) {
-                    currentCycle++;
-                    console.log(`Cycle number: ${currentCycle}`);
-                    io.to(playersQueue[currentDrawerIndex]).emit('you-are-drawer', {
-                        word: currentPromptObject.word,
-                        path: currentPromptImgPath 
-                    });
-                    currentDrawerID = playersQueue[currentDrawerIndex];
-                    //console.log(`User ${playersQueue[currentDrawerIndex]} is the drawer with word: ${currentPromptObject.word}, and currentDrawerID is: ${currentDrawerID}`);
                 } else {
-                    console.log("End of game.");
-                    //TODO: End of game ***
-                }
+                    // Change the data in the object (socket.id specific)
+                    for(i=0; i<messageBoard.length; i++){ // Loop through each message object in message board
+                        if(messageBoard[i].id == socket.id){ // Look for the object with the socket id that matches the current user's socket id
+                            messageBoard[i].text = data.text; // Change the text based on user input
+                            messageBoard[i].imagePath = data.imagePath; // Change the image based on user input
+                        }
+                    }
+                    // socket.to(room).emit('message:received', data); // Broadcasts received messages to all other clients
 
+                    // Update the message board for all users
+                    io.in(room).emit('update-user-message-board', messageBoard);
+                }
             }
-            socket.to(room).emit('message:received', data); // Broadcasts received messages to all other clients
+        } else { // This case is for users that have just joined
+            let userMessage = {
+                id: socket.id, // Set the socket id the server assigned
+                user: data.user,  // The user will be assigned
+                avatar: data.avatar, // The avater will be assigned
+                text: data.text // Test should be blank at this step but will be assigned anyway
+            }
+            // Push the user message on the board
+            messageBoard.push(userMessage);
+
+            // Update the board for every user
+            io.emit('update-user-message-board', messageBoard);
         }
     });
     
@@ -268,8 +291,16 @@ io.on('connection', (socket) => {
     // Listener for socket disconnections
     socket.on('disconnect', () => {
         console.log(`(2)User ${socket.id} disconnected`); // Logs when a user disconnects
-
-        //TODO: at some point, handle people disconnecting
+        playersQueue = playersQueue.filter(playerID => playerID !== socket.id); // Remove from queue
+        playerCount = Math.max(0, playerCount - 1); // Decrease player count
+        console.log(`Current player count: ` + playerCount);
+        for(i=0; i<messageBoard.length; i++){
+            if(messageBoard[i].id == socket.id){
+                messageBoard.splice(i);
+                io.emit('update-user-message-board', (messageBoard));
+            }
+        }
+        io.emit("player-count-update", { playerCount }); // Notify others
     });
 });
 
