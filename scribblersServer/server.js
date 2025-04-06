@@ -267,9 +267,55 @@ io.on('connection', (socket) => {
     
     // Listener for socket disconnections
     socket.on('disconnect', () => {
-        console.log(`(2)User ${socket.id} disconnected`); // Logs when a user disconnects
-
-        //TODO: at some point, handle people disconnecting
+        console.log(`(2)User ${socket.id} disconnected`);
+    
+        // Remove the disconnected user from the playersQueue
+        // This ensures they won't be selected as a drawer or participate further
+        const wasInQueue = playersQueue.includes(socket.id);
+        playersQueue = playersQueue.filter(id => id !== socket.id);
+    
+        // Decrease the total number of players
+        if (wasInQueue) {
+            playerCount--;
+        }
+    
+        // If the disconnected player was the current drawer
+        if (socket.id === currentDrawerID) {
+            console.log(`Drawer ${socket.id} disconnected`);
+    
+            // If there are still players left in the queue
+            if (playersQueue.length > 0) {
+                // Ensure the drawer index doesn't go out of bounds
+                currentDrawerIndex = currentDrawerIndex % playersQueue.length;
+    
+                // Assign a new drawer
+                currentDrawerID = playersQueue[currentDrawerIndex];
+    
+                // Get a new prompt object and corresponding image path
+                currentPromptObject = getPromptObject();
+                const newPath = getPath(currentPromptObject);
+    
+                // Notify the new drawer with their word and image
+                io.to(currentDrawerID).emit('you-are-drawer', {
+                    word: currentPromptObject.word,
+                    path: newPath
+                });
+    
+                console.log(`New drawer is ${currentDrawerID} with word ${currentPromptObject.word}`);
+            } else {
+                // If no players are left, reset the game drawer state
+                currentDrawerID = null;
+                currentDrawerIndex = 0;
+                console.log("No players left in the queue — waiting for new players.");
+            }
+        } else {
+            // If the disconnected user was before the current drawer in the queue,
+            // adjust the index so the drawer stays in the correct spot
+            const disconnectedIndex = playersQueue.findIndex(id => id === socket.id);
+            if (disconnectedIndex !== -1 && disconnectedIndex < currentDrawerIndex) {
+                currentDrawerIndex--;
+            }
+        }
     });
 });
 
