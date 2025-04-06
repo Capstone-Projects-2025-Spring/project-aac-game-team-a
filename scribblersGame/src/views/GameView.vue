@@ -13,7 +13,15 @@ export default {
             currentUser: this.$route.query.user || "", // Stores the username entered by the user
             currentUserAvatar: this.$route.query.avatar || "", // Stores the username entered by the user
             text: "", // Stores the message typed by the user
+
+            currentUserMessage: {
+                avatar: "",
+                user: "",
+                text: "",
+            }, // Stores the avatar and message that is always displayed 
+
             messages: [], // Array to store all received messages
+            playerCount: 0, // Store player count
             isDrawer: false, //track if user is the drawer
             promptWord: "", //store the random drawing prompt word
             promptImgPath: "", // store the path to the image to be referenced for prompt
@@ -36,7 +44,27 @@ export default {
             this.socketInstance = io("http://localhost:3001"); // CHANGE THIS WHEN YOU WANT THE SERVER TO BE PUBLIC
             // this.socketInstance = io("http://[YOUR IP HERE]:3000");
 
+            // Idrk what this is
             this.socketInstance.emit('join-room', this.roomCodeStr);
+
+            // Set the current message object data
+            this.currentUserMessage.text = this.text;
+            this.currentUserMessage.user = this.currentUser;
+            this.currentUserMessage.avatar = this.currentUserAvatar
+            this.messages.push(this.currentUserMessage);
+
+            this.socketInstance.emit('add-user-to-message-board', this.currentUserMessage);
+
+            // Listen for the player count from the server
+            this.socketInstance.on("player-count-update", (count) => {
+                this.playerCount = count;
+                console.log("Updated player count:", count);
+            });
+
+            // Listen for "message" array update and update the message
+            this.socketInstance.on('update-user-message-board', (data) => {
+                this.messages = data;
+            });
 
             // Listen for incoming messages from the server and update messages array
             this.socketInstance.on("message:received", (data) => {
@@ -100,27 +128,51 @@ export default {
         },
       
         // Adds the user's message to the messages array and sends it to the server
-        addMessage(){
-          const message = {
-              id: new Date().getTime(), // Generates a unique ID based on timestamp
-              text: this.text, // Stores the message content
-              user: this.currentUser, // Stores the username
-              avatar: this.currentUserAvatar, // Stores the avatar URL
-          };
+        // addMessage(){
+        //   const message = {
+        //       id: new Date().getTime(), // Generates a unique ID based on timestamp
+        //       text: this.text, // Stores the message content
+        //       user: this.currentUser, // Stores the username
+        //       avatar: this.currentUserAvatar, // Stores the avatar URL
+        //   };
           
-          // Add message to the local messages array
-          this.messages = this.messages.concat(message);
+        //   // Add message to the local messages array
+        //   this.messages = this.messages.concat(message);
           
-          // Send the message to the server via WebSocket
-          this.socketInstance.emit('message', message, this.roomCodeStr);
+        //   // Send the message to the server via WebSocket
+        //   this.socketInstance.emit('message', message, this.roomCodeStr);
+        // },
+
+        // Disconnects the user when called
+        serverDisconnect(){
+            try {
+                this.playerCount = 0;
+
+                // Check if socket exists and is connected
+                if (this.socketInstance && this.socketInstance.connected) {
+                    // disconnect from server
+                    this.socketInstance.disconnect(); // works like how "this.socketInstance.emit('disconnect')" should work
+                    console.log("Disconnected from server.");
+                } else {
+                    console.warn("Socket is not connected or already null.");
+                }
+            } catch (error) {
+                console.error("Error during disconnection:", error.message || error);
+            }
+        },
+
+        changeMessage(item){
+            this.text = item;
+            this.currentUserMessage.text = this.text;
+            this.socketInstance.emit('message', this.currentUserMessage, this.roomCodeStr);
         },
         
-        //Function that handles a word selection on the AAC board 
-        handleItemSelected(item) {
-            console.log('Item selected:', item); //logs selected item
-            this.text = item; //stores aac button selected by user
-            this.addMessage(); //sends websocket message
-        },
+        // //Function that handles a word selection on the AAC board 
+        // handleItemSelected(item) {
+        //     console.log('Item selected:', item); //logs selected item
+        //     this.text = item; //stores aac button selected by user
+        //     this.addMessage(); //sends websocket message
+        // },
 
         //  Handles sending initial drawing data to observer canvases (on mouse click)
         sendDrawDataInit(x, y, draw_color, draw_width) {
@@ -169,6 +221,7 @@ export default {
             :to="{
                 path: '/', // Navigates to the home route
             }"
+            @click="serverDisconnect"
             class="quit-btn">
             QUIT</RouterLink>
             <!--Display drawing prompt for drawer-->
@@ -191,7 +244,7 @@ export default {
 
             <div class="aac-board-box">
                 <!-- AacBoard component is rendered here and we catch item selections here.-->
-                <AacBoard @itemSelected="handleItemSelected"/>
+                <AacBoard @itemSelected="changeMessage" onclick="console.log(this.playerCount)"/>
             </div>
         </div>
 
