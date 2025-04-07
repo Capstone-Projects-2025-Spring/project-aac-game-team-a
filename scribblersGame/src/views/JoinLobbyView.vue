@@ -71,51 +71,45 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 
-// Reactive state for storing selected shapes
-const selectedShapes = ref([null, null, null, null])
-
-// List of available shapes
-const shapes = [
-  { value: 1, imgSrc: 'circle.png', label: 'Circle' },
-  { value: 2, imgSrc: 'diamond.png', label: 'Diamond' },
-  { value: 3, imgSrc: 'heart.png', label: 'Heart' },
-  { value: 4, imgSrc: 'octagon.png', label: 'Octagon' },
-  { value: 5, imgSrc: 'pentagon.png', label: 'Pentagon' },
-  { value: 6, imgSrc: 'rectangle.png', label: 'Rectangle' },
-  { value: 7, imgSrc: 'square.png', label: 'Square' },
-  { value: 8, imgSrc: 'star.png', label: 'Star' },
-  { value: 9, imgSrc: 'triangle.png', label: 'Triangle' }
-]
-
-// Function to select a shape and add it to the room code
-function selectShape(shape) {
-  const index = selectedShapes.value.findIndex((s) => s === null)
-  if (index !== -1) {
-    selectedShapes.value[index] = shape.imgSrc
-  }
-  roomCodeArr.value = selectedShapes.value
-    .map((shapeImg) => shapes.find((s) => s.imgSrc === shapeImg)?.value || '')
-}
-
-// Function to undo the last selected shape
-function undoShape() {
-  const lastIndex = [...selectedShapes.value].reverse().findIndex((s) => s !== null)
-  if (lastIndex !== -1) {
-    selectedShapes.value[selectedShapes.value.length - 1 - lastIndex] = null
-  }
-}
-
-// Function to clear all selected shapes
-function clearShapes() {
-  selectedShapes.value = [null, null, null, null]
-}
-
-// Reactive state for user information
+// Room setup state
+const visibility = ref('public')
+const maxPlayers = ref(4)
+const rounds = ref(3)
+const randomCodeDigits = ref([])
 const currentUser = ref('')
 const currentUserAvatar = ref('')
-const roomCodeArr = ref('')
+
+// Shape mapping
+const shapes = [
+  { value: 0, imgSrc: 'rhombus.png' },
+  { value: 1, imgSrc: 'circle.png' },
+  { value: 2, imgSrc: 'diamond.png' },
+  { value: 3, imgSrc: 'heart.png' },
+  { value: 4, imgSrc: 'octagon.png' },
+  { value: 5, imgSrc: 'pentagon.png' },
+  { value: 6, imgSrc: 'rectangle.png' },
+  { value: 7, imgSrc: 'square.png' },
+  { value: 8, imgSrc: 'star.png' },
+  { value: 9, imgSrc: 'triangle.png' }
+]
+
+// Generate random 5-digit code on mount
+onMounted(() => {
+  generateRandomCode()
+})
+
+function generateRandomCode() {
+  randomCodeDigits.value = Array.from({ length: 5 }, () =>
+    Math.floor(Math.random() * 10) // includes 0 through 9
+  )
+}
+
+function getShapeImg(digit) {
+  const found = shapes.find((s) => s.value === digit)
+  return found ? found.imgSrc : ''
+}
 
 // List of available avatars
 const avatarButtons = [
@@ -135,15 +129,15 @@ function selectAvatar(button) {
   currentUserAvatar.value = button.imgSrc
 }
 
-// Function to validate selection and join the lobby
-function joinLobby() {
-  if (selectedShapes.value.includes(null) || !currentUserAvatar.value) {
-    alert('Please select all 4 shapes and an avatar.')
-    return
-  }
-  alert(`Joining room ${roomCodeArr.value.join('')} as ${currentUser.value}`)
+function launchRoom() {
+  const codeString = randomCodeDigits.value.join('')
+  alert(
+    `Hosting room ${codeString} (${visibility.value}) with max ${maxPlayers.value} players and ${rounds.value} rounds`
+  )
+  // Add actual hosting logic here
 }
 </script>
+
 
 <style scoped>
 .join-screen {
