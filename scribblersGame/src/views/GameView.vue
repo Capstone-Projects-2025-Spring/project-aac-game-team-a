@@ -252,15 +252,15 @@ export default {
         </div>
 
         <div class="right-container">
-            <div class="chat-container">
-                <!--  Remove after testing timer -->
-                <h2>Timer: {{ roundTimer }}</h2>
-                <button type="test" class="test" @click="sendTimerStart(roundLength)">test</button>
+            <!--  Remove after testing timer -->
+            <h2>Timer: {{ roundTimer }}</h2>
+            <button type="test" class="test" @click="sendTimerStart(roundLength)">test</button>
                 
+            <div class="chat-container">                
                 <!-- Loop through messageBoard array and display each message -->
                 <div v-for="message in messageBoard" :key="message.id" class="chat-message">
                     <img :src="message.avatar" :alt="message.user" class="game-avatar-image" />
-                    <span>{{ message.text }}</span>
+                    <span class="guess-message">{{ message.text }}</span>
                     <img 
                         v-if="message.imagePath" 
                         :src="message.imagePath" 
@@ -353,31 +353,58 @@ export default {
     }
 
     .right-container{
-        height: 100vh; /* Takes full height of the page */
+        /* background-color: #e0e0e0; */
+        height: 100vh;              /* Full height of the page */
         display: flex;
-        justify-content: flex-end; /* Aligns the chat to the right */
+        flex-direction: column;     /* Vertical stacking */
+        align-items: center;      /*cAlign children to the right side*/
+        padding: 1rem;              /* Optional padding */
     }
 
     .chat-container {            
-        height: 94.5%;             /* Takes up the full height of the viewport */
-        position: relative;        /* Ensures the text input stays at the bottom */
-        overflow-y: auto;          /* Enables scrolling if messages exceed height */
-        background-color: #c9c6c6; /* Optional background color */
-        box-sizing: border-box;    /* Ensures padding is included in width/height */
+        background-color: #c9c6c6;
+        box-sizing: border-box;
         border: 5px solid black;
+        border-radius: 25px;
         resize: none;
-        width: 150px;
+        width: 250px;
+
+        height: auto;
+        min-height: 150px;
+        max-height: 80vh;
+        overflow-y: auto;
+
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;        /* Horizontal centering */
+        justify-content: center;    /* Vertical centering */
+        text-align: center;         /* Optional: centers inline text */
+    }
+
+    .chat-message {
+        display: flex;
+        flex-direction: row;
     }
 
     .game-avatar-image {
-        width: 30px; /* Adjust the image size */
-        height: 30px;
+        width: auto; /* Adjust the image size */
+        height: 50px;
+        padding-left: 1rem;
+    }
+
+    .guess-message {
+        padding-top: 0.9rem;
+        font-weight: bold;
+        font-family: 'Segoe UI', sans-serif;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
     }
 
     .message-symbol {
-    width: 50px;
-    height: 50px;
-    margin-left: auto;
+        width: 50px;
+        height: 50px;
+        margin-left: auto;
+        padding-right: 1rem;
     }
 
     .quit-btn{
