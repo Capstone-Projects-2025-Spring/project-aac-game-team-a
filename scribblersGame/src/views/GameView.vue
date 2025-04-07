@@ -46,22 +46,28 @@ export default {
 
             //Listen for 'you-are-drawer' message and random prompt word
             this.socketInstance.on("drawer", (data) => {
+                // window.location.reload();
                 this.gameObject = data.message
                 console.log('you are the drawer now');
                 console.log("data: "+ JSON.stringify(data))
                 console.log("client id: " + this.socketInstance.id)
                 if(this.socketInstance.id == data.message.drawer){
                     this.isDrawer = true;
+                    this.promptWord = data.message.prompt;
+                    this.promptImgPath = data.message.wordImg;
                 }
-                this.promptWord = data.message.prompt;
-                this.promptImgPath = data.message.wordImg;
+                else{
+                    this.isDrawer = false
+                    this.promptWord = "";
+                    this.promptImgPath = "";
+                }
             });
 
             //Listen for 'you-are-guesser' message when drawing is done
-            this.socketInstance.on('you-are-guesser', (data) => {
-                console.log('you are a guesser now');
-                this.isDrawer = false;
-            });
+            // this.socketInstance.on('you-are-guesser', (data) => {
+            //     console.log('you are a guesser now');
+            //     this.isDrawer = false;
+            // });
 
             // Listen for broadcasted initial drawing data
             this.socketInstance.on("cast-draw-init", (x, y, draw_color, draw_width) => {
@@ -125,7 +131,11 @@ export default {
             console.log("game object: " + JSON.stringify(this.gameObject))
             console.log('Item selected:', item); //logs selected item
             this.text = item; //stores aac button selected by user
-            this.addMessage(); //sends websocket message
+            if(this.gameObject.prompt == item){
+                this.socketInstance.emit("on_round_start", {sessionID: parseInt(this.roomCodeStr)})
+            }
+            // this.gameObject
+            // this.addMessage(); //sends websocket message
         },
 
         //  Handles sending initial drawing data to observer canvases (on mouse click)
