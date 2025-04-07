@@ -1,7 +1,6 @@
 import { createApp } from 'vue'
 import './style.css'
 import App from './App.vue'
-import HelloWorld from './components/HelloWorld.vue';
 import { io } from "socket.io-client";
 
 const SOCKET_URL = "http://localhost:3001"; // Replace with your server URL
@@ -84,7 +83,7 @@ document.querySelector(".pen-range").addEventListener("input", function() {
     draw_width = this.value; 
 });
 
-//listens for any mouse down action and saves each state (eg. drawing)
+//listens for any mouse down action and saves each state 
 canvas.addEventListener("mousedown", function(event) {
     saveState();
   });

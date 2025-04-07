@@ -240,6 +240,7 @@ export default {
             }"
             @click="serverDisconnect"
             class="quit-btn">
+            
             QUIT</RouterLink>
             <!-- Display room code as shapes inside a white block -->
             <div class="room-code">
@@ -250,6 +251,7 @@ export default {
             </div>
             
             <!-- Display drawing prompt for drawer -->
+
             <div v-if="isDrawer" class="draw-prompt">
                 <h2>DRAW: {{ promptWord }}</h2>
                 <img class='prompt-image' :src=promptImgPath :alt=promptWord >
@@ -267,22 +269,22 @@ export default {
                 </DrawingBoard>
             </div>
 
-            <div class="aac-board-box">
+            <div v-if="!isDrawer" class="aac-board-box">
                 <!-- AacBoard component is rendered here and we catch item selections here.-->
                 <AacBoard @itemSelected="handleItemSelected"/>
             </div>
         </div>
 
         <div class="right-container">
-            <div class="chat-container">
-                <!--  Remove after testing timer -->
-                <h2>Timer: {{ roundTimer }}</h2>
-                <button type="test" class="test" @click="sendTimerStart(roundLength)">test</button>
+            <!--  Remove after testing timer -->
+            <h2>Timer: {{ roundTimer }}</h2>
+            <button type="test" class="test" @click="sendTimerStart(roundLength)">test</button>
                 
+            <div class="chat-container">                
                 <!-- Loop through messageBoard array and display each message -->
                 <div v-for="message in messageBoard" :key="message.id" class="chat-message">
                     <img :src="message.avatar" :alt="message.user" class="game-avatar-image" />
-                    <span>{{ message.text }}</span>
+                    <span class="guess-message">{{ message.text }}</span>
                     <img 
                         v-if="message.imagePath" 
                         :src="message.imagePath" 
@@ -296,6 +298,7 @@ export default {
 </template>
 
 <style>
+
 /* Add styles for the room code display */
 .room-code {
     text-align: center;
@@ -315,5 +318,160 @@ export default {
 .shapes img {
     width: 40px;
     height: 40px;
+
+@media (min-width: 1024px) {
+    .game {
+        min-height: 100vh;
+        /* display: flex; */
+        align-items: center;
+    }
+
+    .game-container{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-evenly; /* Space between left and right containers */
+        height: 90vh; /* Full height of the viewport */
+    }
+
+    .left-container {
+        height: 100vh; /* Takes full height of the page */
+        /* display: flex; */
+        flex-direction: column; /* Stack the boxes vertically */
+        justify-content: flex-start;
+        gap: 100px;
+    }
+
+    .draw-prompt {
+        background-color: #ffcc00; /* Light yellow background */
+        border-radius: 25px;
+        margin: auto;
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px; /* Space between prompt and drawing area */
+        gap: 20px; /* Space between flex items */
+    }
+
+    .prompt-image {
+        border-radius: 25px;
+        height: auto; 
+        width: auto; 
+        max-width: 100px; 
+        max-height: 100px;
+    }
+
+    .drawing-box {
+        width: 100%; 
+        height: 60vh;
+        border-radius: 25px;
+
+        background-image: url("whiteBoard.jpg");
+        background-position: center;
+        background-size: 100% 100%;
+
+        display: flex;
+        align-items: center;
+        background-color: transparent; /* Light background for the drawing box */
+    }
+    
+    .drawing-board {
+        position: relative;
+        bottom: 6px;
+        left: 25px;
+    }
+
+    .aac-board-box {
+        width: 100%;
+        height: 25%; /* Takes 20% of the page height */
+        border: 5px solid blue; /* Border for the button area */
+        background-color: #e0e0e0; /* Light background for the button box */
+    }
+
+    .aac-buttons{
+        margin: 10px; /* Adds space between buttons */
+        background: white;
+        border: 1px bold black;
+        padding: 10px;
+        cursor: pointer;
+    }
+
+    .right-container{
+        /* background-color: #e0e0e0; */
+        height: 100vh;              /* Full height of the page */
+        display: flex;
+        flex-direction: column;     /* Vertical stacking */
+        align-items: center;      /*cAlign children to the right side*/
+        padding: 1rem;              /* Optional padding */
+    }
+
+    .chat-container {            
+        background-color: #c9c6c6;
+        box-sizing: border-box;
+        border: 5px solid black;
+        border-radius: 25px;
+        resize: none;
+        width: 250px;
+
+        height: auto;
+        min-height: 150px;
+        max-height: 80vh;
+        overflow-y: auto;
+
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;        /* Horizontal centering */
+        justify-content: center;    /* Vertical centering */
+        text-align: center;         /* Optional: centers inline text */
+    }
+
+    .chat-message {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .game-avatar-image {
+        width: auto; /* Adjust the image size */
+        height: 50px;
+        padding-left: 1rem;
+    }
+
+    .guess-message {
+        padding-top: 0.9rem;
+        font-weight: bold;
+        font-family: 'Segoe UI', sans-serif;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+
+    .message-symbol {
+        width: 50px;
+        height: 50px;
+        margin-left: auto;
+        padding-right: 1rem;
+    }
+
+    .quit-btn{
+        padding-bottom: 100px;
+        padding: 12px 20px;
+        font-size: 1.1rem;
+        background-color: #1929a0;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        text-decoration: none;
+        cursor: pointer;
+        box-shadow: 0 5px 15px rgba(0, 123, 255, 0.2);
+        transition: background-color 0.3s, transform 0.1s;
+        font-family: 'Segoe UI', sans-serif;
+        font-weight: bold;
+    }
+
+    .quit-btn:hover {
+        background-color: #111d76;
+        transform: translateY(-2px);
+    }
+
 }
 </style>
