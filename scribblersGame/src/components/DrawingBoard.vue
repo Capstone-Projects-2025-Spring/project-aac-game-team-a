@@ -14,14 +14,25 @@ const start_background_color = "white";
 
 onMounted(() => {
     const canvas = canvasRef.value;
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+
+
+    //const canvas = canvasRef.value;
     if (!canvas) {
         console.error("Canvas not found!");
         return;
     }
 
     // Set up canvas size
-    canvas.width = 1201;
-    canvas.height = 400;
+    //canvas.width = 1201;
+    //canvas.height = 350;
+
+    canvasRef.value.width = canvasRef.value.offsetWidth;
+    canvasRef.value.height = canvasRef.value.offsetHeight;
+
+
+;
     context = canvas.getContext("2d");
     context.fillStyle = start_background_color;
     context.fillRect(0, 0, canvas.width, canvas.height);
@@ -62,9 +73,13 @@ function start(event) {
     if (!context) return;
 
     const rect = canvasRef.value.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
 
+    const scaleX = canvasRef.value.width / rect.width;
+    const scaleY = canvasRef.value.height / rect.height;
+
+    const x = (event.clientX - rect.left) * scaleX;
+    const y = (event.clientY - rect.top) * scaleY;
+    
     emit("startDrawData", x, y, draw_color, draw_width);
     //console.log("Drawing started");
 
@@ -78,11 +93,15 @@ function draw(event) {
     if (!is_drawing || !context) return;
 
     const rect = canvasRef.value.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
+
+    const scaleX = canvasRef.value.width / rect.width;
+    const scaleY = canvasRef.value.height / rect.height;
+
+    const x = (event.clientX - rect.left) * scaleX;
+    const y = (event.clientY - rect.top) * scaleY;
+
 
     emit("addDrawData", x, y);
-    //console.log("Drawing...");
 
     context.lineTo(x, y);
     context.strokeStyle = draw_color;
@@ -128,9 +147,9 @@ function undo_action() {
             <canvas id="canvas" ref="canvasRef"></canvas>
             <div class="tools"> 
                 <!--creates buttons for undo and clear-->
-                <button type="Ubutton" class="Ubutton">Undo</button>
-                <button type="Cbutton" class="Cbutton">Clear</button>
-                
+                <button type="button" class="Ubutton">↩️ Undo</button> 
+                <button type="button" class="Cbutton">🧽 Clear</button>
+
                 <!--creates buttons for colors-->
                     <div   class="color-field" style="background: red;"></div>
                     <div   class="color-field" style="background: orange;"></div>
@@ -196,14 +215,23 @@ function undo_action() {
     button {
         border-radius: 8px;
         border: 2px solid;
-        padding: 0.6em 1.2em;
-        font-size: 1em;
-        font-weight: 500;
+        width: 120px; /* Optional: fixed width */
+        height: 40px; /* Set your desired button height */
+        font-size: 25px;
+        font-weight: 600;
         font-family: inherit;
         background-color: #f6f3f3;
         cursor: pointer;
         transition: border-color 0.25s;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        overflow: hidden; /* Just in case text overflows */
+        line-height: 1.1; /* Controls spacing inside text */
     }
+
     button:hover {
         border-color: #646cff;
     }
@@ -235,9 +263,10 @@ function undo_action() {
 
     /* style for canvas */
     canvas {
-        width: 100%;
+        width: 99.9%;
+        height: 270px;
         border: 10px solid #0481ff;
-        border-radius: 25px;
+        border-radius: 20px;
         border-color: #1676d6;
         cursor: pointer;
         background-color: white;

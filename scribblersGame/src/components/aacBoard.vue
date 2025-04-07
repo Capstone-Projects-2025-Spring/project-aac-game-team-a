@@ -70,7 +70,7 @@ const selectItem = (item) => {
     flex-direction: column;
     text-align: center;
     padding: 10px;
-    justify-content: center;
+    justify-content: left;
     align-items: center;
     min-height: 10vh;
 }
@@ -78,8 +78,9 @@ const selectItem = (item) => {
 .grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 10px;
+    gap: 20px;
     max-width: 1000px;
+    
     margin: auto;
 }
 
@@ -92,7 +93,7 @@ button {
 
 .category-image, .item-image {
     width: 100px;
-    height: 100px;
+    height: 70px;
     margin-bottom: 0px;
 }
 
