@@ -226,7 +226,7 @@ export default {
             }"
             @click="serverDisconnect"
             class="quit-btn">
-            QUIT</RouterLink>
+            QUIT ❌</RouterLink>
             <!--Display drawing prompt for drawer-->
             <div v-if="isDrawer" class="draw-prompt">
                 <h2>DRAW: {{ promptWord }}</h2>
