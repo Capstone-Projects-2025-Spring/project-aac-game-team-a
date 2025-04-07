@@ -2,6 +2,7 @@
 import io from "socket.io-client"; // Import the socket.io-client library to enable WebSocket communication
 import AacBoard from '../components/aacBoard.vue'; //import AACBoard component
 import DrawingBoard from '../components/DrawingBoard.vue'; // import Drawing board component
+const backendHost = import.meta.env.VITE_BACKEND_HOST;
 
 export default {
     components: {
@@ -45,7 +46,8 @@ export default {
         // Connect to the server
         serverConnect(){
             // Establish connection to the WebSocket server
-            this.socketInstance = io("http://localhost:3001"); // CHANGE THIS WHEN YOU WANT THE SERVER TO BE PUBLIC
+            //"http://localhost:3001"
+            this.socketInstance = io(backendHost); // CHANGE THIS WHEN YOU WANT THE SERVER TO BE PUBLIC
             // this.socketInstance = io("http://[YOUR IP HERE]:3000");
 
             // 
