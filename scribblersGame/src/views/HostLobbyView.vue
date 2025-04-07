@@ -74,7 +74,6 @@ const currentUserAvatar = ref('')
 
 // Shape mapping
 const shapes = [
-  { value: 0, imgSrc: 'rhombus.png' },
   { value: 1, imgSrc: 'circle.png' },
   { value: 2, imgSrc: 'diamond.png' },
   { value: 3, imgSrc: 'heart.png' },
@@ -86,14 +85,14 @@ const shapes = [
   { value: 9, imgSrc: 'triangle.png' }
 ]
 
-// Generate random 5-digit code on mount
+// Generate random 4-digit code on mount
 onMounted(() => {
   generateRandomCode()
 })
 
 function generateRandomCode() {
-  randomCodeDigits.value = Array.from({ length: 5 }, () =>
-    Math.floor(Math.random() * 10) // includes 0 through 9
+  randomCodeDigits.value = Array.from({ length: 4 }, () =>
+    Math.floor(Math.random() * 9) + 1
   )
 }
 
@@ -128,7 +127,6 @@ function launchRoom() {
   // Add actual hosting logic here
 }
 </script>
-
 
 <style scoped>
 .host-screen {

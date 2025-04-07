@@ -20,20 +20,6 @@ export default {
             imagePath: ""
         };
 
-        // Define the shape array for room code mapping
-        const shapes = [
-            { value: 1, imgSrc: 'circle.png', label: 'Circle' },
-            { value: 2, imgSrc: 'diamond.png', label: 'Diamond' },
-            { value: 3, imgSrc: 'heart.png', label: 'Heart' },
-            { value: 4, imgSrc: 'octagon.png', label: 'Octagon' },
-            { value: 5, imgSrc: 'pentagon.png', label: 'Pentagon' },
-            { value: 6, imgSrc: 'rectangle.png', label: 'Rectangle' },
-            { value: 7, imgSrc: 'rhombus.png', label: 'Rhombus' }, // NEW
-            { value: 8, imgSrc: 'square.png', label: 'Square' },
-            { value: 9, imgSrc: 'star.png', label: 'Star' },
-            { value: 10, imgSrc: 'triangle.png', label: 'Triangle' }
-        ];
-
         return {
             selectedImagePath: "", //path to current AAC image selected
             currentUserMessage,
@@ -48,7 +34,6 @@ export default {
             roundTimer: 0,  // tracks counter state
             roomCodeArr: this.$route.query.roomCode, // stores room code for game as array of numbers
             roomCodeStr: this.$route.query.roomCode.join(''), // stores room code for game as string of numbers
-            shapes, // Array for shape mapping
             AACButtons: [// Buttons for game AAC board with associated images and labels
                 {id: 1, imgSrc: 'lion.png', label: 'Lion'},
                 {id: 2, imgSrc: 'tiger.webp', label: 'Tiger'},
@@ -61,6 +46,7 @@ export default {
         serverConnect(){
             // Establish connection to the WebSocket server
             this.socketInstance = io("http://localhost:3001"); // CHANGE THIS WHEN YOU WANT THE SERVER TO BE PUBLIC
+            // this.socketInstance = io("http://[YOUR IP HERE]:3000");
 
             // 
             this.socketInstance.emit('join-room', this.roomCodeStr);
@@ -240,18 +226,8 @@ export default {
             }"
             @click="serverDisconnect"
             class="quit-btn">
-            
-            QUIT</RouterLink>
-            <!-- Display room code as shapes inside a white block -->
-            <div class="room-code">
-                <h3>Room Code:</h3>
-                <div class="shapes">
-                    <img v-for="shape in roomCodeArr" :key="shape" :src="shapes.find(s => s.value == shape).imgSrc" :alt="shapes.find(s => s.value == shape).label" />
-                </div>
-            </div>
-            
-            <!-- Display drawing prompt for drawer -->
-
+            QUIT ❌</RouterLink>
+            <!--Display drawing prompt for drawer-->
             <div v-if="isDrawer" class="draw-prompt">
                 <h2>DRAW: {{ promptWord }}</h2>
                 <img class='prompt-image' :src=promptImgPath :alt=promptWord >
@@ -298,27 +274,6 @@ export default {
 </template>
 
 <style>
-
-/* Add styles for the room code display */
-.room-code {
-    text-align: center;
-    margin-bottom: 20px;
-    background-color: white; /* White block background */
-    padding: 20px;
-    border-radius: 8px; /* Rounded corners */
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.shapes {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-}
-
-.shapes img {
-    width: 40px;
-    height: 40px;
-
 @media (min-width: 1024px) {
     .game {
         min-height: 100vh;
@@ -472,6 +427,5 @@ export default {
         background-color: #111d76;
         transform: translateY(-2px);
     }
-
 }
 </style>
