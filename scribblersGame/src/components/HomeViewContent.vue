@@ -3,7 +3,7 @@
 
 <template>
   <div class="home-elements">
-    <h1 class="welcome-text">Welcome to Scribbers!</h1>
+    <h1 class="welcome-text">Welcome to Scribblers!</h1>
     <div class="lobby-buttons">
       <RouterLink to="/hostLobby" class="host-lobby-button">Host Lobby</RouterLink>
       <RouterLink to="/joinLobby" class="join-lobby-button">Join Lobby</RouterLink>
