@@ -24,12 +24,14 @@
 </template>
 
 <script setup>
+
 import { ref } from 'vue';
 
 //define the emit function to send events to parent
 const emit = defineEmits();
 
 const currentCategory = ref(null);
+
 
 const categories = {
     Animals: ['Dog', 'Cat', 'Bird', 'Elephant', 'Mouse', 'Horse'],
@@ -56,6 +58,7 @@ const getItemImage = (category, item) => {
 
 //Function that emits an event from this component when user selects a word
 const selectItem = (item) => {
+    // console.log("game object: ", JSON.stringify(gameObject))
     //Emit an event with the selected aac word
     emit('itemSelected', item);
 };

@@ -13,8 +13,9 @@ class GameSession{
      * @param {string} prompt The prompt that all non-drawers are guessing
      * @param {string} drawer This is the person doing the drawing
      * @param {Number} numberPlayers This is the amount of players in the game
+     * @param {String} wordImg This is the path of the generated word's image
      */
-    constructor(sessionID, players, numberRounds, roundsCompleted, winner, prompt, drawer, numberPlayers
+    constructor(sessionID, players, numberRounds, roundsCompleted, winner, prompt, drawer, numberPlayers, wordImg
     ){
         this.sessionID = sessionID;
         this.players = players;
@@ -24,6 +25,7 @@ class GameSession{
         this.prompt = prompt;
         this.drawer = drawer;
         this.numberPlayers = numberPlayers;
+        this.wordImg = wordImg;
     }
 
     /**
@@ -98,13 +100,14 @@ class GameSession{
             "winner": this.winner,
             "prompt": this.prompt,
             "drawer": this.drawer,
-            "numberOfPlayers": this.numberPlayers
+            "numberOfPlayers": this.numberPlayers,
+            "wordImg": this.wordImg
         }
     }
 
     // returns a string of all of the values
     toString(){
-        return "session: " + this.sessionID + " players: " + this.players + " number of Rounds: " + this.numberRounds + " number of rounds completed: " + this.roundsCompleted + " winner: " + this.winner + " number of players: " + this.numberPlayers
+        return "session: " + this.sessionID + " players: " + this.players + " number of Rounds: " + this.numberRounds + " number of rounds completed: " + this.roundsCompleted + " winner: " + this.winner + " number of players: " + this.numberPlayers + " path to image " + this.wordImg
     }
 }
 

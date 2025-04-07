@@ -140,6 +140,7 @@ function selectAvatar(button) {
 
 // Function to validate selection and join the lobby
 function joinLobby() {
+  let codeString = roomCodeArr.value.join('')
   if (selectedShapes.value.includes(null) || !currentUserAvatar.value) {
     alert('Please select all 4 shapes and an avatar.')
     return

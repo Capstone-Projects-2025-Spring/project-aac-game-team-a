@@ -30,6 +30,62 @@ class SocketHandler{
         return wordsList[randomIndex];
     }
 
+    getPath(promptObject){
+        let imagesPerPrompt = 3;
+        if(promptObject == null){
+            
+        }
+        // Get random number to append for the image associated for the prompt 
+        let randomImgNumber = Math.floor(Math.random() * imagesPerPrompt) + 1;
+    
+        // Ensure the image name is in all lowercase and append the number 
+        // Images follow this format: "1image.png", "2image.png", ...
+        let lowerCaseWord = randomImgNumber + promptObject.word.toLowerCase();
+    
+        // Assemble the path
+        let path = 'promptImages/' + promptObject.type + '/' + promptObject.word + '/' + lowerCaseWord + '.png';
+    
+        // for testing
+        console.log(path);
+    
+        return path;
+    }
+
+    getPromptObject() {
+        const promptList = [
+            {word: 'Eat', type: 'Actions'},
+            {word: 'Jump', type: 'Actions'},
+            {word: 'Run', type: 'Actions'},
+            {word: 'Sleep', type: 'Actions'},
+        
+            {word: 'Bird', type: 'Animals'},
+            {word: 'Cat', type: 'Animals'},
+            {word: 'Dog', type: 'Animals'},
+            {word: 'Elephant', type: 'Animals'},
+            {word: 'Horse', type: 'Animals'},
+            {word: 'Mouse', type: 'Animals'},
+        
+            {word: 'Glasses', type: 'Clothing'},
+            {word: 'Gloves', type: 'Clothing'},
+            {word: 'Hat', type: 'Clothing'},
+            {word: 'Pants', type: 'Clothing'},
+            {word: 'Shirt', type: 'Clothing'},
+            {word: 'Shoe', type: 'Clothing'},
+        
+            {word: 'Apple', type: 'Food'},
+            {word: 'Banana', type: 'Food'},
+            {word: 'Carrot', type: 'Food'},
+            {word: 'Grapes', type: 'Food'},
+            {word: 'Pizza', type: 'Food'},
+            {word: 'Spaghetti', type: 'Food'}
+        ]
+        const randomIndex = Math.floor(Math.random() * promptList.length); // get index for random prompt object
+        const promptObject = promptList[randomIndex]; // get random prompt object
+    
+        return promptObject;
+    }
+    
+
     logDataRecieved(socketId, jsonData){
         console.log("data sent from " + socketId)
         console.log("data sent: " + jsonData)
@@ -55,12 +111,15 @@ class SocketHandler{
                 let currentDrawerID = this.socket.id; //assigns first user to join's ID to currentDrawerID
                 //gamesessions[gameSessionData.sessionID] = gameSessionData
 
+                let currentPromptObject = this.getPromptObject();
+                let currentPromptImgPath = this.getPath(currentPromptObject);
+
                 let currentPrompt = this.getRandomWord();
                 console.log("current prompt: " + currentPrompt)
 
                 // Generating game session data
                 let gameSessionData = new GameSessionClass(
-                    randomInteger, [currentDrawerID], numbRounds, 0, null, currentPrompt, currentDrawerID, numbPlayers
+                    randomInteger, [currentDrawerID], numbRounds, 0, null, currentPromptObject.word, currentDrawerID, numbPlayers, currentPromptImgPath
                 )
                 console.log("sessionID type: "+ typeof gameSessionData.sessionID)
                 this.gameSession.saveSession(gameSessionData)
@@ -105,7 +164,7 @@ class SocketHandler{
                 console.log("game data: " + gameData.toString())
                 gameData.players.push(this.socket.id)
 
-                this.io.to(roomId).emit("message", {"message": gameData.toJson()});
+                this.io.to(roomId).emit("drawer", {"message": gameData.toJson()});
             } catch (error){
                 console.log("User could not join game session");
                 console.error(error)
@@ -120,12 +179,26 @@ class SocketHandler{
      * @param {string} roomId The room ID number linked to the game session
      * @throws An error if the user could not leave the game session
      */
-    onPlayerLeave(socket, roomId){
-        try {
+    onCheckResult(){
+        this.socket.on("check_result", (data) => {
+            try{
+                // const jsonData = JSON.parse(data);
+                console.log('Received JSON data:', data);
+                const roomId = data.sessionID
+                const guess = data.guess
+                console.log('room id: ' + roomId)
 
-        } catch (err){
-            console.log("User could not leave game session");
-        }
+                // console.log(this.gameSession)
+                const gameData = this.gameSession.retrieveSession(roomId);
+                console.log("game data: " + gameData.toString())
+                // gameData.players.push(this.socket.id)
+
+                this.io.to(roomId).emit("check_result:message", {"message": gameData.toJson()});
+            } catch (error){
+                console.log("User could not join game session");
+                console.error(error)
+            }
+        });
     }
 
     /**
@@ -196,11 +269,12 @@ class SocketHandler{
 
                 const startGameResult = gameData.startRound(currentPrompt, drawer)
                 if(!startGameResult){
-                    this.io.to(roomId).emit("message", {"error": 'Game over'});
+                    this.io.to(roomId).emit("drawer", {"error": 'Game over'});
+                    return
                 }
 
                 gameData.players.push(drawer)
-                this.io.to(roomId).emit("message", {"message": gameData.toJson()});
+                this.io.to(roomId).emit("drawer", {"message": gameData.toJson()});
             } catch (error){
                 console.log("User was not able to go to next round");
                 console.error(error)

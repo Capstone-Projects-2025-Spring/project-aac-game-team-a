@@ -27,6 +27,7 @@ export default {
                 {id: 2, imgSrc: 'tiger.webp', label: 'Tiger'},
                 {id: 3, imgSrc: 'bear.png', label: 'Bear'}
             ],
+            gameObject: NaN
         };
     },
     methods: {
@@ -44,11 +45,16 @@ export default {
             });
 
             //Listen for 'you-are-drawer' message and random prompt word
-            this.socketInstance.on("you-are-drawer", (data) => {
+            this.socketInstance.on("drawer", (data) => {
+                this.gameObject = data.message
                 console.log('you are the drawer now');
-                this.isDrawer = true;
-                this.promptWord = data.word;
-                this.promptImgPath = data.path;
+                console.log("data: "+ JSON.stringify(data))
+                console.log("client id: " + this.socketInstance.id)
+                if(this.socketInstance.id == data.message.drawer){
+                    this.isDrawer = true;
+                }
+                this.promptWord = data.message.prompt;
+                this.promptImgPath = data.message.wordImg;
             });
 
             //Listen for 'you-are-guesser' message when drawing is done
@@ -92,7 +98,7 @@ export default {
             this.socketInstance.on("timer-update", (serverTime) => {
                 this.roundTimer = serverTime
                 if (serverTime == 0){
-                    this.socketInstance.emit("on_round_start", {sessionID: parseInt(this.roomCodeStr)})
+                    // this.socketInstance.emit("on_round_start", {sessionID: parseInt(this.roomCodeStr)})
                 }
                 
             });
@@ -116,6 +122,7 @@ export default {
         
         //Function that handles a word selection on the AAC board 
         handleItemSelected(item) {
+            console.log("game object: " + JSON.stringify(this.gameObject))
             console.log('Item selected:', item); //logs selected item
             this.text = item; //stores aac button selected by user
             this.addMessage(); //sends websocket message
