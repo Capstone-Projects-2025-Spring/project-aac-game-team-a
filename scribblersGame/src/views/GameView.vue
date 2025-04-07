@@ -245,7 +245,7 @@ export default {
                 </DrawingBoard>
             </div>
 
-            <div class="aac-board-box">
+            <div v-if="!isDrawer" class="aac-board-box">
                 <!-- AacBoard component is rendered here and we catch item selections here.-->
                 <AacBoard @itemSelected="handleItemSelected"/>
             </div>
