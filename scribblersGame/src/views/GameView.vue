@@ -20,6 +20,20 @@ export default {
             imagePath: ""
         };
 
+        // Define the shape array for room code mapping
+        const shapes = [
+            { value: 1, imgSrc: 'circle.png', label: 'Circle' },
+            { value: 2, imgSrc: 'diamond.png', label: 'Diamond' },
+            { value: 3, imgSrc: 'heart.png', label: 'Heart' },
+            { value: 4, imgSrc: 'octagon.png', label: 'Octagon' },
+            { value: 5, imgSrc: 'pentagon.png', label: 'Pentagon' },
+            { value: 6, imgSrc: 'rectangle.png', label: 'Rectangle' },
+            { value: 7, imgSrc: 'rhombus.png', label: 'Rhombus' }, // NEW
+            { value: 8, imgSrc: 'square.png', label: 'Square' },
+            { value: 9, imgSrc: 'star.png', label: 'Star' },
+            { value: 10, imgSrc: 'triangle.png', label: 'Triangle' }
+        ];
+
         return {
             selectedImagePath: "", //path to current AAC image selected
             currentUserMessage,
@@ -34,6 +48,7 @@ export default {
             roundTimer: 0,  // tracks counter state
             roomCodeArr: this.$route.query.roomCode, // stores room code for game as array of numbers
             roomCodeStr: this.$route.query.roomCode.join(''), // stores room code for game as string of numbers
+            shapes, // Array for shape mapping
             AACButtons: [// Buttons for game AAC board with associated images and labels
                 {id: 1, imgSrc: 'lion.png', label: 'Lion'},
                 {id: 2, imgSrc: 'tiger.webp', label: 'Tiger'},
@@ -46,7 +61,6 @@ export default {
         serverConnect(){
             // Establish connection to the WebSocket server
             this.socketInstance = io("http://localhost:3001"); // CHANGE THIS WHEN YOU WANT THE SERVER TO BE PUBLIC
-            // this.socketInstance = io("http://[YOUR IP HERE]:3000");
 
             // 
             this.socketInstance.emit('join-room', this.roomCodeStr);
@@ -227,7 +241,15 @@ export default {
             @click="serverDisconnect"
             class="quit-btn">
             QUIT</RouterLink>
-            <!--Display drawing prompt for drawer-->
+            <!-- Display room code as shapes inside a white block -->
+            <div class="room-code">
+                <h3>Room Code:</h3>
+                <div class="shapes">
+                    <img v-for="shape in roomCodeArr" :key="shape" :src="shapes.find(s => s.value == shape).imgSrc" :alt="shapes.find(s => s.value == shape).label" />
+                </div>
+            </div>
+            
+            <!-- Display drawing prompt for drawer -->
             <div v-if="isDrawer" class="draw-prompt">
                 <h2>DRAW: {{ promptWord }}</h2>
                 <img class='prompt-image' :src=promptImgPath :alt=promptWord >
@@ -274,131 +296,24 @@ export default {
 </template>
 
 <style>
-@media (min-width: 1024px) {
-    .game {
-        min-height: 100vh;
-        /* display: flex; */
-        align-items: center;
-    }
+/* Add styles for the room code display */
+.room-code {
+    text-align: center;
+    margin-bottom: 20px;
+    background-color: white; /* White block background */
+    padding: 20px;
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
 
-    .game-container{
-        display: flex;
-        flex-direction: row;
-        justify-content: space-evenly; /* Space between left and right containers */
-        height: 90vh; /* Full height of the viewport */
-    }
+.shapes {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
 
-    .left-container {
-        height: 100vh; /* Takes full height of the page */
-        /* display: flex; */
-        flex-direction: column; /* Stack the boxes vertically */
-        justify-content: flex-start;
-        gap: 100px;
-    }
-
-    .draw-prompt {
-        background-color: #ffcc00; /* Light yellow background */
-        border-radius: 25px;
-        margin: auto;
-        display: flex;
-        align-items: center;
-        padding: 10px;
-        font-size: 24px;
-        font-weight: bold;
-        margin-bottom: 20px; /* Space between prompt and drawing area */
-        gap: 20px; /* Space between flex items */
-    }
-
-    .prompt-image {
-        border-radius: 25px;
-        height: auto; 
-        width: auto; 
-        max-width: 100px; 
-        max-height: 100px;
-    }
-
-    .drawing-box {
-        width: 100%; 
-        height: 60vh;
-        border-radius: 25px;
-
-        background-image: url("whiteBoard.jpg");
-        background-position: center;
-        background-size: 100% 100%;
-
-        display: flex;
-        align-items: center;
-        background-color: transparent; /* Light background for the drawing box */
-    }
-    
-    .drawing-board {
-        position: relative;
-        bottom: 6px;
-        left: 25px;
-    }
-
-    .aac-board-box {
-        width: 100%;
-        height: 25%; /* Takes 20% of the page height */
-        border: 5px solid blue; /* Border for the button area */
-        background-color: #e0e0e0; /* Light background for the button box */
-    }
-
-    .aac-buttons{
-        margin: 10px; /* Adds space between buttons */
-        background: white;
-        border: 1px bold black;
-        padding: 10px;
-        cursor: pointer;
-    }
-
-    .right-container{
-        height: 100vh; /* Takes full height of the page */
-        display: flex;
-        justify-content: flex-end; /* Aligns the chat to the right */
-    }
-
-    .chat-container {            
-        height: 94.5%;             /* Takes up the full height of the viewport */
-        position: relative;        /* Ensures the text input stays at the bottom */
-        overflow-y: auto;          /* Enables scrolling if messages exceed height */
-        background-color: #c9c6c6; /* Optional background color */
-        box-sizing: border-box;    /* Ensures padding is included in width/height */
-        border: 5px solid black;
-        resize: none;
-        width: 150px;
-    }
-
-    .game-avatar-image {
-        width: 30px; /* Adjust the image size */
-        height: 30px;
-    }
-
-    .message-symbol {
-    width: 50px;
-    height: 50px;
-    margin-left: auto;
-    }
-
-    .quit-btn{
-        padding-bottom: 100px;
-        padding: 12px 20px;
-        font-size: 1.1rem;
-        background-color: #1929a0;
-        color: white;
-        border: none;
-        border-radius: 12px;
-        text-decoration: none;
-        cursor: pointer;
-        box-shadow: 0 5px 15px rgba(0, 123, 255, 0.2);
-        transition: background-color 0.3s, transform 0.1s;
-        font-family: 'Segoe UI', sans-serif;
-        font-weight: bold;
-    }
-
-    .quit-btn:hover {
-        background-color: #111d76;
-        transform: translateY(-2px);
-    }
+.shapes img {
+    width: 40px;
+    height: 40px;
 }
 </style>
