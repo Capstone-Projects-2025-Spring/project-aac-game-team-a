@@ -45,8 +45,8 @@ export default {
         // Connect to the server
         serverConnect(){
             // Establish connection to the WebSocket server
-            this.socketInstance = io("http://localhost:3001"); // CHANGE THIS WHEN YOU WANT THE SERVER TO BE PUBLIC
-            // this.socketInstance = io("http://[YOUR IP HERE]:3000");
+            //this.socketInstance = io("http://localhost:3001"); // CHANGE THIS WHEN YOU WANT THE SERVER TO BE PUBLIC
+            this.socketInstance = io("scribblersserver.fly.dev");
 
             // 
             this.socketInstance.emit('join-room', this.roomCodeStr);
