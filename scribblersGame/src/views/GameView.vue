@@ -11,7 +11,14 @@ export default {
     data() {
         const user = this.$route.query.user || ""; // Stores the username entered by the user
         const avatar = this.$route.query.avatar || ""; // Stores the username entered by the user
+        let roomCodeArr = this.$route.query.roomCode;
 
+        // Check if roomCode is a string and split it, otherwise assume it's already an array
+        if (typeof roomCodeArr  === 'string') {
+        roomCodeArr = roomCodeArr.split(',').map(Number);
+        } else if (Array.isArray(roomCodeArr)) {
+        roomCodeArr = roomCodeArr.map(Number);
+        }
         let currentUserMessage = { // Holds all the user message info being sent back and forth between client and server
             id: 0,
             avatar: avatar,
@@ -32,16 +39,36 @@ export default {
             context: CanvasRenderingContext2D, // stores drawing context for drawing broadcasted data
             roundLength: 10, // how many seconds each round will last
             roundTimer: 0,  // tracks counter state
-            roomCodeArr: this.$route.query.roomCode, // stores room code for game as array of numbers
-            roomCodeStr: this.$route.query.roomCode.join(''), // stores room code for game as string of numbers
+            roomCodeArr: roomCodeArr, // Now roomCodeArr is correctly assigned here
+            roomCodeStr: roomCodeArr.join(''),
             AACButtons: [// Buttons for game AAC board with associated images and labels
                 {id: 1, imgSrc: 'lion.png', label: 'Lion'},
                 {id: 2, imgSrc: 'tiger.webp', label: 'Tiger'},
                 {id: 3, imgSrc: 'bear.png', label: 'Bear'}
             ],
+            roomCodeShapes: [
+                { value: 1, imgSrc: '/circle.png', label: 'Circle' },
+                { value: 2, imgSrc: '/diamond.png', label: 'Diamond' },
+                { value: 3, imgSrc: '/heart.png', label: 'Heart' },
+                { value: 4, imgSrc: '/octagon.png', label: 'Octagon' },
+                { value: 5, imgSrc: '/pentagon.png', label: 'Pentagon' },
+                { value: 6, imgSrc: '/rectangle.png', label: 'Rectangle' },
+                { value: 7, imgSrc: '/square.png', label: 'Square' },
+                { value: 8, imgSrc: '/star.png', label: 'Star' },
+                { value: 9, imgSrc: '/triangle.png', label: 'Triangle' }
+            ],
         };
     },
     methods: {
+        getShapeImage(digit) {
+            const shape = this.roomCodeShapes.find(shape => shape.value === digit);
+            return shape ? shape.imgSrc : '';
+            },
+        getShapeLabel(digit) {
+            const shape = this.roomCodeShapes.find(shape => shape.value === digit);
+            return shape ? shape.label : '';
+        },
+
         // Connect to the server
         serverConnect(){
             // Establish connection to the WebSocket server
@@ -217,6 +244,20 @@ export default {
 </script>
 
 <template>
+    <div class="room-code-block">
+        <span class="room-code-label">Room Code:</span>
+        <div class="room-code-shapes">
+            <img
+            v-for="(digit, index) in roomCodeArr"
+            :key="index"
+            :src="getShapeImage(digit)"
+            :alt="getShapeLabel(digit)"
+            class="room-code-shape"
+            />
+        </div>
+    </div>
+
+
     <div class="game-container"> 
         <!-- Left side: Drawing canvas and button box -->
         <div class="left-container">
@@ -275,6 +316,40 @@ export default {
 
 <style>
 @media (min-width: 1024px) {
+    .room-code-block {
+        display: flex;
+        justify-content: flex-end;  /* Align the box to the right */
+        align-items: center;
+        background-color: white;
+        padding: 15px;  
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        position: fixed;
+        right: 20px;  
+        bottom: 20px; 
+        z-index: 1000; /* Ensure it stays on top of other elements */
+        height: auto;
+        min-width: 250px; 
+        max-width: 350px; 
+    }
+
+    .room-code-label {
+    font-weight: bold;
+    font-size: 1.1rem;
+    }
+
+    .room-code-shapes {
+    display: flex;
+    gap: 0.5rem;
+    }
+
+    .room-code-shape {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    }
+
+    
     .game {
         min-height: 100vh;
         /* display: flex; */
