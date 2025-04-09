@@ -119,6 +119,7 @@ io.on('connection', (socket) => {
     SocketHandler.createGame()
     SocketHandler.onPlayerJoin()
     SocketHandler.onRoundStart()
+    let currentPromptImgPath = null
 
     if(currentDrawerIndex === 0 && !currentDrawerID) {
         // Generating game code 
@@ -137,7 +138,7 @@ io.on('connection', (socket) => {
         // gamesessions[gameSessionData.sessionID] = gameSessionData
 
         currentPromptObject = getPromptObject();
-        let currentPromptImgPath = getPath(currentPromptObject);
+        currentPromptImgPath = getPath(currentPromptObject);
         io.to(playersQueue[currentDrawerIndex]).emit('you-are-drawer', 
             {
                 word: currentPromptObject.word,

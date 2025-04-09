@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: node-backend
+  namespace: aac-game
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: node-backend
+  template:
+    metadata:
+      labels:
+        app: node-backend
+    spec:
+      containers:
+        - name: node-backend
+          image: ljtron/aacbackend:latest
+          ports:
+            - containerPort: 3001
+          # env:
+          #   - name: NODE_ENV
+          #     value: "production"

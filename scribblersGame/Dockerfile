@@ -17,4 +17,5 @@ COPY . .
 EXPOSE 5173
 
 # Start the Vite dev server
-CMD ["npm", "run", "dev", "--", "--host"]
+ENV backendHost=""
+CMD [backendHost, "npm", "run", "dev", "--", "--host"]
