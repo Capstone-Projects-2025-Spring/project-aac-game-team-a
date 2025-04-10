@@ -193,6 +193,9 @@ io.on('connection', (socket) => {
                     if (correctGuesses === playerCount - 1) {
                         correctGuesses = 0;
 
+                        // clear drawing board for all users
+                        io.in(room).emit('cast-draw-clear');
+
                         //next drawer
                         currentDrawerIndex = (currentDrawerIndex + 1) % playersQueue.length;
                         currentPromptObject = getPromptObject();

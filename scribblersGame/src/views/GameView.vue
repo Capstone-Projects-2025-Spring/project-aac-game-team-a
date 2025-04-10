@@ -139,6 +139,7 @@ export default {
 
             // Listen for broadcasted clear canvas
             this.socketInstance.on("cast-draw-clear", () => {
+                if (this.isDrawer) this.context = document.getElementById("canvas").getContext("2d");
                 this.context.fillStyle = "white";
                 this.context.clearRect(0, 0, document.getElementById("canvas").width, document.getElementById("canvas").height);
             });
@@ -282,7 +283,8 @@ export default {
                     @addDrawData="sendDrawData" 
                     @endDrawData="sendDrawDataEnd"
                     @canvasClear="sendDrawDataClear"
-                    @canvasUndo="sendDrawDataUndo">
+                    @canvasUndo="sendDrawDataUndo"
+                    :isDrawer=this.isDrawer>
                 </DrawingBoard>
             </div>
 
