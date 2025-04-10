@@ -2,19 +2,6 @@
   <div class="host-screen">
     <h1>Host a New Game</h1>
 
-    <!-- Display random room code in shapes -->
-    <div class="form-group">
-      <label>Room Code:</label>
-      <div class="shape-code-display">
-        <div v-for="(digit, index) in randomCodeDigits" :key="index" class="shape-slot">
-          <img :src="getShapeImg(digit)" />
-        </div>
-      </div>
-    </div>
-
-    <!-- Game visibility selection -->
-
-
     <!-- Max players input -->
     <div class="form-group">
       <label>Max Players</label>
@@ -27,52 +14,70 @@
       <input type="number" v-model="rounds" min="1" max="10" />
     </div>
 
-    <div class="form-group">
-      <!-- Section for choosing an avatar -->
-      <label>Choose Your Avatar</label>
-      <div class="avatar-container">
-        <button
-          v-for="(button, index) in avatarButtons"
-          :key="index"
-          @click="selectAvatar(button)"
-          :class="['avatar-button', { selected: currentUserAvatar === button.imgSrc }]"
-        >
-          <img :src="button.imgSrc" :alt="button.label" />
-          <p>{{ button.label }}</p>
-        </button>
+    <!-- Host participation toggle -->
+    <div class="host-participation" v-if="!showAvatars">
+      <button class="play-too-btn" @click="toggleAvatars(true)">I'm playing too</button>
+    </div>
+
+    <!-- Avatar selection (conditionally displayed) -->
+    <div v-if="showAvatars" class="avatar-section">
+      <div class="form-group">
+        <label>Choose Your Avatar</label>
+        <div class="avatar-container">
+          <button
+            v-for="(button, index) in avatarButtons"
+            :key="index"
+            @click="selectAvatar(button)"
+            :class="['avatar-button', { selected: currentUserAvatar === button.imgSrc }]"
+          >
+            <img :src="button.imgSrc" :alt="button.label" />
+            <p>{{ button.label }}</p>
+          </button>
+        </div>
       </div>
+      <button class="not-playing-btn" @click="toggleAvatars(false)">I'm not playing</button>
     </div>
 
     <div class="bottom-buttons">
       <RouterLink 
       :to="{
-          path: '/game', // Navigates to the game route
-          query: { user: currentUser, avatar: currentUserAvatar, roomCode: randomCodeDigits} // Passes selected user data as query params
+          path: '/waiting-room',
+          query: { 
+            user: isHostPlaying ? currentUser : 'Host', 
+            avatar: isHostPlaying ? currentUserAvatar : 'host.png', 
+            roomCode: randomCodeString,
+            isHost: true,
+            maxPlayers: maxPlayers,
+            rounds: rounds,
+            isHostPlaying: isHostPlaying
+          }
       }"
       class="launch-btn" 
-      @click="launchRoom">Launch Room</RouterLink>
+      @click="launchRoom">Create Lobby</RouterLink>
       
       <RouterLink 
       :to="{
-          path: '/', // Navigates to the home route
+          path: '/',
       }"
       class="back-btn">Back</RouterLink>
-      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 
 // Room setup state
-const visibility = ref('public')
 const maxPlayers = ref(4)
 const rounds = ref(3)
 const randomCodeDigits = ref([])
 const currentUser = ref('')
 const currentUserAvatar = ref('')
+const showAvatars = ref(false)
+const isHostPlaying = computed(() => showAvatars.value && currentUser.value && currentUserAvatar.value)
+const randomCodeString = computed(() => randomCodeDigits.value.join(''))
 
-// Shape mapping
+// Shape mapping (no longer displayed but kept for room code generation)
 const shapes = [
   { value: 1, imgSrc: 'circle.png' },
   { value: 2, imgSrc: 'diamond.png' },
@@ -96,11 +101,6 @@ function generateRandomCode() {
   )
 }
 
-function getShapeImg(digit) {
-  const found = shapes.find((s) => s.value === digit)
-  return found ? found.imgSrc : ''
-}
-
 // List of available avatars
 const avatarButtons = [
   { id: 1, imgSrc: 'lion.png', label: 'Lion' },
@@ -113,6 +113,16 @@ const avatarButtons = [
   { id: 8, imgSrc: 'dog.png', label: 'Dog' }
 ]
 
+// Function to toggle avatar selection visibility
+function toggleAvatars(show) {
+  showAvatars.value = show
+  // Clear selected avatar if "not playing"
+  if (!show) {
+    currentUser.value = ''
+    currentUserAvatar.value = ''
+  }
+}
+
 // Function to select an avatar
 function selectAvatar(button) {
   currentUser.value = button.label
@@ -120,11 +130,10 @@ function selectAvatar(button) {
 }
 
 function launchRoom() {
-  const codeString = randomCodeDigits.value.join('')
-  alert(
-    `Hosting room ${codeString} (${visibility.value}) with max ${maxPlayers.value} players and ${rounds.value} rounds`
-  )
-  // Add actual hosting logic here
+  if (showAvatars.value && (!currentUser.value || !currentUserAvatar.value)) {
+    alert('Please select an avatar before creating a lobby.')
+    return false
+  }
 }
 </script>
 
@@ -161,26 +170,47 @@ label {
   font-weight: bold;
 }
 
-.shape-code-display {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 20px;
+.host-participation {
+  margin: 30px 0;
 }
 
-.shape-slot {
-  width: 60px;
-  height: 60px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.play-too-btn {
+  padding: 12px 24px;
+  font-size: 1rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
-.shape-slot img {
-  width: 40px;
-  height: 40px;
+.play-too-btn:hover {
+  background-color: #0056b3;
+}
+
+.not-playing-btn {
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background-color 0.3s;
+}
+
+.not-playing-btn:hover {
+  background-color: #5a6268;
+}
+
+.avatar-section {
+  margin: 20px 0;
+  padding: 15px;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  background-color: #f9f9f9;
 }
 
 .avatar-container {

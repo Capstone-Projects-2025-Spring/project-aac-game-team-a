@@ -4,6 +4,7 @@ import GameView from '../views/GameView.vue'
 import AvatarSelectView from '../views/AvatarSelectView.vue'
 import HostLobbyView from '../views/HostLobbyView.vue'
 import JoinLobbyView from '../views/JoinLobbyView.vue'
+import Waitingroom from '@/views/Waitingroom.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -35,6 +36,11 @@ const router = createRouter({
       path: '/joinLobby',
       name: 'join',
       component: JoinLobbyView,
+    },
+    {
+      path: '/waiting-room',
+      name: 'waiting-room',
+      component: Waitingroom,
     },
   ],
 })
