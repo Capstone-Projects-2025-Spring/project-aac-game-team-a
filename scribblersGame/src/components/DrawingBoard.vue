@@ -1,8 +1,9 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 
 //define the emit function to send events to parent
 const emit = defineEmits();
+const props = defineProps(['isDrawer']);
 
 const canvasRef = ref(null);
 let context = null;
@@ -12,11 +13,22 @@ let is_drawing = false;
 let draw_width = 1;
 const start_background_color = "white";
 
+// React to player role changes
+watch(() => props.isDrawer, (currentValue) => {
+
+    //  Hide drawing tools for non-drawers
+    if (currentValue == true)
+        document.querySelector(".tools").style.display = 'inline';
+    else
+        document.querySelector(".tools").style.display = 'none';
+});
+
 onMounted(() => {
     const canvas = canvasRef.value;
+
+    // Set up canvas size
     canvas.width = canvas.offsetWidth;
     canvas.height = canvas.offsetHeight;
-
 
     //const canvas = canvasRef.value;
     if (!canvas) {
@@ -24,20 +36,14 @@ onMounted(() => {
         return;
     }
 
-    // Set up canvas size
-    //canvas.width = 1201;
-    //canvas.height = 350;
-
     canvasRef.value.width = canvasRef.value.offsetWidth;
     canvasRef.value.height = canvasRef.value.offsetHeight;
 
-
-;
     context = canvas.getContext("2d");
     context.fillStyle = start_background_color;
     context.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Event Listeners
+    // Drawing Event Listeners
     canvas.addEventListener("mousedown", saveState);
     canvas.addEventListener("touchstart", start, false);
     canvas.addEventListener("touchmove", draw, false);
@@ -46,19 +52,21 @@ onMounted(() => {
     canvas.addEventListener("touchend", stop, false);
     canvas.addEventListener("mouseup", stop, false);
     canvas.addEventListener("mouseout", stop, false);
-
+   
+    // Button Event Listeners
+    document.querySelector(".Cbutton").addEventListener("click", clear_canvas);
+    document.querySelector(".Ubutton").addEventListener("click", undo_action);   
     document.querySelectorAll(".color-field").forEach((div) => {
         div.addEventListener("click", () => {
             draw_color = div.style.background;
         });
     });
-
     document.querySelector(".pen-range").addEventListener("input", function () {
         draw_width = this.value;
     });
 
-    document.querySelector(".Cbutton").addEventListener("click", clear_canvas);
-    document.querySelector(".Ubutton").addEventListener("click", undo_action);
+    // Drawing tools disabled by default
+    document.querySelector(".tools").style.display = 'none';
 });
 
 //  Pushes current canvas state onto undo stack
@@ -70,7 +78,7 @@ function saveState() {
 
 //  Start new drawing stroke
 function start(event) {
-    if (!context) return;
+    if (!context || !props.isDrawer) return;
 
     const rect = canvasRef.value.getBoundingClientRect();
 
@@ -81,7 +89,6 @@ function start(event) {
     const y = (event.clientY - rect.top) * scaleY;
     
     emit("startDrawData", x, y, draw_color, draw_width);
-    //console.log("Drawing started");
 
     is_drawing = true;
     context.beginPath(); // Start a new path
@@ -90,7 +97,7 @@ function start(event) {
 
 //  Function to draw on canvas while mouse moves
 function draw(event) {
-    if (!is_drawing || !context) return;
+    if (!is_drawing || !context || !props.isDrawer) return;
 
     const rect = canvasRef.value.getBoundingClientRect();
 
@@ -100,7 +107,6 @@ function draw(event) {
     const x = (event.clientX - rect.left) * scaleX;
     const y = (event.clientY - rect.top) * scaleY;
 
-
     emit("addDrawData", x, y);
 
     context.lineTo(x, y);
@@ -109,22 +115,20 @@ function draw(event) {
     context.lineCap = "round";
     context.lineJoin = "round";
     context.stroke();
-
     event.preventDefault();
 }
 
 function stop(event) {
-    if (!context) return;
+    if (!context || !props.isDrawer) return;
 
     emit("endDrawData");
-    //console.log("Drawing ended");
 
     is_drawing = false;
     context.closePath();
 }
 
 function clear_canvas() {
-    if (context) {
+    if (context && props.isDrawer) {
         context.fillStyle = start_background_color;
         context.clearRect(0, 0, canvasRef.value.width, canvasRef.value.height);
         context.fillRect(0, 0, canvasRef.value.width, canvasRef.value.height);
@@ -133,7 +137,7 @@ function clear_canvas() {
 }
 
 function undo_action() {
-    if (context && undoHistory.length > 0) {
+    if (context && undoHistory.length > 0 && props.isDrawer) {
         let previousState = undoHistory.pop();
         context.putImageData(previousState, 0, 0);
         emit("canvasUndo", previousState);
@@ -165,7 +169,6 @@ function undo_action() {
                     <input type="range" min="1" max="100" class="pen-range" value="1">
                 </div>
             </div>
-        
         <div id="app"></div>
     </body>
 </template>
