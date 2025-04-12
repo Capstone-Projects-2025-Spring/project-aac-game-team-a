@@ -2,11 +2,13 @@
 import io from "socket.io-client"; // Import the socket.io-client library to enable WebSocket communication
 import AacBoard from '../components/aacBoard.vue'; //import AACBoard component
 import DrawingBoard from '../components/DrawingBoard.vue'; // import Drawing board component
+import GuessBoard from "@/components/GuessBoard.vue";
 
 export default {
     components: {
         AacBoard, //register Aac board as a component
         DrawingBoard, //register drawing board as a component
+        GuessBoard, // register the drawing borad as a component
     },
     data() {
         const user = this.$route.query.user || ""; // Stores the username entered by the user
@@ -256,19 +258,10 @@ export default {
             <h2>Timer: {{ roundTimer }}</h2>
             <button type="test" class="test" @click="sendTimerStart(roundLength)">test</button>
                 
-            <div class="chat-container">                
-                <!-- Loop through messageBoard array and display each message -->
-                <div v-for="message in messageBoard" :key="message.id" class="chat-message">
-                    <img :src="message.avatar" :alt="message.user" class="game-avatar-image" />
-                    <span class="guess-message">{{ message.text }}</span>
-                    <img 
-                        v-if="message.imagePath" 
-                        :src="message.imagePath" 
-                        alt="Symbol" 
-                        class="message-symbol" 
-                    />
-                </div>
-            </div>
+            <!-- Assign the messageBoard in this class to the messageBoard in the MessageBoard component -->
+            <GuessBoard
+                :guesses=this.messageBoard> 
+            </GuessBoard>
         </div>
     </div>
 </template>
@@ -359,52 +352,6 @@ export default {
         flex-direction: column;     /* Vertical stacking */
         align-items: center;      /*cAlign children to the right side*/
         padding: 1rem;              /* Optional padding */
-    }
-
-    .chat-container {            
-        background-color: #c9c6c6;
-        box-sizing: border-box;
-        border: 5px solid black;
-        border-radius: 25px;
-        resize: none;
-        width: 250px;
-
-        height: auto;
-        min-height: 150px;
-        max-height: 80vh;
-        overflow-y: auto;
-
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;        /* Horizontal centering */
-        justify-content: center;    /* Vertical centering */
-        text-align: center;         /* Optional: centers inline text */
-    }
-
-    .chat-message {
-        display: flex;
-        flex-direction: row;
-    }
-
-    .game-avatar-image {
-        width: auto; /* Adjust the image size */
-        height: 50px;
-        padding-left: 1rem;
-    }
-
-    .guess-message {
-        padding-top: 0.9rem;
-        font-weight: bold;
-        font-family: 'Segoe UI', sans-serif;
-        padding-left: 0.5rem;
-        padding-right: 0.5rem;
-    }
-
-    .message-symbol {
-        width: 50px;
-        height: 50px;
-        margin-left: auto;
-        padding-right: 1rem;
     }
 
     .quit-btn{
