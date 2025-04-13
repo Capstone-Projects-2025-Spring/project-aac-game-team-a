@@ -3,6 +3,7 @@ import io from "socket.io-client"; // Import the socket.io-client library to ena
 import AacBoard from '../components/aacBoard.vue'; //import AACBoard component
 import DrawingBoard from '../components/DrawingBoard.vue'; // import Drawing board component
 import GuessBoard from "@/components/GuessBoard.vue";
+import { GameState } from '@/stores/GameState'
 
 export default {
     components: {
@@ -11,9 +12,13 @@ export default {
         GuessBoard, // register the drawing borad as a component
     },
     data() {
-        const user = this.$route.query.user || ""; // Stores the username entered by the user
-        const avatar = this.$route.query.avatar || ""; // Stores the username entered by the user
-        let roomCodeArr = this.$route.query.roomCode;
+        // Define local state to recieve user data from Host and Join lobby
+        const localGameState = GameState();
+
+        // Use the local state to define specific user choices
+        const user = localGameState.currentUser; // Stores the username entered by the user
+        const avatar = localGameState.currentUserAvatar; // Stores the username entered by the user
+        let roomCodeArr = localGameState.roomCode;
 
         // Check if roomCode is a string and split it, otherwise assume it's already an array
         if (typeof roomCodeArr  === 'string') {
