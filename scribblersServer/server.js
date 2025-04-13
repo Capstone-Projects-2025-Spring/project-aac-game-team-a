@@ -145,7 +145,7 @@ io.on('connection', (socket) => {
     //  Listens for users leaving the room
     socket.on('leave-room', (code, user) => {
 
-        //  Loop through array to find and remove player
+        //  Loop through array to find and remove player from array
         let index = 0;
         let arrLength = mappedGameData.get(code).players.length
         for (index = 0; index < arrLength; index++) {
@@ -156,6 +156,7 @@ io.on('connection', (socket) => {
             }
         }
         socket.leave(code);
+        io.emit("update-player-list", mappedGameData.get(code).players);
         console.log(mappedGameData.get(code))
         console.log(`User ${socket.id} has disconnected from room ${code}`);
 

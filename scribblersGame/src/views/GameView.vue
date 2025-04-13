@@ -309,7 +309,9 @@ export default {
         <WaitingRoom
             @startGame="startGame"
             @leaveLobby="leaveLobby"
-            :roomCode="roomCodeArr">
+            :roomCode="roomCodeArr"
+            :maxPlayers="maxPlayers"
+            :players="players">
         </WaitingRoom>
     </div>
 

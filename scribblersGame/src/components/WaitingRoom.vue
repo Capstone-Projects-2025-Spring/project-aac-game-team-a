@@ -27,15 +27,17 @@
       
       <div class="players-list">
         <!-- Current user (only show in player list if host is playing or if user is not host) -->
+        <!--
         <div v-if="isHostPlaying || !isHost" class="player">
           <img :src="userAvatar" :alt="userName" class="player-avatar" />
           <p>{{ userName }} <span v-if="isHost">(Host)</span></p>
         </div>
+        -->
         
         <!-- Joined players list -->
-        <div v-for="(player, index) in joinedPlayers" :key="index" class="player">
-          <img :src="player.avatar" :alt="player.name" class="player-avatar" />
-          <p>{{ player.name }}</p>
+        <div v-for="(player, index) in props.players" :key="index" class="player">
+          <img :src="player.toLowerCase() + '.png'" :alt="player" class="player-avatar" />
+          <p>{{ player }}</p>
         </div>
 
         <!-- Empty state message when no players have joined -->
@@ -90,14 +92,20 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
 
 //define the emit function to send events to parent
 const emit = defineEmits();
-const props = defineProps(['roomCode']);
+const props = defineProps(['roomCode', 'maxPlayers', 'players']);
+
+watch(props.players, (newVal) => {
+
+  console.log("players updated - waiting room");
+  //$forceUpdate();
+})
 
 // Extract query parameters
 const userName = ref(route.query.user || '')
