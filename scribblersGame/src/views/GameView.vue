@@ -96,17 +96,15 @@ export default {
 
             //  Create new lobby if host is connecting to socket, otherwise attempt to join specified lobby
             if (this.isHost) {
-
+                
                 //  Add host to player array if they are playing
                 if (this.isHostPlaying)
                     this.players.push(this.currentUser)
-                //console.log(this.players)
+
                 this.socketInstance.emit("create-new-lobby", this.numRounds, this.maxPlayers, this.players);
-                //console.log("codeArr: " + this.roomCodeArr);
             }
             else {
-                this.socketInstance.emit('join-room', this.roomCodeStr, this.currentUser);
-                //console.log("codeArr: " + this.roomCodeArr);    
+                this.socketInstance.emit('join-room', this.roomCodeStr, this.currentUser);    
             }
 
             // Listen for new lobby code
@@ -123,25 +121,25 @@ export default {
             // Listen for new player list
             this.socketInstance.on("update-player-list", (updatePlayers) => {
 
-                //console.log("Updating player list: ", updatePlayers);
                 this.players = updatePlayers;
-                //console.log("players: " + this.players);
             })
 
             //  Listen for max players for lobby
             this.socketInstance.on("update-max-players", (updateMaxPlayers) => {
 
-                console.log("Updating maximum player count: ", updateMaxPlayers);
                 this.maxPlayers = updateMaxPlayers;
-                console.log("maxPlayers: " + this.maxPlayers);
             })
 
             //  Listen for new round count
             this.socketInstance.on("update-round", (updateRound) => {
 
-                //console.log("Updating round: ", updateRound);
                 this.numRounds = updateRound;
-                //console.log("round: " + this.rounds);
+            })
+
+            //  Listen for host to start game
+            this.socketInstance.on("start-game", () => {
+
+                this.gameStarted = true;
             })
 
             // Listen for the player count from the server
@@ -303,7 +301,9 @@ export default {
 
         //  Handles request for host to start game
         startGame() {
-
+            //console.log("Starting game");
+            this.gameStarted = true;
+            this.socketInstance.emit("start-game", this.roomCodeStr);
         },
 
         //  Handles request to leave lobby

@@ -34,7 +34,7 @@
         </div>
 
         <!-- Empty state message when no players have joined -->
-        <div v-if="playerCount === 0" class="empty-players">
+        <div v-if="props.players.length === 0" class="empty-players">
           <p>Waiting for players to join...</p>
         </div>
       </div>
@@ -42,23 +42,15 @@
     
     <div class="bottom-buttons">
       <!-- Only host can start the game -->
-      <RouterLink 
-        v-if="isHost && playerCount >= 2"
-        :to="{
-          path: '/game',
-          query: { 
-            user: userName, 
-            avatar: userAvatar,
-            isHost: isHost,
-            isHostPlaying: isHostPlaying
-          }
-        }"
+      <button 
+        v-if="isHost && props.players.length >= 2"
+        @click="startGame"
         class="start-btn">
         Start Game
-      </RouterLink>
+      </button>
       
       <RouterLink 
-        v-if="isHost && playerCount < 2"
+        v-if="isHost && props.players.length < 2"
         to="#"
         class="disabled-btn"
         @click.prevent="showNotEnoughPlayersAlert">
@@ -117,6 +109,10 @@ function getShapeImg(digit) {
 
 function showNotEnoughPlayersAlert() {
   alert('Need at least 2 players to start the game!')
+}
+
+function startGame() {
+  emit("startGame");
 }
 
 function leaveLobby(){

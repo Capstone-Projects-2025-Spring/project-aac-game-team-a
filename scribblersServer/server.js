@@ -122,6 +122,10 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on('start-game', (code)  => {
+        socket.to(code).emit('start-game');
+    })
+
     // Listens for user joining room
     socket.on('join-room', (code, user)  => {
         
