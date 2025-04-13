@@ -55,7 +55,6 @@
       <RouterLink 
       :to="{
           path: '/game', // Navigates to the game route
-          query: { user: currentUser, avatar: currentUserAvatar, roomCode: roomCodeArr} // Passes selected user data as query params
       }"
       class="join-btn" 
       @click="joinLobby">
@@ -72,6 +71,10 @@
 
 <script setup>
 import { ref } from 'vue'
+import { GameState } from '@/stores/GameState'
+
+// Define local state to send user data to Game
+const localGameState = GameState();
 
 // Reactive state for storing selected shapes
 const selectedShapes = ref([null, null, null, null])
@@ -142,6 +145,9 @@ function joinLobby() {
     return
   }
   alert(`Joining room ${roomCodeArr.value.join('')} as ${currentUser.value}`)
+
+  // Use local state to set and save the selection of the user
+  localGameState.setUser(currentUser, currentUserAvatar, roomCodeArr)
 }
 </script>
 

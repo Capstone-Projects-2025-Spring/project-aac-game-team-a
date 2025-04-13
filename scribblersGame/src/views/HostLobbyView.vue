@@ -47,7 +47,6 @@
       <RouterLink 
       :to="{
           path: '/game', // Navigates to the game route
-          query: { user: currentUser, avatar: currentUserAvatar, roomCode: randomCodeDigits} // Passes selected user data as query params
       }"
       class="launch-btn" 
       @click="launchRoom">Launch Room</RouterLink>
@@ -63,6 +62,10 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { GameState } from '@/stores/GameState'
+
+// Define local state to send user data to Game
+const localGameState = GameState();
 
 // Room setup state
 const visibility = ref('public')
@@ -125,6 +128,10 @@ function launchRoom() {
     `Hosting room ${codeString} (${visibility.value}) with max ${maxPlayers.value} players and ${rounds.value} rounds`
   )
   // Add actual hosting logic here
+
+   // Use local state to set and save the selection of the user
+   localGameState.setUser(currentUser, currentUserAvatar, randomCodeDigits)
+
 }
 </script>
 
