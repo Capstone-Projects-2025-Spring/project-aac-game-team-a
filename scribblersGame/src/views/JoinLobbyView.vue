@@ -54,12 +54,12 @@
       <!-- Button to join the waiting room instead of going directly to game -->
       <RouterLink 
       :to="{
-          path: '/waiting-room', // Navigate to waiting room
+          path: '/game', // Navigates to the game
           query: { 
             user: currentUser, 
-            avatar: currentUserAvatar, 
-            roomCode: roomCodeArr.join(''),
-            isHost: false
+            avatar: currentUserAvatar,
+            isHost: false, 
+            roomCode: roomCodeArr
           }
       }"
       class="join-btn" 

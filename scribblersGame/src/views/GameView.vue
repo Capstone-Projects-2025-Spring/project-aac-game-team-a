@@ -2,23 +2,26 @@
 import io from "socket.io-client"; // Import the socket.io-client library to enable WebSocket communication
 import AacBoard from '../components/aacBoard.vue'; //import AACBoard component
 import DrawingBoard from '../components/DrawingBoard.vue'; // import Drawing board component
+import WaitingRoom from '../components/WaitingRoom.vue'; // import Drawing board component
 
 export default {
     components: {
         AacBoard, //register Aac board as a component
         DrawingBoard, //register drawing board as a component
+        WaitingRoom, //register waiting room as a component
     },
     data() {
         const user = this.$route.query.user || ""; // Stores the username entered by the user
         const avatar = this.$route.query.avatar || ""; // Stores the username entered by the user
-        let roomCodeArr = this.$route.query.roomCode;
+        const isHost = this.$route.query.isHost === 'true';
+        let roomCodeArr = this.$route.query.roomCode; // Stores room code in array
 
-        // Check if roomCode is a string and split it, otherwise assume it's already an array
-        if (typeof roomCodeArr  === 'string') {
-        roomCodeArr = roomCodeArr.split(',').map(Number);
-        } else if (Array.isArray(roomCodeArr)) {
-        roomCodeArr = roomCodeArr.map(Number);
-        }
+        //Check if roomCode is a string and split it, otherwise assume it's already an array
+        if (typeof roomCodeArr  === 'string')
+            roomCodeArr = roomCodeArr.split(',').map(Number);
+        else if (Array.isArray(roomCodeArr))
+            roomCodeArr = roomCodeArr.map(Number);
+        
         let currentUserMessage = { // Holds all the user message info being sent back and forth between client and server
             id: 0,
             avatar: avatar,
@@ -28,12 +31,15 @@ export default {
         };
 
         return {
+            inProduction: false, //change this variable to switch between connecting to public backend server and localhost
+            socketServer: "scribblersserver.fly.dev", //web address for hosted websocket server
             selectedImagePath: "", //path to current AAC image selected
             currentUserMessage,
             messageBoard: [
                 currentUserMessage
             ], // Array to store all received users in message board
             isDrawer: false, //track if user is the drawer
+            isHost: isHost, //track if user is hosting
             promptWord: "", //store the random drawing prompt word
             promptImgPath: "", // store the path to the image to be referenced for prompt
             context: CanvasRenderingContext2D, // stores drawing context for drawing broadcasted data
@@ -41,6 +47,7 @@ export default {
             roundTimer: 0,  // tracks counter state
             roomCodeArr: roomCodeArr, // Now roomCodeArr is correctly assigned here
             roomCodeStr: roomCodeArr.join(''),
+            gameStarted: false,
             AACButtons: [// Buttons for game AAC board with associated images and labels
                 {id: 1, imgSrc: 'lion.png', label: 'Lion'},
                 {id: 2, imgSrc: 'tiger.webp', label: 'Tiger'},
@@ -72,11 +79,31 @@ export default {
         // Connect to the server
         serverConnect(){
             // Establish connection to the WebSocket server
-            this.socketInstance = io("http://localhost:3001"); // CHANGE THIS WHEN YOU WANT THE SERVER TO BE PUBLIC
-            // this.socketInstance = io("http://[YOUR IP HERE]:3000");
+            if (this.inProduction) 
+                this.socketInstance = io(this.socketServer);
+            else 
+                this.socketInstance = io("http://localhost:3001"); // CHANGE THIS WHEN YOU WANT THE SERVER TO BE PUBLIC
 
-            // 
-            this.socketInstance.emit('join-room', this.roomCodeStr);
+            //  Create new lobby if host is connecting to socket
+            console.log("isHost: " + this.isHost);
+            if (this.isHost) {
+                this.socketInstance.emit("create-new-lobby");
+                console.log("codeArr: " + this.roomCodeArr);
+            }
+            else {
+                this.socketInstance.emit('join-room', this.roomCodeStr);
+                console.log("codeArr: " + this.roomCodeArr);    
+            }
+            // Listen for new lobby code
+            this.socketInstance.on("update-lobby-code", (newRoomCode) => {
+                
+                console.log("Updating lobby code: ", newRoomCode);
+                this.roomCodeStr = newRoomCode;
+                this.roomCodeArr = newRoomCode.split('');
+
+                // Connect user to lobby
+                this.socketInstance.emit('join-room', this.roomCodeStr);
+            });
 
             // Listen for the player count from the server
             this.socketInstance.on("player-count-update", (count) => {
@@ -233,7 +260,17 @@ export default {
         sendTimerStart(length){
             if (this.roundTimer != 0) return;
             this.socketInstance.emit('timer-start', this.roomCodeStr, length);
-        }
+        },
+
+        //  Handles request for host to start game
+        startGame() {
+
+        },
+
+        //  Handles request to leave lobby
+        leaveLobby() {
+            this.socketInstance.emit("leave-room", this.roomCodeStr);
+        },
     },
     // Automatically connect to the WebSocket server when the component is mounted
     mounted(){
@@ -244,21 +281,32 @@ export default {
 </script>
 
 <template>
-    <div class="room-code-block">
-        <span class="room-code-label">Room Code:</span>
-        <div class="room-code-shapes">
-            <img
-            v-for="(digit, index) in roomCodeArr"
-            :key="index"
-            :src="getShapeImage(digit)"
-            :alt="getShapeLabel(digit)"
-            class="room-code-shape"
-            />
-        </div>
+    <!--Display waiting room in between games-->
+    <div v-if="!gameStarted" class="waiting-room">
+        <WaitingRoom
+            @startGame="startGame"
+            @leaveLobby="leaveLobby"
+            :roomCode="roomCodeArr">
+        </WaitingRoom>
     </div>
 
+    <!--Display game while started-->
+    <div v-if="gameStarted" class="game-container"> 
 
-    <div class="game-container"> 
+        <!-- Display room code-->
+        <div class="room-code-block">
+            <span class="room-code-label">Room Code:</span>
+            <div class="room-code-shapes">
+                <img
+                v-for="(digit, index) in roomCodeArr"
+                :key="index"
+                :src="getShapeImage(digit)"
+                :alt="getShapeLabel(digit)"
+                class="room-code-shape"
+                />
+            </div>
+        </div>
+
         <!-- Left side: Drawing canvas and button box -->
         <div class="left-container">
             <RouterLink 

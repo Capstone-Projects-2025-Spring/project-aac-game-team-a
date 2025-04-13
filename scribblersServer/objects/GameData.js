@@ -1,29 +1,29 @@
 /**
  * This class manages the game session and rounds on the server
  */
-class GameSession{
+class GameData{
     /**
      * Creates an instance of an GameSession to track data about the current game session
      * 
-     * @param {Number} sessionID The unique ID of the current game session
-     * @param {Array} players The array of player objects linked to the game session
-     * @param {number} numberRounds The amount of rounds for this game
-     * @param {number} roundsCompleted The counter of number of rounds completed in the current game session
-     * @param {string} winner The declared winner of the game session
-     * @param {string} prompt The prompt that all non-drawers are guessing
-     * @param {string} drawer This is the person doing the drawing
-     * @param {Number} numberPlayers This is the amount of players in the game
+     * @param {number} numberRounds The number of rounds remaining for the game
+     * @param {number} maxPlayers The maximum number of players allowed to join the game
+     * @param {string} players An array of avatars currently in game
+     * @param {string} prompt The prompt for drawers to draw and guessers to guess
+     * @param {string} drawer The currently selected drawer
+     * @param {number} timerID The ID related to the timer interval for the room
+     * @param {number} timerValue The current value of the round timer
+     * @param {Map}    scores The scores of each player, each key is a playerID and value is score
      */
-    constructor(sessionID, players, numberRounds, roundsCompleted, winner, prompt, drawer, numberPlayers
-    ){
-        this.sessionID = sessionID;
-        this.players = players;
+
+    constructor( numberRounds, maxPlayers, players, prompt, drawer, timerID, timerValue, scores ){
         this.numberRounds = numberRounds;
-        this.roundsCompleted = roundsCompleted;
-        this.winner = winner;
+        this.maxPlayers = maxPlayers;
+        this.players = players;
         this.prompt = prompt;
         this.drawer = drawer;
-        this.numberPlayers = numberPlayers;
+        this.timerID = timerID;
+        this.timerValue = timerValue;
+        this.scores = scores;
     }
 
     /**
@@ -61,10 +61,10 @@ class GameSession{
         try {
             this.prompt = newPrompt
             this.drawer = drawer
-            this.roundsCompleted = this.roundsCompleted + 1
+            this.numberRounds--
 
-            if(this.roundsCompleted > this.numberRounds){
-                console.log("End of a the game")
+            if(this.roundsCompleted == 0){
+                console.log("Game over.")
                 return false
             }
 
@@ -92,20 +92,17 @@ class GameSession{
     // returns the json data
     toJson(){
         return {
-            "sessionID": this.sessionID,
-            "players": this.players,
             "numberRounds": this.numberRounds,
             "winner": this.winner,
             "prompt": this.prompt,
-            "drawer": this.drawer,
-            "numberOfPlayers": this.numberPlayers
+            "drawer": this.drawer
         }
     }
 
     // returns a string of all of the values
     toString(){
-        return "session: " + this.sessionID + " players: " + this.players + " number of Rounds: " + this.numberRounds + " number of rounds completed: " + this.roundsCompleted + " winner: " + this.winner + " number of players: " + this.numberPlayers
+        return "number of Rounds: " + this.numberRounds + this.maxPlayers + this.players + this.prompt + this.drawer + this.timerID + this.timerValue + this.scores
     }
 }
 
-module.exports = GameSession;
+module.exports = GameData;

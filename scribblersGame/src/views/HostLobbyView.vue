@@ -5,7 +5,7 @@
     <!-- Max players input -->
     <div class="form-group">
       <label>Max Players</label>
-      <input type="number" v-model="maxPlayers" min="2" max="6" />
+      <input type="number" v-model="maxPlayers" min="2" max="8" />
     </div>
 
     <!-- Number of rounds input -->
@@ -41,7 +41,7 @@
     <div class="bottom-buttons">
       <RouterLink 
       :to="{
-          path: '/waiting-room',
+          path: '/game', // Navigates to the game',
           query: { 
             user: isHostPlaying ? currentUser : 'Host', 
             avatar: isHostPlaying ? currentUserAvatar : 'host.png', 
@@ -76,30 +76,6 @@ const currentUserAvatar = ref('')
 const showAvatars = ref(false)
 const isHostPlaying = computed(() => showAvatars.value && currentUser.value && currentUserAvatar.value)
 const randomCodeString = computed(() => randomCodeDigits.value.join(''))
-
-// Shape mapping (no longer displayed but kept for room code generation)
-const shapes = [
-  { value: 1, imgSrc: 'circle.png' },
-  { value: 2, imgSrc: 'diamond.png' },
-  { value: 3, imgSrc: 'heart.png' },
-  { value: 4, imgSrc: 'octagon.png' },
-  { value: 5, imgSrc: 'pentagon.png' },
-  { value: 6, imgSrc: 'rectangle.png' },
-  { value: 7, imgSrc: 'square.png' },
-  { value: 8, imgSrc: 'star.png' },
-  { value: 9, imgSrc: 'triangle.png' }
-]
-
-// Generate random 4-digit code on mount
-onMounted(() => {
-  generateRandomCode()
-})
-
-function generateRandomCode() {
-  randomCodeDigits.value = Array.from({ length: 4 }, () =>
-    Math.floor(Math.random() * 9) + 1
-  )
-}
 
 // List of available avatars
 const avatarButtons = [

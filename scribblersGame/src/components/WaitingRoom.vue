@@ -6,7 +6,7 @@
       <div class="room-code">
         <h2>Room Code:</h2>
         <div class="shape-code-display">
-          <div v-for="(digit, index) in roomCodeArray" :key="index" class="shape-slot">
+          <div v-for="(digit, index) in roomCode" :key="index" class="shape-slot">
             <img :src="getShapeImg(parseInt(digit))" />
           </div>
         </div>
@@ -54,7 +54,7 @@
           query: { 
             user: userName, 
             avatar: userAvatar, 
-            roomCode: roomCode,
+            //roomCode: roomCode,
             isHost: isHost,
             isHostPlaying: isHostPlaying,
             maxPlayers: maxPlayers,
@@ -81,7 +81,8 @@
         :to="{
           path: '/',
         }"
-        class="leave-btn">
+        class="leave-btn"
+        @click="leaveLobby">
         Leave Lobby
       </RouterLink>
     </div>
@@ -94,19 +95,17 @@ import { useRoute } from 'vue-router'
 
 const route = useRoute()
 
+//define the emit function to send events to parent
+const emit = defineEmits();
+const props = defineProps(['roomCode']);
+
 // Extract query parameters
 const userName = ref(route.query.user || '')
 const userAvatar = ref(route.query.avatar || '')
-const roomCode = ref(route.query.roomCode || '')
 const isHost = ref(route.query.isHost === 'true')
 const isHostPlaying = ref(route.query.isHostPlaying === 'true')
 const maxPlayers = ref(parseInt(route.query.maxPlayers) || 8)
 const rounds = ref(parseInt(route.query.rounds) || 5)
-
-// Convert room code to array for displaying shapes
-const roomCodeArray = computed(() => {
-  return roomCode.value.toString().split('')
-})
 
 // Mock joined players array for now
 const joinedPlayers = ref([])
@@ -152,6 +151,9 @@ function showNotEnoughPlayersAlert() {
   alert('Need at least 2 players to start the game!')
 }
 
+function leaveLobby(){
+  emit("leaveLobby");
+}
 // For testing: uncomment to add mock players
 /*
 onMounted(() => {

@@ -6,7 +6,7 @@ const { Server } = require('socket.io'); // Importing the Server class from sock
 const app = express(); // Initializing an Express application
 const server = http.createServer(app); // Creating an HTTP server using Express
 
-const GameSessionClass = require("./objects/GameSessionClass")
+const GameData = require("./objects/GameData") // Holds all game data needed by server
 const SocketHandlerClass = require("./objects/SocketHandler")
 const GameSessionsDBClass = require("./Database/GameSessions.js")
 
@@ -31,6 +31,7 @@ let imagesPerPrompt = 3; // represents the amount of images to choose from per p
 let currentPromptObject = null;
 let messageBoard = []; // Used to display messages next to avatars in game
 
+const mappedGameData = new Map();
 const activeTimers = new Map();
 const GameSessionDB = new GameSessionsDBClass()
 
@@ -86,11 +87,62 @@ function getPath(promptObject){
 
 // Event listener for new socket connections
 io.on('connection', (socket) => {
+
+    //  Listen for request to create new lobby
+    socket.on("create-new-lobby", () => {
+        
+        //  Generate new lobby code
+        //console.log("generating lobby code...");
+
+        let randomCodeDigits = [];
+        let uniqueCodeFound = false;
+
+        while (!uniqueCodeFound) {
+            
+            //  Generate random values in array
+            randomCodeDigits.value = Array.from({ length: 4 }, () =>
+                Math.floor(Math.random() * 9) + 1
+            );
+
+            //  Check if value is in mapped array
+            const newCodeString = randomCodeDigits.value.join('');
+
+            if (io.sockets.adapter.rooms.has(newCodeString)) {
+                //console.log(`room ${newCodeString} exists!`)
+            }
+            else{
+                //console.log(`room ${newCodeString} does not exist`)
+                uniqueCodeFound = true;
+                io.to(socket.id).emit("update-lobby-code", newCodeString);
+                const scores = new Map();
+                const gameData = new GameData(3, 4, [], "", "", 0, 0, scores);
+                mappedGameData.set(newCodeString, gameData);
+            }
+        }
+    });
+
+    // Listens for user joining room
     socket.on('join-room', (code)  => {
-        socket.join(code);
+
+        //  Prevent users from joining non-existent rooms
+        if (io.sockets.adapter.rooms.has(code)) {
+            //console.log(`room ${code} exists!`)
+            socket.join(code);
+        }
+        else{
+            //console.log(`room ${code} does not exist!`)
+            socket.join(code);
+        }
         console.log(`User ${socket.id} is connected to room ${code}`); // Logs when a new user connects
     })
     playerCount++;
+
+    //  Listens for users leaving the room
+    socket.on('leave-room', (code) => {
+        socket.leave(code);
+        console.log(`User ${socket.id} has disconnected from room ${code}`);
+        //console.log(io.of("/").adapter.rooms.get(code)); // Print all users in room
+    })
 
     //add player to the queue
     playersQueue.push(socket.id);
@@ -277,7 +329,7 @@ io.on('connection', (socket) => {
     });
 
     //  Handles timer functionality
-    function updateTimer(room){
+    function updateTimer(room) {
         io.in(room).emit("timer-update", activeTimers.get(room).timerValue);
         
         if (activeTimers.get(room).timerValue == 0) {
@@ -286,7 +338,7 @@ io.on('connection', (socket) => {
         }
         else
             activeTimers.get(room).timerValue--;
-    }
+    };
     
     // Listener for socket disconnections
     socket.on('disconnect', () => {
