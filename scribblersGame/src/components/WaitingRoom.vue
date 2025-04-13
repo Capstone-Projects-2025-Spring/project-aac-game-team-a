@@ -13,26 +13,19 @@
       </div>
       
       <div class="game-config">
-        <p v-if="isHost"><strong>Players:</strong> {{ playerCount }}/{{ maxPlayers }}</p>
-        <p v-if="isHost"><strong>Rounds:</strong> {{ rounds }}</p>
+        <p><strong>Players:</strong> {{ props.players.length }}/{{ props.maxPlayers }}</p>
+        <p><strong>Rounds:</strong> {{ props.numRounds }}</p>
       </div>
     </div>
     
     <div class="players-section">
-      <h2>Players ({{ playerCount }}/{{ maxPlayers }})</h2>
+      <h2>Players ({{ props.players.length }}/{{ props.maxPlayers }})</h2>
       
       <div class="host-status" v-if="isHost && !isHostPlaying">
         <p class="host-observing">You are observing this game (not playing)</p>
       </div>
       
       <div class="players-list">
-        <!-- Current user (only show in player list if host is playing or if user is not host) -->
-        <!--
-        <div v-if="isHostPlaying || !isHost" class="player">
-          <img :src="userAvatar" :alt="userName" class="player-avatar" />
-          <p>{{ userName }} <span v-if="isHost">(Host)</span></p>
-        </div>
-        -->
         
         <!-- Joined players list -->
         <div v-for="(player, index) in props.players" :key="index" class="player">
@@ -55,12 +48,9 @@
           path: '/game',
           query: { 
             user: userName, 
-            avatar: userAvatar, 
-            //roomCode: roomCode,
+            avatar: userAvatar,
             isHost: isHost,
-            isHostPlaying: isHostPlaying,
-            maxPlayers: maxPlayers,
-            rounds: rounds
+            isHostPlaying: isHostPlaying
           }
         }"
         class="start-btn">
@@ -92,50 +82,20 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
 
 //define the emit function to send events to parent
 const emit = defineEmits();
-const props = defineProps(['roomCode', 'maxPlayers', 'players']);
-
-watch(props.players, (newVal) => {
-
-  console.log("players updated - waiting room");
-  //$forceUpdate();
-})
+const props = defineProps(['roomCode', 'maxPlayers', 'players', 'numRounds']);
 
 // Extract query parameters
 const userName = ref(route.query.user || '')
 const userAvatar = ref(route.query.avatar || '')
 const isHost = ref(route.query.isHost === 'true')
 const isHostPlaying = ref(route.query.isHostPlaying === 'true')
-const maxPlayers = ref(parseInt(route.query.maxPlayers) || 8)
-const rounds = ref(parseInt(route.query.rounds) || 5)
-
-// Mock joined players array for now
-const joinedPlayers = ref([])
-
-// Calculate player count
-const playerCount = computed(() => {
-  // Start with joined players count
-  let count = joinedPlayers.value.length
-  
-  // Add current user to count if they are playing
-  if (isHost.value) {
-    // Only count host if they're playing
-    if (isHostPlaying.value) {
-      count += 1
-    }
-  } else {
-    // Always count non-host users
-    count += 1
-  }
-  
-  return count
-})
 
 // Shape map
 const shapes = [
@@ -162,19 +122,10 @@ function showNotEnoughPlayersAlert() {
 function leaveLobby(){
   emit("leaveLobby");
 }
-// For testing: uncomment to add mock players
-/*
-onMounted(() => {
-  joinedPlayers.value = [
-    { name: 'Player 1', avatar: 'lion.png' },
-    { name: 'Player 2', avatar: 'tiger.webp' }
-  ]
-})
-*/
 
 onMounted(() => {
-  console.log("Waiting room mounted, isHostPlaying:", isHostPlaying.value)
-  console.log("Current player count:", playerCount.value)
+  //console.log("Waiting room mounted, isHostPlaying:", isHostPlaying.value)
+  //console.log("Current round count:", props.rounds)
 })
 </script>
 

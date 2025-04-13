@@ -123,15 +123,31 @@ export default {
             // Listen for new player list
             this.socketInstance.on("update-player-list", (updatePlayers) => {
 
-                console.log("Updating player list: ", updatePlayers);
+                //console.log("Updating player list: ", updatePlayers);
                 this.players = updatePlayers;
-                console.log("players: " + this.players);
+                //console.log("players: " + this.players);
+            })
+
+            //  Listen for max players for lobby
+            this.socketInstance.on("update-max-players", (updateMaxPlayers) => {
+
+                console.log("Updating maximum player count: ", updateMaxPlayers);
+                this.maxPlayers = updateMaxPlayers;
+                console.log("maxPlayers: " + this.maxPlayers);
+            })
+
+            //  Listen for new round count
+            this.socketInstance.on("update-round", (updateRound) => {
+
+                //console.log("Updating round: ", updateRound);
+                this.numRounds = updateRound;
+                //console.log("round: " + this.rounds);
             })
 
             // Listen for the player count from the server
             this.socketInstance.on("player-count-update", (count) => {
                 this.playerCount = count;
-                console.log("Updated player count:", count);
+                //console.log("Updated player count:", count);
             });
 
             // Signal backend to add user to the message board
@@ -311,7 +327,8 @@ export default {
             @leaveLobby="leaveLobby"
             :roomCode="roomCodeArr"
             :maxPlayers="maxPlayers"
-            :players="players">
+            :players="players"
+            :numRounds="numRounds">
         </WaitingRoom>
     </div>
 

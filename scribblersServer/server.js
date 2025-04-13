@@ -124,7 +124,6 @@ io.on('connection', (socket) => {
 
     // Listens for user joining room
     socket.on('join-room', (code, user)  => {
-
         
         //  Prevent users from joining non-existent rooms
         if (io.sockets.adapter.rooms.has(code)) {
@@ -133,6 +132,8 @@ io.on('connection', (socket) => {
             mappedGameData.get(code).players.push(user)
             console.log(mappedGameData);
             io.emit("update-player-list", mappedGameData.get(code).players);
+            io.to(socket.id).emit("update-max-players", mappedGameData.get(code).maxPlayers);
+            io.to(socket.id).emit("update-round", mappedGameData.get(code).numberRounds);
         }
         else{
             //console.log(`room ${code} does not exist!`)
