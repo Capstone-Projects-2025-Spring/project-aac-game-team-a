@@ -14,7 +14,12 @@ export default {
         const user = this.$route.query.user || ""; // Stores the username entered by the user
         const avatar = this.$route.query.avatar || ""; // Stores the username entered by the user
         const isHost = this.$route.query.isHost === 'true';
+        const isHostPlaying = this.$route.query.isHostPlaying === 'true';
+        const maxPlayers = this.$route.query.maxPlayers;
+        const rounds = this.$route.query.rounds;
         let roomCodeArr = this.$route.query.roomCode; // Stores room code in array
+
+        console.log("isHostPlaying: " + isHostPlaying);
 
         //Check if roomCode is a string and split it, otherwise assume it's already an array
         if (typeof roomCodeArr  === 'string')
@@ -38,11 +43,16 @@ export default {
             messageBoard: [
                 currentUserMessage
             ], // Array to store all received users in message board
+            currentUser: user, //track user mounting the game view
             isDrawer: false, //track if user is the drawer
-            isHost: isHost, //track if user is hosting
+            isHost: isHost, //track if user is hosting game
+            isHostPlaying: isHostPlaying, //track if host is playing or spectating
             promptWord: "", //store the random drawing prompt word
             promptImgPath: "", // store the path to the image to be referenced for prompt
             context: CanvasRenderingContext2D, // stores drawing context for drawing broadcasted data
+            numRounds: rounds, // tracks remaining rounds in the game
+            maxPlayers: maxPlayers, // tracks maximum number of players allowed in lobby
+            players: [], // string array of active players in lobby
             roundLength: 10, // how many seconds each round will last
             roundTimer: 0,  // tracks counter state
             roomCodeArr: roomCodeArr, // Now roomCodeArr is correctly assigned here
@@ -84,26 +94,39 @@ export default {
             else 
                 this.socketInstance = io("http://localhost:3001"); // CHANGE THIS WHEN YOU WANT THE SERVER TO BE PUBLIC
 
-            //  Create new lobby if host is connecting to socket
-            console.log("isHost: " + this.isHost);
+            //  Create new lobby if host is connecting to socket, otherwise attempt to join specified lobby
             if (this.isHost) {
-                this.socketInstance.emit("create-new-lobby");
-                console.log("codeArr: " + this.roomCodeArr);
+
+                //  Add host to player array if they are playing
+                if (this.isHostPlaying)
+                    this.players.push(this.currentUser)
+                //console.log(this.players)
+                this.socketInstance.emit("create-new-lobby", this.numRounds, this.maxPlayers, this.players);
+                //console.log("codeArr: " + this.roomCodeArr);
             }
             else {
-                this.socketInstance.emit('join-room', this.roomCodeStr);
-                console.log("codeArr: " + this.roomCodeArr);    
+                this.socketInstance.emit('join-room', this.roomCodeStr, this.currentUser);
+                //console.log("codeArr: " + this.roomCodeArr);    
             }
+
             // Listen for new lobby code
             this.socketInstance.on("update-lobby-code", (newRoomCode) => {
                 
-                console.log("Updating lobby code: ", newRoomCode);
+                //console.log("Updating lobby code: ", newRoomCode);
                 this.roomCodeStr = newRoomCode;
                 this.roomCodeArr = newRoomCode.split('');
 
                 // Connect user to lobby
                 this.socketInstance.emit('join-room', this.roomCodeStr);
             });
+
+            // Listen for new player list
+            this.socketInstance.on("update-player-list", (updatePlayers) => {
+
+                console.log("Updating player list: ", updatePlayers);
+                this.players = updatePlayers;
+                console.log("players: " + this.players);
+            })
 
             // Listen for the player count from the server
             this.socketInstance.on("player-count-update", (count) => {
@@ -269,7 +292,7 @@ export default {
 
         //  Handles request to leave lobby
         leaveLobby() {
-            this.socketInstance.emit("leave-room", this.roomCodeStr);
+            this.socketInstance.emit("leave-room", this.roomCodeStr, this.currentUser);
         },
     },
     // Automatically connect to the WebSocket server when the component is mounted

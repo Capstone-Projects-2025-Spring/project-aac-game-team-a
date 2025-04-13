@@ -74,7 +74,7 @@ const randomCodeDigits = ref([])
 const currentUser = ref('')
 const currentUserAvatar = ref('')
 const showAvatars = ref(false)
-const isHostPlaying = computed(() => showAvatars.value && currentUser.value && currentUserAvatar.value)
+const isHostPlaying = ref(false)
 const randomCodeString = computed(() => randomCodeDigits.value.join(''))
 
 // List of available avatars
@@ -92,6 +92,7 @@ const avatarButtons = [
 // Function to toggle avatar selection visibility
 function toggleAvatars(show) {
   showAvatars.value = show
+  isHostPlaying.value = show
   // Clear selected avatar if "not playing"
   if (!show) {
     currentUser.value = ''

@@ -89,7 +89,7 @@ function getPath(promptObject){
 io.on('connection', (socket) => {
 
     //  Listen for request to create new lobby
-    socket.on("create-new-lobby", () => {
+    socket.on("create-new-lobby", (numRounds, maxPlayers, players) => {
         
         //  Generate new lobby code
         //console.log("generating lobby code...");
@@ -115,19 +115,24 @@ io.on('connection', (socket) => {
                 uniqueCodeFound = true;
                 io.to(socket.id).emit("update-lobby-code", newCodeString);
                 const scores = new Map();
-                const gameData = new GameData(3, 4, [], "", "", 0, 0, scores);
+                const gameData = new GameData(numRounds, maxPlayers, players, "", "", 0, 0, scores);
                 mappedGameData.set(newCodeString, gameData);
+                console.log(mappedGameData);
             }
         }
     });
 
     // Listens for user joining room
-    socket.on('join-room', (code)  => {
+    socket.on('join-room', (code, user)  => {
 
+        
         //  Prevent users from joining non-existent rooms
         if (io.sockets.adapter.rooms.has(code)) {
             //console.log(`room ${code} exists!`)
             socket.join(code);
+            mappedGameData.get(code).players.push(user)
+            console.log(mappedGameData);
+            io.emit("update-player-list", mappedGameData.get(code).players);
         }
         else{
             //console.log(`room ${code} does not exist!`)
@@ -138,10 +143,33 @@ io.on('connection', (socket) => {
     playerCount++;
 
     //  Listens for users leaving the room
-    socket.on('leave-room', (code) => {
+    socket.on('leave-room', (code, user) => {
+
+        //  Loop through array to find and remove player
+        let index = 0;
+        let arrLength = mappedGameData.get(code).players.length
+        for (index = 0; index < arrLength; index++) {
+            if (mappedGameData.get(code).players[index] == user) {
+                mappedGameData.get(code).players.splice(index, 1);
+                index = arrLength;
+                //console.log(mappedGameData.get(code).players);
+            }
+        }
         socket.leave(code);
+        console.log(mappedGameData.get(code))
         console.log(`User ${socket.id} has disconnected from room ${code}`);
-        //console.log(io.of("/").adapter.rooms.get(code)); // Print all users in room
+
+        //  Check if room deleted
+        if (!io.of("/").adapter.rooms.get(code)) {
+
+            console.log(`room ${code} has been deleted`);
+
+            //  Remove game data from deleted room. Delete() function returns false if key does not exist.
+            mappedGameData.delete(code);
+            console.log(mappedGameData);
+        }
+
+        //console.log(io.of("/").adapter.rooms.get(code)); // Print remaining users in room
     })
 
     //add player to the queue
