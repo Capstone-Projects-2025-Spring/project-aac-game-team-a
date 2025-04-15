@@ -163,7 +163,7 @@ function joinLobby() {
   }
 
   // Use local state to set and save the selection of the user
-  localGameState.setUser(currentUser, currentUserAvatar, roomCodeArr, false, 0, 0, false)
+  localGameState.setGameState(currentUser, currentUserAvatar, roomCodeArr, false, 0, 0, false)
 }
 </script>
 

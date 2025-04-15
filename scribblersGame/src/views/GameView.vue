@@ -1,4 +1,9 @@
 <script>
+/**
+ * This file handles the view for all game components. 
+ * Host and Join Lobby point to this file.
+ * WaitingRoom, AACboard, DrawingBoard, and GuessBoard are children of this component.
+ */
 import io from "socket.io-client"; // Import the socket.io-client library to enable WebSocket communication
 import AacBoard from '../components/aacBoard.vue'; //import AACBoard component
 import DrawingBoard from '../components/DrawingBoard.vue'; // import Drawing board component
@@ -11,23 +16,16 @@ export default {
         AacBoard, //register Aac board as a component
         DrawingBoard, //register drawing board as a component
         WaitingRoom, //register waiting room as a component
-        GuessBoard, // register the drawing borad as a component
+        GuessBoard, //register the drawing board as a component
     },
     data() {
     
         // Define local state to recieve user data from Host and Join lobby
         const localGameState = GameState();
-
-        // Use the local state to define specific user choices
-        const user = localGameState.currentUser; // Stores the username entered by the user
-        const avatar = localGameState.currentUserAvatar; // Stores the username entered by the user
-        let roomCodeArr = localGameState.roomCode;
-        const isHost = localGameState.isHost;
-        const isHostPlaying = localGameState.isHostPlaying;
-        const maxPlayers = localGameState.maxPlayers;
-        const rounds = localGameState.rounds;
-
+        
         //Check if roomCode is a string and split it, otherwise assume it's already an array
+        let roomCodeArr = localGameState.roomCode;
+
         if (typeof roomCodeArr  === 'string')
             roomCodeArr = roomCodeArr.split(',').map(Number);
         else if (Array.isArray(roomCodeArr))
@@ -35,8 +33,8 @@ export default {
         
         let currentUserMessage = { // Holds all the user message info being sent back and forth between client and server
             id: 0,
-            avatar: avatar,
-            user: user,
+            avatar: localGameState.currentUserAvatar,
+            user: localGameState.currentUser,
             text: "",
             imagePath: ""
         };
@@ -49,15 +47,15 @@ export default {
             messageBoard: [
                 currentUserMessage
             ], // Array to store all received users in message board
-            currentUser: user, //track user mounting the game view
+            currentUser: localGameState.currentUser, //track user mounting the game view
             isDrawer: false, //track if user is the drawer
-            isHost: isHost, //track if user is hosting game
-            isHostPlaying: isHostPlaying, //track if host is playing or spectating
+            isHost: localGameState.isHost, //track if user is hosting game
+            isHostPlaying: localGameState.isHostPlaying, //track if host is playing or spectating
             promptWord: "", //store the random drawing prompt word
             promptImgPath: "", // store the path to the image to be referenced for prompt
             context: CanvasRenderingContext2D, // stores drawing context for drawing broadcasted data
-            numRounds: rounds, // tracks remaining rounds in the game
-            maxPlayers: maxPlayers, // tracks maximum number of players allowed in lobby
+            numRounds: localGameState.rounds, // tracks remaining rounds in the game
+            maxPlayers: localGameState.maxPlayers, // tracks maximum number of players allowed in lobby
             players: [], // string array of active players in lobby
             roundLength: 10, // how many seconds each round will last
             roundTimer: 0,  // tracks counter state

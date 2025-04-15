@@ -106,7 +106,7 @@ function launchRoom() {
   // Add actual hosting logic here
 
   // Use local state to set and save the selection of the user
-  localGameState.setUser(currentUser, currentUserAvatar, codeString, true, maxPlayers, rounds, isHostPlaying)
+  localGameState.setGameState(currentUser, currentUserAvatar, codeString, true, maxPlayers, rounds, isHostPlaying)
 }
 </script>
 

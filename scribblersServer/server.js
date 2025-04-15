@@ -1,3 +1,6 @@
+/**
+ * 
+ */
 const exp = require('constants'); // Importing constants module (not needed in this case)
 const express = require('express'); // Importing Express.js to create the server
 const http = require('http'); // Importing HTTP module to create an HTTP server
@@ -9,7 +12,6 @@ const server = http.createServer(app); // Creating an HTTP server using Express
 const GameData = require("./objects/GameData") // Holds all game data needed by server
 const SocketHandlerClass = require("./objects/SocketHandler")
 const GameSessionsDBClass = require("./Database/GameSessions.js");
-//const { random } = require('core-js/core/number');
 
 // Initializing a new Socket.io server instance and configuring CORS
 const io = new Server(server, {
@@ -21,12 +23,9 @@ const io = new Server(server, {
 
 const roundTimerLength = 60; //set length of round timer
 let currentDrawerID = null; //keeps track of current drawer (by socket ID)
-let currentDrawerIndex = 0; //index in queue of current drawer
 let playerCount = 0; //number of player that have joined
 let correctGuesses = 0; //tracks how many have guessed correctly in a round
 let playersQueue = []; //queue of players by socket ID
-const maxCycles = 10; //number of cycles (how many times each player draws)
-let currentCycle = 0; //tracks cycle number
 let imagesPerPrompt = 3; // represents the amount of images to choose from per prompt
 let currentPromptObject = null;
 let messageBoard = []; // Used to display messages next to avatars in game
