@@ -5,18 +5,20 @@ class GameData{
     /**
      * Creates an instance of an GameSession to track data about the current game session
      * 
-     * @param {number} numberRounds The number of rounds remaining for the game
+     * @param {number} numberRounds The number of rounds selected for the game
+     * @param {number} currentRound The current round for the game
      * @param {number} maxPlayers The maximum number of players allowed to join the game
      * @param {string} players An array of avatars currently in game
-     * @param {string} prompt The prompt for drawers to draw and guessers to guess
+     * @param {object} prompt The prompt for drawers to draw and guessers to guess
      * @param {string} drawer The currently selected drawer
      * @param {number} timerID The ID related to the timer interval for the room
      * @param {number} timerValue The current value of the round timer
      * @param {Map}    scores The scores of each player, each key is a playerID and value is score
      */
 
-    constructor( numberRounds, maxPlayers, players, prompt, drawer, timerID, timerValue, scores ){
+    constructor( numberRounds, currentRound, maxPlayers, players, prompt, drawer, timerID, timerValue, scores ){
         this.numberRounds = numberRounds;
+        this.currentRound = currentRound;
         this.maxPlayers = maxPlayers;
         this.players = players;
         this.prompt = prompt;

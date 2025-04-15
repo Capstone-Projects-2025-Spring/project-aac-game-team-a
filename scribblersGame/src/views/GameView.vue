@@ -19,8 +19,6 @@ export default {
         const rounds = this.$route.query.rounds;
         let roomCodeArr = this.$route.query.roomCode; // Stores room code in array
 
-        console.log("isHostPlaying: " + isHostPlaying);
-
         //Check if roomCode is a string and split it, otherwise assume it's already an array
         if (typeof roomCodeArr  === 'string')
             roomCodeArr = roomCodeArr.split(',').map(Number);
@@ -136,10 +134,32 @@ export default {
                 this.numRounds = updateRound;
             })
 
-            //  Listen for host to start game
+            //  Listen for new drawer
+            this.socketInstance.on("update-drawer", (drawer) => {
+
+                if (this.currentUser == drawer)
+                    this.isDrawer = true;
+                else
+                    this.isDrawer = false;   
+            })
+
+            //  Listen for new prompt
+            this.socketInstance.on("update-prompt", (updatePrompt) => {
+
+                this.promptWord = updatePrompt.word;
+            })
+
+
+            //  Listen for host to start of new round
             this.socketInstance.on("start-game", () => {
 
                 this.gameStarted = true;
+            })
+
+            //  Listen for end of game
+            this.socketInstance.on("end-game", () => {
+
+                this.gameStarted = false;
             })
 
             // Listen for the player count from the server
@@ -166,6 +186,7 @@ export default {
                 this.messageBoard = this.messageBoard.concat(data); // Append received message to messages array
             });
 
+            /*
             //Listen for 'you-are-drawer' message and random prompt word
             this.socketInstance.on("you-are-drawer", (data) => {
                 console.log('you are the drawer now');
@@ -180,7 +201,7 @@ export default {
                 console.log('you are a guesser now');
                 this.isDrawer = false;
             });
-
+            */
             // Listen for broadcasted initial drawing data
             this.socketInstance.on("cast-draw-init", (x, y, draw_color, draw_width) => {
                 this.context = document.getElementById("canvas").getContext("2d");

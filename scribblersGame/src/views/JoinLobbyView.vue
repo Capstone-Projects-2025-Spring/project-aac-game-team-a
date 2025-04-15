@@ -59,6 +59,7 @@
             user: currentUser, 
             avatar: currentUserAvatar,
             isHost: false, 
+            isDrawer: false,
             roomCode: roomCodeArr
           }
       }"
