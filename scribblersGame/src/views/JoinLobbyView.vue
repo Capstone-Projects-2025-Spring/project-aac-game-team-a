@@ -51,7 +51,7 @@
     </div>
 
     <div class="bottom-buttons">
-      <!-- Button to join the lobby with the selected configurations -->
+      <!-- Button to join the waiting room instead of going directly to game -->
       <RouterLink 
       :to="{
           path: '/game', // Navigates to the game route
@@ -81,25 +81,34 @@ const selectedShapes = ref([null, null, null, null])
 
 // List of available shapes
 const shapes = [
-  { value: 1, imgSrc: 'circle.png', label: 'Circle' },
-  { value: 2, imgSrc: 'diamond.png', label: 'Diamond' },
-  { value: 3, imgSrc: 'heart.png', label: 'Heart' },
-  { value: 4, imgSrc: 'octagon.png', label: 'Octagon' },
-  { value: 5, imgSrc: 'pentagon.png', label: 'Pentagon' },
-  { value: 6, imgSrc: 'rectangle.png', label: 'Rectangle' },
-  { value: 7, imgSrc: 'square.png', label: 'Square' },
-  { value: 8, imgSrc: 'star.png', label: 'Star' },
-  { value: 9, imgSrc: 'triangle.png', label: 'Triangle' }
+  { value: 1, imgSrc: '/circle.png', label: 'Circle' },
+  { value: 2, imgSrc: '/diamond.png', label: 'Diamond' },
+  { value: 3, imgSrc: '/heart.png', label: 'Heart' },
+  { value: 4, imgSrc: '/octagon.png', label: 'Octagon' },
+  { value: 5, imgSrc: '/pentagon.png', label: 'Pentagon' },
+  { value: 6, imgSrc: '/rectangle.png', label: 'Rectangle' },
+  { value: 7, imgSrc: '/square.png', label: 'Square' },
+  { value: 8, imgSrc: '/star.png', label: 'Star' },
+  { value: 9, imgSrc: '/triangle.png', label: 'Triangle' }
 ]
+
+// Reactive state for room code array
+const roomCodeArr = ref([])
 
 // Function to select a shape and add it to the room code
 function selectShape(shape) {
   const index = selectedShapes.value.findIndex((s) => s === null)
   if (index !== -1) {
     selectedShapes.value[index] = shape.imgSrc
+    
+    // Update room code array
+    roomCodeArr.value = selectedShapes.value
+      .map((shapeImg) => {
+        const found = shapes.find((s) => s.imgSrc === shapeImg)
+        return found ? found.value : ''
+      })
+      .filter(val => val !== '')
   }
-  roomCodeArr.value = selectedShapes.value
-    .map((shapeImg) => shapes.find((s) => s.imgSrc === shapeImg)?.value || '')
 }
 
 // Function to undo the last selected shape
@@ -107,18 +116,26 @@ function undoShape() {
   const lastIndex = [...selectedShapes.value].reverse().findIndex((s) => s !== null)
   if (lastIndex !== -1) {
     selectedShapes.value[selectedShapes.value.length - 1 - lastIndex] = null
+    
+    // Update room code array
+    roomCodeArr.value = selectedShapes.value
+      .map((shapeImg) => {
+        const found = shapes.find((s) => s.imgSrc === shapeImg)
+        return found ? found.value : ''
+      })
+      .filter(val => val !== '')
   }
 }
 
 // Function to clear all selected shapes
 function clearShapes() {
   selectedShapes.value = [null, null, null, null]
+  roomCodeArr.value = []
 }
 
 // Reactive state for user information
 const currentUser = ref('')
 const currentUserAvatar = ref('')
-const roomCodeArr = ref('')
 
 // List of available avatars
 const avatarButtons = [
@@ -142,12 +159,11 @@ function selectAvatar(button) {
 function joinLobby() {
   if (selectedShapes.value.includes(null) || !currentUserAvatar.value) {
     alert('Please select all 4 shapes and an avatar.')
-    return
+    return false
   }
-  alert(`Joining room ${roomCodeArr.value.join('')} as ${currentUser.value}`)
 
   // Use local state to set and save the selection of the user
-  localGameState.setUser(currentUser, currentUserAvatar, roomCodeArr)
+  localGameState.setUser(currentUser, currentUserAvatar, roomCodeArr, false, 0, 0, false)
 }
 </script>
 

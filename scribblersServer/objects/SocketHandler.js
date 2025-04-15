@@ -1,4 +1,4 @@
-const GameSessionClass = require("./GameSessionClass")
+const GameSessionClass = require("./GameData")
 
 /**
  * This class handles real-time WebSocket communication for frontend and backend interactions

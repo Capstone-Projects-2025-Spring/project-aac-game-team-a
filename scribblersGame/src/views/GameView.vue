@@ -2,6 +2,7 @@
 import io from "socket.io-client"; // Import the socket.io-client library to enable WebSocket communication
 import AacBoard from '../components/aacBoard.vue'; //import AACBoard component
 import DrawingBoard from '../components/DrawingBoard.vue'; // import Drawing board component
+import WaitingRoom from '../components/WaitingRoom.vue'; // import Drawing board component
 import GuessBoard from "@/components/GuessBoard.vue";
 import { GameState } from '@/stores/GameState'
 
@@ -9,9 +10,11 @@ export default {
     components: {
         AacBoard, //register Aac board as a component
         DrawingBoard, //register drawing board as a component
+        WaitingRoom, //register waiting room as a component
         GuessBoard, // register the drawing borad as a component
     },
     data() {
+    
         // Define local state to recieve user data from Host and Join lobby
         const localGameState = GameState();
 
@@ -19,13 +22,17 @@ export default {
         const user = localGameState.currentUser; // Stores the username entered by the user
         const avatar = localGameState.currentUserAvatar; // Stores the username entered by the user
         let roomCodeArr = localGameState.roomCode;
+        const isHost = localGameState.isHost;
+        const isHostPlaying = localGameState.isHostPlaying;
+        const maxPlayers = localGameState.maxPlayers;
+        const rounds = localGameState.rounds;
 
-        // Check if roomCode is a string and split it, otherwise assume it's already an array
-        if (typeof roomCodeArr  === 'string') {
-        roomCodeArr = roomCodeArr.split(',').map(Number);
-        } else if (Array.isArray(roomCodeArr)) {
-        roomCodeArr = roomCodeArr.map(Number);
-        }
+        //Check if roomCode is a string and split it, otherwise assume it's already an array
+        if (typeof roomCodeArr  === 'string')
+            roomCodeArr = roomCodeArr.split(',').map(Number);
+        else if (Array.isArray(roomCodeArr))
+            roomCodeArr = roomCodeArr.map(Number);
+        
         let currentUserMessage = { // Holds all the user message info being sent back and forth between client and server
             id: 0,
             avatar: avatar,
@@ -35,19 +42,28 @@ export default {
         };
 
         return {
+            inProduction: false, //change this variable to switch between connecting to public backend server and localhost
+            socketServer: "scribblersserver.fly.dev", //web address for hosted websocket server
             selectedImagePath: "", //path to current AAC image selected
             currentUserMessage,
             messageBoard: [
                 currentUserMessage
             ], // Array to store all received users in message board
+            currentUser: user, //track user mounting the game view
             isDrawer: false, //track if user is the drawer
+            isHost: isHost, //track if user is hosting game
+            isHostPlaying: isHostPlaying, //track if host is playing or spectating
             promptWord: "", //store the random drawing prompt word
             promptImgPath: "", // store the path to the image to be referenced for prompt
             context: CanvasRenderingContext2D, // stores drawing context for drawing broadcasted data
+            numRounds: rounds, // tracks remaining rounds in the game
+            maxPlayers: maxPlayers, // tracks maximum number of players allowed in lobby
+            players: [], // string array of active players in lobby
             roundLength: 10, // how many seconds each round will last
             roundTimer: 0,  // tracks counter state
             roomCodeArr: roomCodeArr, // Now roomCodeArr is correctly assigned here
             roomCodeStr: roomCodeArr.join(''),
+            gameStarted: false,
             AACButtons: [// Buttons for game AAC board with associated images and labels
                 {id: 1, imgSrc: 'lion.png', label: 'Lion'},
                 {id: 2, imgSrc: 'tiger.webp', label: 'Tiger'},
@@ -79,16 +95,85 @@ export default {
         // Connect to the server
         serverConnect(){
             // Establish connection to the WebSocket server
-            //this.socketInstance = io("http://localhost:3001"); // CHANGE THIS WHEN YOU WANT THE SERVER TO BE PUBLIC
-            this.socketInstance = io("scribblersserver.fly.dev");
+            if (this.inProduction) 
+                this.socketInstance = io(this.socketServer);
+            else 
+                this.socketInstance = io("http://localhost:3001"); // CHANGE THIS WHEN YOU WANT THE SERVER TO BE PUBLIC
 
-            // 
-            this.socketInstance.emit('join-room', this.roomCodeStr);
+            //  Create new lobby if host is connecting to socket, otherwise attempt to join specified lobby
+            if (this.isHost) {
+                
+                //  Add host to player array if they are playing
+                if (this.isHostPlaying)
+                    this.players.push(this.currentUser)
+
+                this.socketInstance.emit("create-new-lobby", this.numRounds, this.maxPlayers, this.players);
+            }
+            else {
+                this.socketInstance.emit('join-room', this.roomCodeStr, this.currentUser);    
+            }
+
+            // Listen for new lobby code
+            this.socketInstance.on("update-lobby-code", (newRoomCode) => {
+                
+                //console.log("Updating lobby code: ", newRoomCode);
+                this.roomCodeStr = newRoomCode;
+                this.roomCodeArr = newRoomCode.split('');
+
+                // Connect user to lobby
+                this.socketInstance.emit('join-room', this.roomCodeStr);
+            });
+
+            // Listen for new player list
+            this.socketInstance.on("update-player-list", (updatePlayers) => {
+
+                this.players = updatePlayers;
+            })
+
+            //  Listen for max players for lobby
+            this.socketInstance.on("update-max-players", (updateMaxPlayers) => {
+
+                this.maxPlayers = updateMaxPlayers;
+            })
+
+            //  Listen for new round count
+            this.socketInstance.on("update-round", (updateRound) => {
+
+                this.numRounds = updateRound;
+            })
+
+            //  Listen for new drawer
+            this.socketInstance.on("update-drawer", (drawer) => {
+
+                if (this.currentUser == drawer)
+                    this.isDrawer = true;
+                else
+                    this.isDrawer = false;   
+            })
+
+            //  Listen for new prompt
+            this.socketInstance.on("update-prompt", (updatePrompt) => {
+
+                this.promptWord = updatePrompt.word;
+            })
+
+
+            //  Listen for host to start of new round
+            this.socketInstance.on("start-game", () => {
+
+                this.gameStarted = true;
+            })
+
+            //  Listen for end of game
+            this.socketInstance.on("end-game", () => {
+
+                this.gameStarted = false;
+            })
 
             // Listen for the player count from the server
             this.socketInstance.on("player-count-update", (count) => {
                 this.playerCount = count;
-                console.log("Updated player count:", count);
+                //console.log("Updated player count:", count);
             });
 
             // Signal backend to add user to the message board
@@ -109,6 +194,7 @@ export default {
                 this.messageBoard = this.messageBoard.concat(data); // Append received message to messages array
             });
 
+            /*
             //Listen for 'you-are-drawer' message and random prompt word
             this.socketInstance.on("you-are-drawer", (data) => {
                 console.log('you are the drawer now');
@@ -123,7 +209,7 @@ export default {
                 console.log('you are a guesser now');
                 this.isDrawer = false;
             });
-
+            */
             // Listen for broadcasted initial drawing data
             this.socketInstance.on("cast-draw-init", (x, y, draw_color, draw_width) => {
                 this.context = document.getElementById("canvas").getContext("2d");
@@ -241,7 +327,19 @@ export default {
         sendTimerStart(length){
             if (this.roundTimer != 0) return;
             this.socketInstance.emit('timer-start', this.roomCodeStr, length);
-        }
+        },
+
+        //  Handles request for host to start game
+        startGame() {
+            //console.log("Starting game");
+            this.gameStarted = true;
+            this.socketInstance.emit("start-game", this.roomCodeStr);
+        },
+
+        //  Handles request to leave lobby
+        leaveLobby() {
+            this.socketInstance.emit("leave-room", this.roomCodeStr, this.currentUser);
+        },
     },
     // Automatically connect to the WebSocket server when the component is mounted
     mounted(){
@@ -252,21 +350,37 @@ export default {
 </script>
 
 <template>
-    <div class="room-code-block">
-        <span class="room-code-label">Room Code:</span>
-        <div class="room-code-shapes">
-            <img
-            v-for="(digit, index) in roomCodeArr"
-            :key="index"
-            :src="getShapeImage(digit)"
-            :alt="getShapeLabel(digit)"
-            class="room-code-shape"
-            />
-        </div>
+    <!--Display waiting room in between games-->
+    <div v-if="!gameStarted" class="waiting-room">
+        <WaitingRoom
+            @startGame="startGame"
+            @leaveLobby="leaveLobby"
+            :roomCode="roomCodeArr"
+            :maxPlayers="maxPlayers"
+            :players="players"
+            :numRounds="numRounds"
+            :isHost="isHost"
+            :isHostPlaying="isHostPlaying">
+        </WaitingRoom>
     </div>
 
+    <!--Display game while started-->
+    <div v-if="gameStarted" class="game-container"> 
 
-    <div class="game-container"> 
+        <!-- Display room code-->
+        <div class="room-code-block">
+            <span class="room-code-label">Room Code:</span>
+            <div class="room-code-shapes">
+                <img
+                v-for="(digit, index) in roomCodeArr"
+                :key="index"
+                :src="getShapeImage(digit)"
+                :alt="getShapeLabel(digit)"
+                class="room-code-shape"
+                />
+            </div>
+        </div>
+
         <!-- Left side: Drawing canvas and button box -->
         <div class="left-container">
             <RouterLink 

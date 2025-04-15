@@ -2,23 +2,10 @@
   <div class="host-screen">
     <h1>Host a New Game</h1>
 
-    <!-- Display random room code in shapes -->
-    <div class="form-group">
-      <label>Room Code:</label>
-      <div class="shape-code-display">
-        <div v-for="(digit, index) in randomCodeDigits" :key="index" class="shape-slot">
-          <img :src="getShapeImg(digit)" />
-        </div>
-      </div>
-    </div>
-
-    <!-- Game visibility selection -->
-
-
     <!-- Max players input -->
     <div class="form-group">
       <label>Max Players</label>
-      <input type="number" v-model="maxPlayers" min="2" max="6" />
+      <input type="number" v-model="maxPlayers" min="2" max="8" />
     </div>
 
     <!-- Number of rounds input -->
@@ -27,20 +14,28 @@
       <input type="number" v-model="rounds" min="1" max="10" />
     </div>
 
-    <div class="form-group">
-      <!-- Section for choosing an avatar -->
-      <label>Choose Your Avatar</label>
-      <div class="avatar-container">
-        <button
-          v-for="(button, index) in avatarButtons"
-          :key="index"
-          @click="selectAvatar(button)"
-          :class="['avatar-button', { selected: currentUserAvatar === button.imgSrc }]"
-        >
-          <img :src="button.imgSrc" :alt="button.label" />
-          <p>{{ button.label }}</p>
-        </button>
+    <!-- Host participation toggle -->
+    <div class="host-participation" v-if="!showAvatars">
+      <button class="play-too-btn" @click="toggleAvatars(true)">I'm playing too</button>
+    </div>
+
+    <!-- Avatar selection (conditionally displayed) -->
+    <div v-if="showAvatars" class="avatar-section">
+      <div class="form-group">
+        <label>Choose Your Avatar</label>
+        <div class="avatar-container">
+          <button
+            v-for="(button, index) in avatarButtons"
+            :key="index"
+            @click="selectAvatar(button)"
+            :class="['avatar-button', { selected: currentUserAvatar === button.imgSrc }]"
+          >
+            <img :src="button.imgSrc" :alt="button.label" />
+            <p>{{ button.label }}</p>
+          </button>
+        </div>
       </div>
+      <button class="not-playing-btn" @click="toggleAvatars(false)">I'm not playing</button>
     </div>
 
     <div class="bottom-buttons">
@@ -49,60 +44,33 @@
           path: '/game', // Navigates to the game route
       }"
       class="launch-btn" 
-      @click="launchRoom">Launch Room</RouterLink>
+      @click="launchRoom">Create Lobby</RouterLink>
       
       <RouterLink 
       :to="{
-          path: '/', // Navigates to the home route
+          path: '/',
       }"
       class="back-btn">Back</RouterLink>
-      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { GameState } from '@/stores/GameState'
 
 // Define local state to send user data to Game
 const localGameState = GameState();
 
 // Room setup state
-const visibility = ref('public')
 const maxPlayers = ref(4)
 const rounds = ref(3)
 const randomCodeDigits = ref([])
 const currentUser = ref('')
 const currentUserAvatar = ref('')
-
-// Shape mapping
-const shapes = [
-  { value: 1, imgSrc: 'circle.png' },
-  { value: 2, imgSrc: 'diamond.png' },
-  { value: 3, imgSrc: 'heart.png' },
-  { value: 4, imgSrc: 'octagon.png' },
-  { value: 5, imgSrc: 'pentagon.png' },
-  { value: 6, imgSrc: 'rectangle.png' },
-  { value: 7, imgSrc: 'square.png' },
-  { value: 8, imgSrc: 'star.png' },
-  { value: 9, imgSrc: 'triangle.png' }
-]
-
-// Generate random 4-digit code on mount
-onMounted(() => {
-  generateRandomCode()
-})
-
-function generateRandomCode() {
-  randomCodeDigits.value = Array.from({ length: 4 }, () =>
-    Math.floor(Math.random() * 9) + 1
-  )
-}
-
-function getShapeImg(digit) {
-  const found = shapes.find((s) => s.value === digit)
-  return found ? found.imgSrc : ''
-}
+const showAvatars = ref(false)
+const isHostPlaying = ref(false)
+const randomCodeString = computed(() => randomCodeDigits.value.join(''))
 
 // List of available avatars
 const avatarButtons = [
@@ -116,6 +84,17 @@ const avatarButtons = [
   { id: 8, imgSrc: 'dog.png', label: 'Dog' }
 ]
 
+// Function to toggle avatar selection visibility
+function toggleAvatars(show) {
+  showAvatars.value = show
+  isHostPlaying.value = show
+  // Clear selected avatar if "not playing"
+  if (!show) {
+    currentUser.value = ''
+    currentUserAvatar.value = ''
+  }
+}
+
 // Function to select an avatar
 function selectAvatar(button) {
   currentUser.value = button.label
@@ -124,14 +103,10 @@ function selectAvatar(button) {
 
 function launchRoom() {
   const codeString = randomCodeDigits.value.join('')
-  alert(
-    `Hosting room ${codeString} (${visibility.value}) with max ${maxPlayers.value} players and ${rounds.value} rounds`
-  )
   // Add actual hosting logic here
 
-   // Use local state to set and save the selection of the user
-   localGameState.setUser(currentUser, currentUserAvatar, randomCodeDigits)
-
+  // Use local state to set and save the selection of the user
+  localGameState.setUser(currentUser, currentUserAvatar, codeString, true, maxPlayers, rounds, isHostPlaying)
 }
 </script>
 
@@ -168,26 +143,47 @@ label {
   font-weight: bold;
 }
 
-.shape-code-display {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 20px;
+.host-participation {
+  margin: 30px 0;
 }
 
-.shape-slot {
-  width: 60px;
-  height: 60px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.play-too-btn {
+  padding: 12px 24px;
+  font-size: 1rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
-.shape-slot img {
-  width: 40px;
-  height: 40px;
+.play-too-btn:hover {
+  background-color: #0056b3;
+}
+
+.not-playing-btn {
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background-color 0.3s;
+}
+
+.not-playing-btn:hover {
+  background-color: #5a6268;
+}
+
+.avatar-section {
+  margin: 20px 0;
+  padding: 15px;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  background-color: #f9f9f9;
 }
 
 .avatar-container {
