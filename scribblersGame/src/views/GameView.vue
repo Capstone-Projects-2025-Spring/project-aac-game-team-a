@@ -3,21 +3,33 @@ import io from "socket.io-client"; // Import the socket.io-client library to ena
 import AacBoard from '../components/aacBoard.vue'; //import AACBoard component
 import DrawingBoard from '../components/DrawingBoard.vue'; // import Drawing board component
 import WaitingRoom from '../components/WaitingRoom.vue'; // import Drawing board component
+import GuessBoard from "@/components/GuessBoard.vue";
+import { GameState } from '@/stores/GameState'
 
 export default {
     components: {
         AacBoard, //register Aac board as a component
         DrawingBoard, //register drawing board as a component
         WaitingRoom, //register waiting room as a component
+        GuessBoard, // register the drawing borad as a component
     },
     data() {
-        const user = this.$route.query.user || ""; // Stores the username entered by the user
-        const avatar = this.$route.query.avatar || ""; // Stores the username entered by the user
+    
+        // Define local state to recieve user data from Host and Join lobby
+        const localGameState = GameState();
+
+        // Use the local state to define specific user choices
+        const user = localGameState.currentUser; // Stores the username entered by the user
+        const avatar = localGameState.currentUserAvatar; // Stores the username entered by the user
+        let roomCodeArr = localGameState.roomCode;
+        
+        //const user = this.$route.query.user || ""; // Stores the username entered by the user
+        //const avatar = this.$route.query.avatar || ""; // Stores the username entered by the user
         const isHost = this.$route.query.isHost === 'true';
         const isHostPlaying = this.$route.query.isHostPlaying === 'true';
         const maxPlayers = this.$route.query.maxPlayers;
         const rounds = this.$route.query.rounds;
-        let roomCodeArr = this.$route.query.roomCode; // Stores room code in array
+        //let roomCodeArr = this.$route.query.roomCode; // Stores room code in array
 
         //Check if roomCode is a string and split it, otherwise assume it's already an array
         if (typeof roomCodeArr  === 'string')
@@ -224,6 +236,7 @@ export default {
 
             // Listen for broadcasted clear canvas
             this.socketInstance.on("cast-draw-clear", () => {
+                if (this.isDrawer) this.context = document.getElementById("canvas").getContext("2d");
                 this.context.fillStyle = "white";
                 this.context.clearRect(0, 0, document.getElementById("canvas").width, document.getElementById("canvas").height);
             });
@@ -393,7 +406,8 @@ export default {
                     @addDrawData="sendDrawData" 
                     @endDrawData="sendDrawDataEnd"
                     @canvasClear="sendDrawDataClear"
-                    @canvasUndo="sendDrawDataUndo">
+                    @canvasUndo="sendDrawDataUndo"
+                    :isDrawer=this.isDrawer>
                 </DrawingBoard>
             </div>
 
@@ -408,19 +422,10 @@ export default {
             <h2>Timer: {{ roundTimer }}</h2>
             <button type="test" class="test" @click="sendTimerStart(roundLength)">test</button>
                 
-            <div class="chat-container">                
-                <!-- Loop through messageBoard array and display each message -->
-                <div v-for="message in messageBoard" :key="message.id" class="chat-message">
-                    <img :src="message.avatar" :alt="message.user" class="game-avatar-image" />
-                    <span class="guess-message">{{ message.text }}</span>
-                    <img 
-                        v-if="message.imagePath" 
-                        :src="message.imagePath" 
-                        alt="Symbol" 
-                        class="message-symbol" 
-                    />
-                </div>
-            </div>
+            <!-- Assign the messageBoard in this class to the messageBoard in the MessageBoard component -->
+            <GuessBoard
+                :guesses=this.messageBoard> 
+            </GuessBoard>
         </div>
     </div>
 </template>
@@ -545,52 +550,6 @@ export default {
         flex-direction: column;     /* Vertical stacking */
         align-items: center;      /*cAlign children to the right side*/
         padding: 1rem;              /* Optional padding */
-    }
-
-    .chat-container {            
-        background-color: #c9c6c6;
-        box-sizing: border-box;
-        border: 5px solid black;
-        border-radius: 25px;
-        resize: none;
-        width: 250px;
-
-        height: auto;
-        min-height: 150px;
-        max-height: 80vh;
-        overflow-y: auto;
-
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;        /* Horizontal centering */
-        justify-content: center;    /* Vertical centering */
-        text-align: center;         /* Optional: centers inline text */
-    }
-
-    .chat-message {
-        display: flex;
-        flex-direction: row;
-    }
-
-    .game-avatar-image {
-        width: auto; /* Adjust the image size */
-        height: 50px;
-        padding-left: 1rem;
-    }
-
-    .guess-message {
-        padding-top: 0.9rem;
-        font-weight: bold;
-        font-family: 'Segoe UI', sans-serif;
-        padding-left: 0.5rem;
-        padding-right: 0.5rem;
-    }
-
-    .message-symbol {
-        width: 50px;
-        height: 50px;
-        margin-left: auto;
-        padding-right: 1rem;
     }
 
     .quit-btn{

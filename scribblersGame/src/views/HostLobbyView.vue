@@ -41,16 +41,7 @@
     <div class="bottom-buttons">
       <RouterLink 
       :to="{
-          path: '/game', // Navigates to the game',
-          query: { 
-            user: isHostPlaying ? currentUser : 'Host', 
-            avatar: isHostPlaying ? currentUserAvatar : 'host.png', 
-            roomCode: randomCodeString,
-            isHost: true,
-            maxPlayers: maxPlayers,
-            rounds: rounds,
-            isHostPlaying: isHostPlaying
-          }
+          path: '/game', // Navigates to the game route
       }"
       class="launch-btn" 
       @click="launchRoom">Create Lobby</RouterLink>
@@ -66,6 +57,10 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
+import { GameState } from '@/stores/GameState'
+
+// Define local state to send user data to Game
+const localGameState = GameState();
 
 // Room setup state
 const maxPlayers = ref(4)
@@ -107,10 +102,14 @@ function selectAvatar(button) {
 }
 
 function launchRoom() {
-  if (showAvatars.value && (!currentUser.value || !currentUserAvatar.value)) {
-    alert('Please select an avatar before creating a lobby.')
-    return false
-  }
+  const codeString = randomCodeDigits.value.join('')
+  alert(
+    `Hosting room ${codeString} (${visibility.value}) with max ${maxPlayers.value} players and ${rounds.value} rounds`
+  )
+  // Add actual hosting logic here
+
+   // Use local state to set and save the selection of the user
+   localGameState.setUser(currentUser, currentUserAvatar, randomCodeDigits)
 }
 </script>
 

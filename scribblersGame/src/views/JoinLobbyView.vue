@@ -54,14 +54,7 @@
       <!-- Button to join the waiting room instead of going directly to game -->
       <RouterLink 
       :to="{
-          path: '/game', // Navigates to the game
-          query: { 
-            user: currentUser, 
-            avatar: currentUserAvatar,
-            isHost: false, 
-            isDrawer: false,
-            roomCode: roomCodeArr
-          }
+          path: '/game', // Navigates to the game route
       }"
       class="join-btn" 
       @click="joinLobby">
@@ -78,6 +71,10 @@
 
 <script setup>
 import { ref } from 'vue'
+import { GameState } from '@/stores/GameState'
+
+// Define local state to send user data to Game
+const localGameState = GameState();
 
 // Reactive state for storing selected shapes
 const selectedShapes = ref([null, null, null, null])
@@ -164,6 +161,10 @@ function joinLobby() {
     alert('Please select all 4 shapes and an avatar.')
     return false
   }
+  alert(`Joining room ${roomCodeArr.value.join('')} as ${currentUser.value}`)
+
+  // Use local state to set and save the selection of the user
+  localGameState.setUser(currentUser, currentUserAvatar, roomCodeArr)
 }
 </script>
 
