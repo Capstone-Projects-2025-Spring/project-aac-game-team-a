@@ -161,10 +161,9 @@ function joinLobby() {
     alert('Please select all 4 shapes and an avatar.')
     return false
   }
-  alert(`Joining room ${roomCodeArr.value.join('')} as ${currentUser.value}`)
 
   // Use local state to set and save the selection of the user
-  localGameState.setUser(currentUser, currentUserAvatar, roomCodeArr)
+  localGameState.setUser(currentUser, currentUserAvatar, roomCodeArr, false, 0, 0, false)
 }
 </script>
 

@@ -103,13 +103,10 @@ function selectAvatar(button) {
 
 function launchRoom() {
   const codeString = randomCodeDigits.value.join('')
-  alert(
-    `Hosting room ${codeString} (${visibility.value}) with max ${maxPlayers.value} players and ${rounds.value} rounds`
-  )
   // Add actual hosting logic here
 
-   // Use local state to set and save the selection of the user
-   localGameState.setUser(currentUser, currentUserAvatar, randomCodeDigits)
+  // Use local state to set and save the selection of the user
+  localGameState.setUser(currentUser, currentUserAvatar, codeString, true, maxPlayers, rounds, isHostPlaying)
 }
 </script>
 

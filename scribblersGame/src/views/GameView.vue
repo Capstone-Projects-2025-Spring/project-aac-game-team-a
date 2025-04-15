@@ -22,14 +22,10 @@ export default {
         const user = localGameState.currentUser; // Stores the username entered by the user
         const avatar = localGameState.currentUserAvatar; // Stores the username entered by the user
         let roomCodeArr = localGameState.roomCode;
-        
-        //const user = this.$route.query.user || ""; // Stores the username entered by the user
-        //const avatar = this.$route.query.avatar || ""; // Stores the username entered by the user
-        const isHost = this.$route.query.isHost === 'true';
-        const isHostPlaying = this.$route.query.isHostPlaying === 'true';
-        const maxPlayers = this.$route.query.maxPlayers;
-        const rounds = this.$route.query.rounds;
-        //let roomCodeArr = this.$route.query.roomCode; // Stores room code in array
+        const isHost = localGameState.isHost;
+        const isHostPlaying = localGameState.isHostPlaying;
+        const maxPlayers = localGameState.maxPlayers;
+        const rounds = localGameState.rounds;
 
         //Check if roomCode is a string and split it, otherwise assume it's already an array
         if (typeof roomCodeArr  === 'string')
@@ -362,7 +358,9 @@ export default {
             :roomCode="roomCodeArr"
             :maxPlayers="maxPlayers"
             :players="players"
-            :numRounds="numRounds">
+            :numRounds="numRounds"
+            :isHost="isHost"
+            :isHostPlaying="isHostPlaying">
         </WaitingRoom>
     </div>
 
