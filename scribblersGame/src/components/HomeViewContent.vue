@@ -25,11 +25,8 @@ export default {
     handleClick(text, route) {
       // Turn text to speech
       this.speakNow(text)
-      // Timeout before routing
-      setTimeout(() => {
-        // Route to page
-        this.$router.push(route)
-      }, 500) // wait for speech to begin before navigating
+      // Navigate to required page
+      this.$router.push(route)
     },
 
     // Toggles text to speech locally for user
