@@ -1,12 +1,33 @@
-<script setup lang="ts">
+<script>
+
+export default {
+  methods: {
+    // Called to turn text into speech
+    speakNow(textToSpeak) {
+      const utterance = new SpeechSynthesisUtterance(textToSpeak);
+      utterance.lang = 'en-GB';
+      speechSynthesis.speak(utterance);
+    },
+    // Handles the clicks per button
+    handleClick(text, route) {
+      // Turn text to speech
+      this.speakNow(text)
+      // Timeout before routing
+      setTimeout(() => {
+        // Route to page
+        this.$router.push(route)
+      }, 500) // wait for speech to begin before navigating
+    }
+  }
+}
 </script>
 
 <template>
   <div class="home-elements">
     <h1 class="welcome-text">Welcome to Scribblers!</h1>
     <div class="lobby-buttons">
-      <RouterLink to="/hostLobby" class="host-lobby-button">Host Lobby</RouterLink>
-      <RouterLink to="/joinLobby" class="join-lobby-button">Join Lobby</RouterLink>
+      <button @click="handleClick('Create Lobby', '/hostLobby')" class="create-lobby-button">Create Lobby</button>
+      <button @click="handleClick('Join Lobby', '/joinLobby')" class="join-lobby-button">Join Lobby</button>
     </div>
   </div>
 </template>
@@ -55,7 +76,7 @@
   transform: scale(1.05);
 }
 
-.host-lobby-button {
+.create-lobby-button {
   display: inline-block;
   padding: 12px 24px;
   font-size: 1.2rem;
@@ -70,7 +91,7 @@
   width: 200px;
 }
 
-.host-lobby-button:hover {
+.create-lobby-button:hover {
   background-color: #1c7c31;
   transform: scale(1.05);
 }
