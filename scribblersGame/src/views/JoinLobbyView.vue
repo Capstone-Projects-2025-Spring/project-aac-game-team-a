@@ -1,10 +1,10 @@
 <template>
   <div class="join-screen">
-    <h1>Join a Game</h1>
+    <h1 @click="speakNow('Join a Game')">Join a Game</h1>
 
     <div class="form-group">
       <!-- Section for selecting room code using shapes -->
-      <label>Select Room Code (4 shapes)</label>
+      <label @click="speakNow('Select Room Code (4 shapes)')">Select Room Code (4 shapes)</label>
       <div class="shape-slots">
         <div
           v-for="(shape, index) in selectedShapes"
@@ -36,7 +36,7 @@
 
     <div class="form-group">
       <!-- Section for choosing an avatar -->
-      <label>Choose Your Avatar</label>
+      <label @click="speakNow('Choose Your Avuht-ar')">Choose Your Avatar</label>
       <div class="avatar-container">
         <button
           v-for="(button, index) in avatarButtons"
@@ -61,6 +61,7 @@
         Join Lobby</RouterLink>
 
       <RouterLink 
+      @click="speakNow('Back')"
       :to="{
           path: '/', // Navigates to the home route
       }"
@@ -72,9 +73,22 @@
 <script setup>
 import { ref } from 'vue'
 import { GameState } from '@/stores/GameState'
+import { SettingState } from '@/stores/SettingState'
 
 // Define local state to send user data to Game
 const localGameState = GameState();
+// Define local state of the settings
+const settingsState = SettingState();
+
+// Called to turn text into speech
+function speakNow(textToSpeak) {
+  // Only use text-to-speech if enabled
+  if(settingsState.enableTTS){
+    const utterance = new SpeechSynthesisUtterance(textToSpeak); // Synthesize the speech
+    utterance.lang = 'en'; // Specify the language
+    speechSynthesis.speak(utterance); // Speak fido
+  }
+}
 
 // Reactive state for storing selected shapes
 const selectedShapes = ref([null, null, null, null])
@@ -97,6 +111,9 @@ const roomCodeArr = ref([])
 
 // Function to select a shape and add it to the room code
 function selectShape(shape) {
+  // Speak the shape being selected
+  speakNow(shape.label);
+
   const index = selectedShapes.value.findIndex((s) => s === null)
   if (index !== -1) {
     selectedShapes.value[index] = shape.imgSrc
@@ -113,6 +130,8 @@ function selectShape(shape) {
 
 // Function to undo the last selected shape
 function undoShape() {
+  speakNow('Undo'); // TTS
+
   const lastIndex = [...selectedShapes.value].reverse().findIndex((s) => s !== null)
   if (lastIndex !== -1) {
     selectedShapes.value[selectedShapes.value.length - 1 - lastIndex] = null
@@ -129,6 +148,7 @@ function undoShape() {
 
 // Function to clear all selected shapes
 function clearShapes() {
+  speakNow('Clear'); // TTS
   selectedShapes.value = [null, null, null, null]
   roomCodeArr.value = []
 }
@@ -151,6 +171,7 @@ const avatarButtons = [
 
 // Function to select an avatar
 function selectAvatar(button) {
+  speakNow(button.label);
   currentUser.value = button.label
   currentUserAvatar.value = button.imgSrc
 }
@@ -159,6 +180,7 @@ function selectAvatar(button) {
 function joinLobby() {
   if (selectedShapes.value.includes(null) || !currentUserAvatar.value) {
     alert('Please select all 4 shapes and an avatar.')
+    speakNow('Joining lobby')
     return false
   }
 

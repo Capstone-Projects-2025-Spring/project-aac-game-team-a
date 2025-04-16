@@ -1,17 +1,17 @@
 <template>
   <div class="host-screen">
-    <h1>Host a New Game</h1>
+    <h1 @click="speakNow('Host a New Game')">Host a New Game</h1>
 
     <!-- Max players input -->
     <div class="form-group">
-      <label>Max Players</label>
-      <input type="number" v-model="maxPlayers" min="2" max="8" />
+      <label @click="speakNow('Maximum Players')">Max Players</label>
+      <input @input="validatePlayerCount()" @change="speakNow(maxPlayers + ' players')" type="number" v-model="maxPlayers" min="2" max="8"/>
     </div>
 
     <!-- Number of rounds input -->
     <div class="form-group">
-      <label>Number of Rounds</label>
-      <input type="number" v-model="rounds" min="1" max="10" />
+      <label @click="speakNow('Number of Rounds')" >Number of Rounds</label>
+      <input @input="validateRoundCount()" @change="speakNow(rounds + ' rounds')" type="number" v-model="rounds" min="1" max="10" />
     </div>
 
     <!-- Host participation toggle -->
@@ -22,7 +22,7 @@
     <!-- Avatar selection (conditionally displayed) -->
     <div v-if="showAvatars" class="avatar-section">
       <div class="form-group">
-        <label>Choose Your Avatar</label>
+        <label @click="speakNow('Choose Your Avuht-ar')">Choose Your Avatar</label>
         <div class="avatar-container">
           <button
             v-for="(button, index) in avatarButtons"
@@ -44,13 +44,13 @@
           path: '/game', // Navigates to the game route
       }"
       class="launch-btn" 
-      @click="launchRoom">Create Lobby</RouterLink>
+      @click="launchRoom">Launch Room</RouterLink>
       
       <RouterLink 
       :to="{
           path: '/',
       }"
-      class="back-btn">Back</RouterLink>
+      class="back-btn" @click="speakNow('Back')">Back</RouterLink>
     </div>
   </div>
 </template>
@@ -58,9 +58,12 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { GameState } from '@/stores/GameState'
+import { SettingState } from '@/stores/SettingState'
 
 // Define local state to send user data to Game
 const localGameState = GameState();
+// Define local state of the settings
+const settingsState = SettingState();
 
 // Room setup state
 const maxPlayers = ref(4)
@@ -84,6 +87,30 @@ const avatarButtons = [
   { id: 8, imgSrc: 'dog.png', label: 'Dog' }
 ]
 
+// Called to turn text into speech
+function speakNow(textToSpeak) {
+  // Only use text-to-speech if enabled
+  if(settingsState.enableTTS){
+    const utterance = new SpeechSynthesisUtterance(textToSpeak); // Synthesize the speech
+    utterance.lang = 'en'; // Specify the language
+    speechSynthesis.speak(utterance); // Speak fido
+  }
+}
+
+// Make sure the user doesn't go out of the range for players
+function validatePlayerCount() {
+  if (this.maxPlayers < 2 || this.maxPlayers > 8) {
+    this.maxPlayers = null;  // Clears the value by setting it to null
+  }
+}
+
+// Make sure the user doesn't go out of the range for rounds
+function validateRoundCount() {
+  if (this.rounds < 1 || this.rounds > 10) {
+    this.rounds = null;  // Clears the value by setting it to null
+  }
+}
+
 // Function to toggle avatar selection visibility
 function toggleAvatars(show) {
   showAvatars.value = show
@@ -92,6 +119,9 @@ function toggleAvatars(show) {
   if (!show) {
     currentUser.value = ''
     currentUserAvatar.value = ''
+    speakNow("I'm not playing") // TTS
+  } else {
+    speakNow("I'm playing too") // TTS
   }
 }
 
@@ -99,9 +129,11 @@ function toggleAvatars(show) {
 function selectAvatar(button) {
   currentUser.value = button.label
   currentUserAvatar.value = button.imgSrc
+  speakNow(button.label) // TTS for avatar selected
 }
 
 function launchRoom() {
+  speakNow("Launch room")
   const codeString = randomCodeDigits.value.join('')
   // Add actual hosting logic here
 
