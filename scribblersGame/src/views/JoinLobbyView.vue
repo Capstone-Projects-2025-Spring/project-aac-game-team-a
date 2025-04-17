@@ -82,8 +82,8 @@ const settingsState = SettingState();
 
 // Called to turn text into speech
 function speakNow(textToSpeak) {
-  // Only use text-to-speech if enabled
-  if(settingsState.enableTTS){
+  // Only use text-to-speech if enabled and the string does not contain 'null'
+  if(settingsState.enableTTS && !textToSpeak.includes('null')){
     const utterance = new SpeechSynthesisUtterance(textToSpeak); // Synthesize the speech
     utterance.lang = 'en'; // Specify the language
     speechSynthesis.speak(utterance); // Speak fido
@@ -178,9 +178,9 @@ function selectAvatar(button) {
 
 // Function to validate selection and join the lobby
 function joinLobby() {
+  speakNow('Joining lobby')
   if (selectedShapes.value.includes(null) || !currentUserAvatar.value) {
     alert('Please select all 4 shapes and an avatar.')
-    speakNow('Joining lobby')
     return false
   }
 

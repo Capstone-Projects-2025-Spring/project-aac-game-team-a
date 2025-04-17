@@ -14,7 +14,8 @@ export default {
     // Called to turn text into speech
     speakNow(textToSpeak) {
       // Only use text-to-speech if enabled
-      if(this.settingsState.enableTTS){
+      // Only use text-to-speech if enabled and the string does not contain 'null'
+      if(this.settingsState.enableTTS && !textToSpeak.includes('null')){
         const utterance = new SpeechSynthesisUtterance(textToSpeak); // Synthesize the speech
         utterance.lang = 'en'; // Specify the language
         speechSynthesis.speak(utterance); // Speak fido
