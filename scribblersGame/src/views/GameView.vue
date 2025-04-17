@@ -1,33 +1,30 @@
 <script>
+/**
+ * This file handles the view for all game components. 
+ * Host and Join Lobby point to this file.
+ * WaitingRoom, AACboard, DrawingBoard, and GuessBoard are children of this component.
+ */
 import io from "socket.io-client"; // Import the socket.io-client library to enable WebSocket communication
 import AacBoard from '../components/aacBoard.vue'; //import AACBoard component
 import DrawingBoard from '../components/DrawingBoard.vue'; // import Drawing board component
 import WaitingRoom from '../components/WaitingRoom.vue'; // import Drawing board component
 import GuessBoard from "@/components/GuessBoard.vue";
-import { GameState } from '@/stores/GameState'
+import { GameState } from '@/stores/GameState';
+
+const inProduction = false; //change this variable to switch between connecting to public backend server and localhost
+const socketServer =  "scribblersserver.fly.dev"; //web address for hosted websocket server
 
 export default {
     components: {
         AacBoard, //register Aac board as a component
         DrawingBoard, //register drawing board as a component
         WaitingRoom, //register waiting room as a component
-        GuessBoard, // register the drawing borad as a component
+        GuessBoard, //register the drawing board as a component
     },
     data() {
-    
-        // Define local state to recieve user data from Host and Join lobby
-        const localGameState = GameState();
-
-        // Use the local state to define specific user choices
-        const user = localGameState.currentUser; // Stores the username entered by the user
-        const avatar = localGameState.currentUserAvatar; // Stores the username entered by the user
-        let roomCodeArr = localGameState.roomCode;
-        const isHost = localGameState.isHost;
-        const isHostPlaying = localGameState.isHostPlaying;
-        const maxPlayers = localGameState.maxPlayers;
-        const rounds = localGameState.rounds;
-
         //Check if roomCode is a string and split it, otherwise assume it's already an array
+        let roomCodeArr = GameState().roomCode;
+
         if (typeof roomCodeArr  === 'string')
             roomCodeArr = roomCodeArr.split(',').map(Number);
         else if (Array.isArray(roomCodeArr))
@@ -35,31 +32,29 @@ export default {
         
         let currentUserMessage = { // Holds all the user message info being sent back and forth between client and server
             id: 0,
-            avatar: avatar,
-            user: user,
+            avatar: GameState().currentUserAvatar,
+            user: GameState().currentUser,
             text: "",
             imagePath: ""
         };
 
         return {
-            inProduction: false, //change this variable to switch between connecting to public backend server and localhost
-            socketServer: "scribblersserver.fly.dev", //web address for hosted websocket server
             selectedImagePath: "", //path to current AAC image selected
+            currentUser: GameState().currentUser,
+            currentUserAvatar: GameState().currentUserAvatar,
             currentUserMessage,
             messageBoard: [
                 currentUserMessage
             ], // Array to store all received users in message board
-            currentUser: user, //track user mounting the game view
             isDrawer: false, //track if user is the drawer
-            isHost: isHost, //track if user is hosting game
-            isHostPlaying: isHostPlaying, //track if host is playing or spectating
+            isHost: GameState().isHost,
+            isHostPlaying: GameState().isHostPlaying, //track if host is playing or spectating
             promptWord: "", //store the random drawing prompt word
             promptImgPath: "", // store the path to the image to be referenced for prompt
             context: CanvasRenderingContext2D, // stores drawing context for drawing broadcasted data
-            numRounds: rounds, // tracks remaining rounds in the game
-            maxPlayers: maxPlayers, // tracks maximum number of players allowed in lobby
+            numRounds: GameState().rounds, // tracks remaining rounds in the game
+            maxPlayers: GameState().maxPlayers, // tracks maximum number of players allowed in lobby
             players: [], // string array of active players in lobby
-            roundLength: 10, // how many seconds each round will last
             roundTimer: 0,  // tracks counter state
             roomCodeArr: roomCodeArr, // Now roomCodeArr is correctly assigned here
             roomCodeStr: roomCodeArr.join(''),
@@ -94,23 +89,24 @@ export default {
 
         // Connect to the server
         serverConnect(){
+
             // Establish connection to the WebSocket server
-            if (this.inProduction) 
-                this.socketInstance = io(this.socketServer);
+            if (inProduction) 
+                this.socketInstance = io(socketServer);
             else 
                 this.socketInstance = io("http://localhost:3001"); // CHANGE THIS WHEN YOU WANT THE SERVER TO BE PUBLIC
-
+            
             //  Create new lobby if host is connecting to socket, otherwise attempt to join specified lobby
-            if (this.isHost) {
+            if (GameState().isHost) {
                 
                 //  Add host to player array if they are playing
-                if (this.isHostPlaying)
-                    this.players.push(this.currentUser)
+                if (GameState().isHostPlaying)
+                    this.players.push(GameState().currentUser)
 
                 this.socketInstance.emit("create-new-lobby", this.numRounds, this.maxPlayers, this.players);
             }
             else {
-                this.socketInstance.emit('join-room', this.roomCodeStr, this.currentUser);    
+                this.socketInstance.emit('join-room', this.roomCodeStr, GameState().currentUser);    
             }
 
             // Listen for new lobby code
@@ -145,7 +141,7 @@ export default {
             //  Listen for new drawer
             this.socketInstance.on("update-drawer", (drawer) => {
 
-                if (this.currentUser == drawer)
+                if (GameState().currentUser == drawer)
                     this.isDrawer = true;
                 else
                     this.isDrawer = false;   
@@ -259,7 +255,7 @@ export default {
           const message = {
               id: new Date().getTime(), // Generates a unique ID based on timestamp
               text: this.text, // Stores the message content
-              user: this.currentUser, // Stores the username
+              user: GameState().currentUser, // Stores the username
               avatar: this.currentUserAvatar, // Stores the avatar URL
               imagePath: this.selectedImagePath //Stores AAC image path
           };
@@ -338,7 +334,7 @@ export default {
 
         //  Handles request to leave lobby
         leaveLobby() {
-            this.socketInstance.emit("leave-room", this.roomCodeStr, this.currentUser);
+            this.socketInstance.emit("leave-room", this.roomCodeStr, GameState().currentUser);
         },
     },
     // Automatically connect to the WebSocket server when the component is mounted
@@ -418,7 +414,6 @@ export default {
         <div class="right-container">
             <!--  Remove after testing timer -->
             <h2>Timer: {{ roundTimer }}</h2>
-            <button type="test" class="test" @click="sendTimerStart(roundLength)">test</button>
                 
             <!-- Assign the messageBoard in this class to the messageBoard in the MessageBoard component -->
             <GuessBoard

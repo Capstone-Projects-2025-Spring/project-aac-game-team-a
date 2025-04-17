@@ -6,7 +6,7 @@
       <div class="room-code">
         <h2>Room Code:</h2>
         <div class="shape-code-display">
-          <div v-for="(digit, index) in roomCode" :key="index" class="shape-slot">
+          <div v-for="(digit, index) in props.roomCode" :key="index" class="shape-slot">
             <img :src="getShapeImg(parseInt(digit))" />
           </div>
         </div>
@@ -74,20 +74,11 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-
-const route = useRoute()
+import { onMounted } from 'vue'
 
 //define the emit function to send events to parent
 const emit = defineEmits();
 const props = defineProps(['roomCode', 'maxPlayers', 'players', 'numRounds', 'isHost', 'isHostPlaying']);
-
-// Extract query parameters
-//const userName = ref(route.query.user || '')
-//const userAvatar = ref(route.query.avatar || '')
-//const isHost = ref(route.query.isHost === 'true')
-//const isHostPlaying = ref(route.query.isHostPlaying === 'true')
 
 // Shape map
 const shapes = [
