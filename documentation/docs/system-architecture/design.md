@@ -6,16 +6,16 @@
 The GameRoom class contains elements that pertain to management of game sessions, including players, game rounds, and prompt information. It is the core game logic and controls the flow of the game such as which players are drawing, which players are guessing, the transitions between rounds, and starting and ending the game. It will handle prompts ensuring that none are repeated, and provides references to images pertaining to the prompts. This class also handles server-side functionality but for organization it is under client-side.
 
 **Player**  
-This class is used to represent individual users who will be playing the game. It will store a player’s details and score pertaining to the game session, and 
+This class is used to represent individual users who will be playing the game. It will store a player’s details and score pertaining to the game session.
 
 **DrawingCanvas**  
 This class handles drawing functionality such as the canvas to draw on, the tools to draw with, and the stroke/color to draw with. It gathers the data from the drawer so it can be sent to the interfaces of the other players. 
 
 **ReferenceImageProvider**  
-When a prompt is displayed to a drawer, it will be accompanied by a reference image to assist the drawer if they have limited knowledge of the prompt to draw. This class will aid in storing and presenting the image to the current drawer and only to the current drawer. There will be multiple reference images per prompt to discourage the same drawing being done each time. 
+When a prompt word is displayed to a drawer, it will be accompanied by a reference image icon to assist the drawer to assist players who are unable to read the prompt. This class will aid in storing and presenting the image to the current drawer and only to the current drawer. There will be multiple reference images per prompt to discourage the same drawing being done each time. 
 
 **GuessMessage**  
-The symbols to be sent in chat are handled by this class. It is used to broadcast AAC symbols a player selects to other player interfaces and also to determine the correct guess for a prompt.
+Players guesses are handled by this class. It is used to broadcast AAC symbols that a player selects to other player interfaces and also to determine the correct guess for a prompt.
 
 **GameSettings**  
 This class is used to provide game sessions with rules and configurations such as how much time per round, how many players can join, and if AAC controls are enabled or not.
