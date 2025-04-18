@@ -10,6 +10,7 @@ import DrawingBoard from '../components/DrawingBoard.vue'; // import Drawing boa
 import WaitingRoom from '../components/WaitingRoom.vue'; // import Drawing board component
 import GuessBoard from "@/components/GuessBoard.vue";
 import { GameState } from '@/stores/GameState';
+import { SettingState } from '@/stores/SettingState'
 
 const inProduction = false; //change this variable to switch between connecting to public backend server and localhost
 const socketServer =  "scribblersserver.fly.dev"; //web address for hosted websocket server
@@ -39,6 +40,7 @@ export default {
         };
 
         return {
+            settingsState: null, // Intialize a variable for the settings
             selectedImagePath: "", //path to current AAC image selected
             currentUser: GameState().currentUser,
             currentUserAvatar: GameState().currentUserAvatar,
@@ -77,7 +79,45 @@ export default {
             ],
         };
     },
+
+    created() {
+        this.settingsState = SettingState() // Set the settings to the current state
+    },
+
     methods: {
+
+        // Called to turn text into speech
+        speakNow(textToSpeak) {
+            // Only use text-to-speech if enabled and the string does not contain 'null'
+            if(this.settingsState.enableTTS && !textToSpeak.includes('null')){
+                const utterance = new SpeechSynthesisUtterance(textToSpeak); // Synthesize the speech
+                utterance.lang = 'en'; // Specify the language
+                speechSynthesis.speak(utterance); // Speak fido
+            }
+        },
+
+        // TTS for the room code
+        speakRoomCode(){
+            // Loop through digits in string
+            for(let i=0; i<this.roomCodeArr.length; i++){
+                // Parse digits into int
+                let digit = this.roomCodeArr[i]
+
+                // Loop through shapes object array
+                for (let j=0; j<this.roomCodeShapes.length; j++) {
+                    
+                    if(this.roomCodeShapes[j].value == digit){
+                        // TTS the shape
+                        this.speakNow(this.roomCodeShapes[j].label)
+                    }
+                    // // Find a value that matches the digit
+                    // if (this.roomCodeShapes[j].value == digit) {
+                    //     // TTS the shape
+                    //     this.speakNow(this.roomCodeShapes[j].label)
+                    // }
+                }
+            }
+        },
         getShapeImage(digit) {
             const shape = this.roomCodeShapes.find(shape => shape.value === digit);
             return shape ? shape.imgSrc : '';
@@ -277,6 +317,7 @@ export default {
                     // disconnect from server
                     this.socketInstance.disconnect(); // works like how "this.socketInstance.emit('disconnect')" should work
                     console.log("Disconnected from server.");
+                    this.speakNow('Quitting game')
                 } else {
                     console.warn("Socket is not connected or already null.");
                 }
@@ -311,11 +352,13 @@ export default {
 
         //  Handles sending request to clear canvas
         sendDrawDataClear() {
+            this.speakNow('Clear board')
             this.socketInstance.emit('draw-clear', this.roomCodeStr);
         },
 
         //  Handles sending request to clear undo canvas
         sendDrawDataUndo() {
+            this.speakNow('Undo')
             this.socketInstance.emit('draw-undo', this.roomCodeStr);
         },
 
@@ -365,7 +408,7 @@ export default {
 
         <!-- Display room code-->
         <div class="room-code-block">
-            <span class="room-code-label">Room Code:</span>
+            <span class="room-code-label" @click="speakRoomCode()">Room Code:</span>
             <div class="room-code-shapes">
                 <img
                 v-for="(digit, index) in roomCodeArr"
@@ -387,7 +430,7 @@ export default {
             class="quit-btn">
             QUIT ❌</RouterLink>
             <!--Display drawing prompt for drawer-->
-            <div v-if="isDrawer" class="draw-prompt">
+            <div v-if="isDrawer" class="draw-prompt" @click="speakNow('Draw this')">
                 <h2>DRAW: {{ promptWord }}</h2>
                 <img class='prompt-image' :src=promptImgPath :alt=promptWord >
             </div>
@@ -413,11 +456,11 @@ export default {
 
         <div class="right-container">
             <!--  Remove after testing timer -->
-            <h2>Timer: {{ roundTimer }}</h2>
+            <h2 @click="speakNow(roundTimer + 'seconds left')">Timer: {{ roundTimer }}</h2>
                 
             <!-- Assign the messageBoard in this class to the messageBoard in the MessageBoard component -->
-            <GuessBoard
-                :guesses=this.messageBoard> 
+            <GuessBoard @click="speakNow('Players')" 
+                :guesses=this.messageBoard>
             </GuessBoard>
         </div>
     </div>
@@ -506,7 +549,7 @@ export default {
         height: 60vh;
         border-radius: 25px;
 
-        background-image: url("whiteBoard.jpg");
+        /* background-image: url("whiteBoard.jpg"); */
         background-position: center;
         background-size: 100% 100%;
 
