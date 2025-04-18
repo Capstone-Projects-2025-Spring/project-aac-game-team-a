@@ -88,7 +88,7 @@ function getPath(promptObject){
 io.on('connection', (socket) => {
 
     //  Listen for request to create new lobby
-    socket.on("create-new-lobby", (numRounds, maxPlayers, players) => {
+    socket.on("create-new-lobby", (numRounds, maxPlayers, players, user) => {
         
         //  Generate new lobby code
         let randomCodeDigits = [];
@@ -103,14 +103,19 @@ io.on('connection', (socket) => {
 
             //  Check if value is in mapped array
             const newCodeString = randomCodeDigits.value.join('');
-
             if (io.sockets.adapter.rooms.has(newCodeString)) {
+                //  Do nothing and cycle through while loop to try again
             }
             else{
                 uniqueCodeFound = true;
                 io.to(socket.id).emit("update-lobby-code", newCodeString);
-                const scores = new Map();
-                const gameData = new GameData(numRounds, 0, maxPlayers, players, null, "", 0, 0, scores);
+
+                //  Add host to player list if playing
+                let playerData = new Map();
+                if (user) {
+                    playerData.set(user, {currentGuess: "", score: 0})
+                }
+                const gameData = new GameData(numRounds, 0, maxPlayers, players, null, "", 0, 0, playerData);
                 mappedGameData.set(newCodeString, gameData);
                 console.log(mappedGameData);
             }
@@ -132,10 +137,15 @@ io.on('connection', (socket) => {
             //console.log(`room ${code} exists!`)
             socket.join(code);
             mappedGameData.get(code).players.push(user)
-            console.log(mappedGameData);
+            mappedGameData.get(code).playerData.set(user, {currentGuess: "", score: 0})
+            mappedGameData.get(code).playerData.forEach((value, key) => {
+                io.to(socket.id).emit("add-player", key, value);
+            })
             io.to(code).emit("update-player-list", mappedGameData.get(code).players);
+            socket.to(code).emit("add-player", user, {currentGuess: "", score: 0});
             io.to(socket.id).emit("update-max-players", mappedGameData.get(code).maxPlayers);
             io.to(socket.id).emit("update-round", mappedGameData.get(code).numberRounds);
+            console.log(mappedGameData);
         }
         else{
             //console.log(`room ${code} does not exist!`)
@@ -159,7 +169,9 @@ io.on('connection', (socket) => {
             }
         }
         socket.leave(code);
-        io.emit("update-player-list", mappedGameData.get(code).players);
+        socket.to(code).emit("update-player-list", mappedGameData.get(code).players);
+        mappedGameData.get(code).playerData.delete(user)
+        socket.to(code).emit('remove-player', user)
         console.log(mappedGameData.get(code))
         console.log(`User ${socket.id} has disconnected from room ${code}`);
 
@@ -359,15 +371,9 @@ io.on('connection', (socket) => {
         socket.to(room).emit("cast-draw-undo");
     });
 
-    /*
-    //  Listener for timer
-    socket.on("timer-start", (room, length) => {
-        const gameTimer = {
-            timerID: setInterval(updateTimer, 1000, room), 
-            timerValue: length};
-        activeTimers.set(room, gameTimer);
+    socket.on("update-guess-board", (room, user, guess) => {
+        socket.to(room).emit("update-guess-board", user, guess);
     });
-    */
 
     //  Function to start new round
     function startNewRound(room) {

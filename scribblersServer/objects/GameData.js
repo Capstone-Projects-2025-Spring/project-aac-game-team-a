@@ -9,14 +9,14 @@ class GameData{
      * @param {number} currentRound The current round for the game
      * @param {number} maxPlayers The maximum number of players allowed to join the game
      * @param {string} players An array of avatars currently in game
+     * @param {Map}    playerData Game data associate to individual players such as score and current guess
      * @param {object} prompt The prompt for drawers to draw and guessers to guess
      * @param {string} drawer The currently selected drawer
      * @param {number} timerID The ID related to the timer interval for the room
      * @param {number} timerValue The current value of the round timer
-     * @param {Map}    scores The scores of each player, each key is a playerID and value is score
      */
 
-    constructor( numberRounds, currentRound, maxPlayers, players, prompt, drawer, timerID, timerValue, scores ){
+    constructor( numberRounds, currentRound, maxPlayers, players, prompt, drawer, timerID, timerValue, playerData ){
         this.numberRounds = numberRounds;
         this.currentRound = currentRound;
         this.maxPlayers = maxPlayers;
@@ -25,7 +25,7 @@ class GameData{
         this.drawer = drawer;
         this.timerID = timerID;
         this.timerValue = timerValue;
-        this.scores = scores;
+        this.playerData = playerData;
     }
 
     /**
