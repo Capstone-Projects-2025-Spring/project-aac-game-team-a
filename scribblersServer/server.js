@@ -22,12 +22,9 @@ const io = new Server(server, {
 });
 
 const roundTimerLength = 60; //set length of round timer
-let currentDrawerID = null; //keeps track of current drawer (by socket ID)
 let playerCount = 0; //number of player that have joined
-let correctGuesses = 0; //tracks how many have guessed correctly in a round
 let playersQueue = []; //queue of players by socket ID
 let imagesPerPrompt = 3; // represents the amount of images to choose from per prompt
-let currentPromptObject = null;
 let messageBoard = []; // Used to display messages next to avatars in game
 
 const mappedGameData = new Map();
@@ -83,12 +80,31 @@ function getPath(promptObject){
     return path;
 }
 
+//  Check all guesses, return true if all are correct, return false if there are no correct guesses
+function allGuessesCorrect(room) {
+    let output = true
+    mappedGameData.get(room).playerData.forEach((value, key) => {
+        if (key != mappedGameData.get(room).drawer && value.currentGuess != mappedGameData.get(room).prompt.word)       
+            output = false
+    })
+    return output
+}
+
+//  Clears all user guesses and updates each user in the room
+function clearGuesses(room) {
+
+    mappedGameData.get(room).playerData.forEach((value, key) => {
+        
+        value.currentGuess = ''
+        io.to(room).emit("update-user-guess", key, '')
+    })
+}
 
 // Event listener for new socket connections
 io.on('connection', (socket) => {
 
     //  Listen for request to create new lobby
-    socket.on("create-new-lobby", (numRounds, maxPlayers, players) => {
+    socket.on("create-new-lobby", (numRounds, maxPlayers, players, user) => {
         
         //  Generate new lobby code
         let randomCodeDigits = [];
@@ -103,14 +119,19 @@ io.on('connection', (socket) => {
 
             //  Check if value is in mapped array
             const newCodeString = randomCodeDigits.value.join('');
-
             if (io.sockets.adapter.rooms.has(newCodeString)) {
+                //  Do nothing and cycle through while loop to try again
             }
             else{
                 uniqueCodeFound = true;
                 io.to(socket.id).emit("update-lobby-code", newCodeString);
-                const scores = new Map();
-                const gameData = new GameData(numRounds, 0, maxPlayers, players, null, "", 0, 0, scores);
+
+                //  Add host to player list if playing
+                let playerData = new Map();
+                if (user) {
+                    playerData.set(user, {currentGuess: "", score: 0})
+                }
+                const gameData = new GameData(numRounds, 0, maxPlayers, players, null, "", 0, 0, playerData);
                 mappedGameData.set(newCodeString, gameData);
                 console.log(mappedGameData);
             }
@@ -132,10 +153,16 @@ io.on('connection', (socket) => {
             //console.log(`room ${code} exists!`)
             socket.join(code);
             mappedGameData.get(code).players.push(user)
-            console.log(mappedGameData);
+            mappedGameData.get(code).playerData.set(user, {currentGuess: "", score: 0})
+            mappedGameData.get(code).playerData.forEach((value, key) => {
+                io.to(socket.id).emit("add-player", key, value);
+            })
             io.to(code).emit("update-player-list", mappedGameData.get(code).players);
+            socket.to(code).emit("add-player", user, {currentGuess: "", score: 0});
             io.to(socket.id).emit("update-max-players", mappedGameData.get(code).maxPlayers);
-            io.to(socket.id).emit("update-round", mappedGameData.get(code).numberRounds);
+            io.to(socket.id).emit("update-round", mappedGameData.get(code).currentRound);
+            io.to(socket.id).emit("update-num-rounds", mappedGameData.get(code).numberRounds);
+            console.log(mappedGameData);
         }
         else{
             //console.log(`room ${code} does not exist!`)
@@ -159,13 +186,15 @@ io.on('connection', (socket) => {
             }
         }
         socket.leave(code);
-        io.emit("update-player-list", mappedGameData.get(code).players);
+        socket.to(code).emit("update-player-list", mappedGameData.get(code).players);
+        mappedGameData.get(code).playerData.delete(user)
+        socket.to(code).emit('remove-player', user)
         console.log(mappedGameData.get(code))
         console.log(`User ${socket.id} has disconnected from room ${code}`);
 
         //  Check if room deleted
         if (!io.of("/").adapter.rooms.get(code)) {
-
+            clearInterval(mappedGameData.get(code).timerID);
             console.log(`room ${code} has been deleted`);
 
             //  Remove game data from deleted room. Delete() function returns false if key does not exist.
@@ -182,56 +211,11 @@ io.on('connection', (socket) => {
     // Keeps track of players currently in game (needs to be refined to be room specific)
     io.emit("player-count-update", { playerCount }); // Notify all players of new count
 
-    // Add players to the message board
-    socket.on('add-user-to-message-board', (data) => {
-        
-
-    })
-
-    /*
-    //assign drawer if there isn't one
-    if (!currentDrawerID){
-        currentDrawerID = socket.id; //makes this user the drawer
-        currentPromptObject.word = getPromptObject(); // Get a random word for the drawer
-
-        // Send "you-are-drawer" and  randomly selected word to the new drawer
-        socket.emit('you-are-drawer', { word: currentPromptObject.word });
-        console.log(`FIRST DRAWER: User ${socket.id} is the drawer with word: ${currentPromptObject.word}`);
-
-    }*/
     const SocketHandler = new SocketHandlerClass(io, socket, GameSessionDB)
     SocketHandler.createGame()
     SocketHandler.onPlayerJoin()
     SocketHandler.onRoundStart()
 
-    /*
-    if(currentDrawerIndex === 0 && !currentDrawerID) {
-        // Generating game code 
-        const randomNumbers = Array.from({ length: 4 }, () => Math.floor(Math.random() * 9));
-        const randomInteger = parseInt(randomNumbers.join(""), 10);
-        console.log(randomInteger);
-
-        // // grab number of players
-        // let numbPlayers = 4
-        // // grab number of rounds
-        // let numbRounds = 3
-        // // grab the a player
-        // currentDrawerID = socket.id; //assigns first user to join's ID to currentDrawerID
-        // // Generating game session data
-        // let gameSessionData = new GameSessionClass(randomInteger,[currentDrawerID], numbRounds, numbPlayers, null)
-        // gamesessions[gameSessionData.sessionID] = gameSessionData
-
-        currentPromptObject = getPromptObject();
-        let currentPromptImgPath = getPath(currentPromptObject);
-        io.to(playersQueue[currentDrawerIndex]).emit('you-are-drawer', 
-            {
-                word: currentPromptObject.word,
-                path: currentPromptImgPath
-            });
-        console.log(`(1)User ${socket.id} is the drawer with word: ${currentPromptObject.word} with path ${currentPromptImgPath}`);
-        // console.log("games session data: " + gamesessions[gameSessionData.sessionID].toString())
-    }
-    */
     socket.on("draw_data", (data) => {
         console.log("draw_data log")
         try {
@@ -241,100 +225,6 @@ io.on('connection', (socket) => {
         } catch (err){
             console.log("Message data unable to be updated");
             console.error(err)
-        }
-    });
-
-    // Listener for 'message' events from the client
-    socket.on('message', (data, room) => {
-        if(data.text != ""){
-            //console.log('message received:', data); 
-
-            //process guesses made by non drawing players
-            //console.log(`guess incoming from socket.id: ${socket.id}, currentDrawerID: ${currentDrawerID}`);
-            if(socket.id !== currentDrawerID) {            
-                //correct guess?
-                if (data.text.toLowerCase() === currentPromptObject.word.toLowerCase()) {
-                    console.log(`Player ${socket.id} guessed correctly!`);
-
-                    /*
-                    socket.emit('correct-guess', {
-                        user: data.user
-                    }); */
-                    
-                    //message that will show up in the chat upon correct message
-                    for(i=0; i<messageBoard.length; i++){ // Loop through each message object in message board
-                        if(messageBoard[i].id == socket.id){ // Look for the object with the socket id that matches the current user's socket id
-                            messageBoard[i].text = 'Guessed Correctly!'; // Change message to 'Guessed Correctly!'
-                            messageBoard[i].imagePath = null; // change to path to checkmark eventually or something
-                        }
-                    }
-                    // Update the message board for all users
-                    io.in(room).emit('update-user-message-board', messageBoard);
-                    
-                    // io.in(room).emit('message:received', data); // Broadcasts received messages to all other clients, including player who guesesd correct
-                    correctGuesses++;
-
-                    /*
-
-                    //check if all guessers have guessed correctly
-                    if (correctGuesses === playerCount - 1) {
-                        correctGuesses = 0;
-
-                        // clear drawing board for all users
-                        io.in(room).emit('cast-draw-clear');
-
-                        //next drawer
-                        currentDrawerIndex = (currentDrawerIndex + 1) % playersQueue.length;
-                        currentPromptObject = getPromptObject();
-                        currentPromptImgPath = getPath(currentPromptObject);
-
-                        //notify the previous drawer that they are guessing
-                        const previousDrawerIndex = (currentDrawerIndex - 1 + playersQueue.length) % playersQueue.length;
-                        io.to(playersQueue[previousDrawerIndex]).emit('you-are-guesser');
-                    }
-                    */
-                    /*
-                    //if game isn't over, then assign new drawer
-                    if (currentCycle < maxCycles) {
-                        currentCycle++;
-                        console.log(`Cycle number: ${currentCycle}`);
-                        io.to(playersQueue[currentDrawerIndex]).emit('you-are-drawer', {
-                            word: currentPromptObject.word,
-                            path: currentPromptImgPath 
-                        });
-                        currentDrawerID = playersQueue[currentDrawerIndex];
-                        //console.log(`User ${playersQueue[currentDrawerIndex]} is the drawer with word: ${currentPromptObject.word}, and currentDrawerID is: ${currentDrawerID}`);
-                    } else {
-                        console.log("End of game.");
-                        //TODO: End of game ***
-                    }
-                    */
-                } else {
-                    // Change the data in the object (socket.id specific)
-                    for(i=0; i<messageBoard.length; i++){ // Loop through each message object in message board
-                        if(messageBoard[i].id == socket.id){ // Look for the object with the socket id that matches the current user's socket id
-                            messageBoard[i].text = data.text; // Change the text based on user input
-                            messageBoard[i].imagePath = data.imagePath; // Change the image based on user input
-                        }
-                    }
-                    // socket.to(room).emit('message:received', data); // Broadcasts received messages to all other clients
-
-                    // Update the message board for all users
-                    io.in(room).emit('update-user-message-board', messageBoard);
-                }
-            }
-        } else { // This case is for users that have just joined
-            let userMessage = {
-                id: socket.id, // Set the socket id the server assigned
-                user: data.user,  // The user will be assigned
-                avatar: data.avatar, // The avater will be assigned
-                text: data.text // Test should be blank at this step but will be assigned anyway
-            }
-            // Push the user message on the board
-            messageBoard.push(userMessage);
-
-            // Update the board for every user
-            io.emit('update-user-message-board', messageBoard);
         }
     });
     
@@ -359,22 +249,31 @@ io.on('connection', (socket) => {
         socket.to(room).emit("cast-draw-undo");
     });
 
-    /*
-    //  Listener for timer
-    socket.on("timer-start", (room, length) => {
-        const gameTimer = {
-            timerID: setInterval(updateTimer, 1000, room), 
-            timerValue: length};
-        activeTimers.set(room, gameTimer);
+    socket.on("update-user-guess", (room, user, guess) => {
+        //  update player's guess in game data map and emit to all players in room except sender
+        mappedGameData.get(room).playerData.get(user).currentGuess = guess
+        socket.to(room).emit("update-user-guess", user, guess);
+
+        //  handle all users guessing correctly
+        if (allGuessesCorrect(room)) {
+            clearInterval(mappedGameData.get(room).timerID);
+            startNewRound(room);
+        }
     });
-    */
 
     //  Function to start new round
     function startNewRound(room) {
 
+        console.log(`Starting new round in room ${room}...`)
+        clearGuesses(room);
+        console.log(mappedGameData.get(room).playerData);
+        if (mappedGameData.get(room).currentRound != 0)
+            io.to(room).emit("cast-draw-clear");
+
         //  Increment round count and verify it is not end of round
         mappedGameData.get(room).currentRound++
         if (mappedGameData.get(room).currentRound > mappedGameData.get(room).numberRounds) {
+            mappedGameData.get(room).currentRound = 0
             io.to(room).emit('end-game');
             return;
         }
@@ -391,6 +290,7 @@ io.on('connection', (socket) => {
             else {
                 //  Set as new drawer and update all users in room
                 mappedGameData.get(room).drawer = mappedGameData.get(room).players[randomIndex];
+                console.log(`${mappedGameData.get(room).drawer} chosen as drawer`)
                 io.to(room).emit('update-drawer', mappedGameData.get(room).drawer);
                 newDrawerSelected = true;
             }
@@ -398,7 +298,7 @@ io.on('connection', (socket) => {
         
         //  Generate new prompt and update prompt for all users in room
         mappedGameData.get(room).prompt = getPromptObject();
-        io.to(room).emit('update-prompt', mappedGameData.get(room).prompt);
+        io.to(room).emit('update-prompt', mappedGameData.get(room).prompt, getPath(mappedGameData.get(room).prompt));
 
         //  Start Round Timer
         mappedGameData.get(room).timerValue = roundTimerLength;
@@ -408,14 +308,20 @@ io.on('connection', (socket) => {
 
     //  Handles timer functionality
     function updateTimer(room) {
-        io.in(room).emit("timer-update", mappedGameData.get(room).timerValue);
         
-        if (mappedGameData.get(room).timerValue == 0) {
-            clearInterval(mappedGameData.get(room).timerID);
-            // handle end of round by timer
+        try {
+            io.in(room).emit("timer-update", mappedGameData.get(room).timerValue);
+            
+            if (mappedGameData.get(room).timerValue == 0) {
+                clearInterval(mappedGameData.get(room).timerID);
+                startNewRound(room);
+            }
+            else
+                mappedGameData.get(room).timerValue--;
         }
-        else
-            mappedGameData.get(room).timerValue--;
+        catch{
+            console.error(`Error during timer update in room ${room}, clearing timer interval`)
+        }
     };
 
     // Listener for socket disconnections
