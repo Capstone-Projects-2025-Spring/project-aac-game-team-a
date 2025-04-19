@@ -22,12 +22,9 @@ const io = new Server(server, {
 });
 
 const roundTimerLength = 60; //set length of round timer
-let currentDrawerID = null; //keeps track of current drawer (by socket ID)
 let playerCount = 0; //number of player that have joined
-let correctGuesses = 0; //tracks how many have guessed correctly in a round
 let playersQueue = []; //queue of players by socket ID
 let imagesPerPrompt = 3; // represents the amount of images to choose from per prompt
-let currentPromptObject = null;
 let messageBoard = []; // Used to display messages next to avatars in game
 
 const mappedGameData = new Map();
@@ -164,6 +161,7 @@ io.on('connection', (socket) => {
             socket.to(code).emit("add-player", user, {currentGuess: "", score: 0});
             io.to(socket.id).emit("update-max-players", mappedGameData.get(code).maxPlayers);
             io.to(socket.id).emit("update-round", mappedGameData.get(code).currentRound);
+            io.to(socket.id).emit("update-num-rounds", mappedGameData.get(code).numberRounds);
             console.log(mappedGameData);
         }
         else{
@@ -269,7 +267,7 @@ io.on('connection', (socket) => {
         console.log(`Starting new round in room ${room}...`)
         clearGuesses(room);
         console.log(mappedGameData.get(room).playerData);
-        if (!mappedGameData.get(room).currentRound)
+        if (mappedGameData.get(room).currentRound != 0)
             io.to(room).emit("cast-draw-clear");
 
         //  Increment round count and verify it is not end of round

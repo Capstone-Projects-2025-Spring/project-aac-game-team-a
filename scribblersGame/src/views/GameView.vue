@@ -159,6 +159,13 @@ export default {
                 console.log(`currentRound: ${this.currentRound}`)
             })
 
+            //  Listen for number of rounds
+            this.socketInstance.on("update-num-rounds", (updateNumRounds) => {
+
+                this.numRounds = updateNumRounds;
+                console.log(`currentRound: ${this.updateNumRounds}`)
+            })
+
             //  Listen for new drawer
             this.socketInstance.on("update-drawer", (drawer) => {
 
@@ -240,7 +247,7 @@ export default {
 
             // Listen for broadcasted clear canvas
             this.socketInstance.on("cast-draw-clear", () => {
-                if (this.isDrawer) this.context = document.getElementById("canvas").getContext("2d");
+                this.context = document.getElementById("canvas").getContext("2d");
                 this.context.fillStyle = "white";
                 this.context.clearRect(0, 0, document.getElementById("canvas").width, document.getElementById("canvas").height);
             });
