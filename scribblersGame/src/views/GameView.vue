@@ -312,14 +312,13 @@ export default {
         serverDisconnect(){
             try {
                 this.playerCount = 0;
-
+                this.speakNow('Quitting game')
                 // Check if socket exists and is connected
                 if (this.socketInstance && this.socketInstance.connected) {
                     // disconnect from game and server
                     this.socketInstance.emit("leave-room", this.roomCodeStr, GameState().currentUser);
                     this.socketInstance.disconnect(); // works like how "this.socketInstance.emit('disconnect')" should work
                     console.log("Disconnected from server.");
-                    this.speakNow('Quitting game')
                 } else {
                     console.warn("Socket is not connected or already null.");
                 }
@@ -412,8 +411,8 @@ export default {
 
         <!-- Display room code-->
         <div class="room-code-block">
-            <span class="room-code-label" @click="speakRoomCode()">Room Code:</span>
-            <div class="room-code-shapes">
+            <span class="room-code-label" @click="speakRoomCode()" >Room Code:</span>
+            <div @click="speakRoomCode()" class="room-code-shapes">
                 <img
                 v-for="(digit, index) in roomCodeArr"
                 :key="index"

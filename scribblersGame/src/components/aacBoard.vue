@@ -2,7 +2,7 @@
     <div class="aac-board">
         <!-- Grid for categories. -->
         <div v-if="!currentCategory" class="grid">
-            <button v-for="(items, category) in categories" :key="category" @click="currentCategory = category">
+            <button v-for="(items, category) in categories" :key="category" @click="setCurrentCategory(category)">
                 <img :src="getCategoryImage(category)" :alt="category" class="category-image"/>
                 <p>{{category}}</p>
             </button>
@@ -11,7 +11,7 @@
         <!-- Back button + Grid for items in a category -->
         <div v-else class="grid">
             <!-- Back button as first item in the grid -->
-            <button class="back-button-grid" @click="currentCategory = null">
+            <button class="back-button-grid" @click="setCurrentCategory(null)">
                 <img src="/aacSymbols/back.png" alt="Back" class="item-image" />
                 <p>Back</p>
             </button>
@@ -26,9 +26,12 @@
 
 <script setup>
 import { ref } from 'vue';
+import { SettingState } from '@/stores/SettingState'
 
-//define the emit function to send events to parent
+//define the emit function to send events to paren
 const emit = defineEmits();
+// Define local state of the settings
+const settingsState = SettingState();
 
 const currentCategory = ref(null);
 
@@ -57,10 +60,32 @@ const getItemImage = (category, item) => {
 
 //Function that emits an event from this component when user selects a word
 const selectItem = (item) => {
+    // TTS the item
+    speakNow(item)
     //Emit an event with the selected aac word and path to image
     const imagePath = getItemImage(currentCategory.value, item);
     emit('itemSelected', {item, imagePath});
 };
+
+// Called to turn text into speech
+function speakNow(textToSpeak) {
+  // Only use text-to-speech if enabled and the string does not contain 'null'
+  if(settingsState.enableTTS && !textToSpeak.includes('null')){
+    const utterance = new SpeechSynthesisUtterance(textToSpeak); // Synthesize the speech
+    utterance.lang = 'en'; // Specify the language
+    speechSynthesis.speak(utterance); // Speak fido
+  }
+}
+
+// Defines the current category in the AAC board
+function setCurrentCategory(category){
+    if(category != null){
+        speakNow(category)
+    } else {
+        speakNow('back')
+    }
+    this.currentCategory = category
+}
 
 </script>
 
