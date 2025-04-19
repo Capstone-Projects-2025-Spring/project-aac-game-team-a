@@ -43,6 +43,7 @@ export default {
             currentUser: GameState().currentUser,
             currentUserAvatar: GameState().currentUserAvatar,
             currentUserMessage,
+            isGuessCorrect: false, //tracks if current user has guessed correctly
             messageBoard: [
                 currentUserMessage
             ], // Array to store all received users in message board
@@ -53,7 +54,8 @@ export default {
             promptWord: "", //store the random drawing prompt word
             promptImgPath: "", // store the path to the image to be referenced for prompt
             context: CanvasRenderingContext2D, // stores drawing context for drawing broadcasted data
-            numRounds: GameState().rounds, // tracks remaining rounds in the game
+            numRounds: GameState().rounds, // tracks number of rounds set by host
+            currentRound: 0, //tracks the current round in the lobby
             maxPlayers: GameState().maxPlayers, // tracks maximum number of players allowed in lobby
             players: [], // string array of active players in lobby
             roundTimer: 0,  // tracks counter state
@@ -90,8 +92,6 @@ export default {
 
         // Connect to the server
         serverConnect(){
-
-            //this.mappedPlayerData = new Map();
 
             // Establish connection to the WebSocket server
             if (inProduction) 
@@ -155,7 +155,8 @@ export default {
             //  Listen for new round count
             this.socketInstance.on("update-round", (updateRound) => {
 
-                this.numRounds = updateRound;
+                this.currentRound = updateRound;
+                console.log(`currentRound: ${this.currentRound}`)
             })
 
             //  Listen for new drawer
@@ -168,18 +169,19 @@ export default {
             })
 
             //  Listen for new prompt
-            this.socketInstance.on("update-prompt", (updatePrompt) => {
+            this.socketInstance.on("update-prompt", (updatePrompt, path) => {
 
                 this.promptWord = updatePrompt.word;
+                this.promptImgPath = path;
+                this.isGuessCorrect = false;
             })
 
             //  Listen for new guesses
-            this.socketInstance.on("update-guess-board", (user, guess) => {
+            this.socketInstance.on("update-user-guess", (user, guess) => {
 
-                console.log(`user: ${user}  guess: ${guess}`)
                 this.mappedPlayerData.get(user).currentGuess = guess;
-                console.log(this.mappedPlayerData)
-                
+                if (guess == this.promptWord)
+                    console.log(`${user} guessed correctly!`)
             })
 
             //  Listen for host to start of new round
@@ -192,6 +194,7 @@ export default {
             this.socketInstance.on("end-game", () => {
 
                 this.gameStarted = false;
+                this.currentRound = 0;
             })
 
             // Listen for the player count from the server
@@ -199,9 +202,6 @@ export default {
                 this.playerCount = count;
                 //console.log("Updated player count:", count);
             });
-
-            // Signal backend to add user to the message board
-            this.socketInstance.emit('message', this.currentUserMessage, this.roomCodeStr);
 
             // Listen for "message" array update and update the message
             this.socketInstance.on('update-user-message-board', (data) => {
@@ -268,7 +268,8 @@ export default {
 
                 // Check if socket exists and is connected
                 if (this.socketInstance && this.socketInstance.connected) {
-                    // disconnect from server
+                    // disconnect from game and server
+                    this.socketInstance.emit("leave-room", this.roomCodeStr, GameState().currentUser);
                     this.socketInstance.disconnect(); // works like how "this.socketInstance.emit('disconnect')" should work
                     console.log("Disconnected from server.");
                 } else {
@@ -285,7 +286,9 @@ export default {
             this.currentUserMessage.text = item; //stores aac button selected by user
             this.currentUserMessage.imagePath = imagePath;
             this.mappedPlayerData.get(this.currentUser).currentGuess = item;
-            this.socketInstance.emit('update-guess-board', this.roomCodeStr, this.currentUser, this.mappedPlayerData.get(this.currentUser).currentGuess)
+            this.socketInstance.emit('update-user-guess', this.roomCodeStr, this.currentUser, this.mappedPlayerData.get(this.currentUser).currentGuess)
+            if (item == this.promptWord)
+                    console.log(`You guessed correctly!`)
         },
 
         //  Handles sending initial drawing data to observer canvases (on mouse click)
