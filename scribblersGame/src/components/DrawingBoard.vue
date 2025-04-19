@@ -1,5 +1,9 @@
 <script setup>
 import { ref, onMounted, watch } from "vue";
+import { SettingState } from '@/stores/SettingState'
+
+// Define local state of the settings
+const settingsState = SettingState();
 
 //define the emit function to send events to parent
 const emit = defineEmits();
@@ -68,6 +72,16 @@ onMounted(() => {
     // Drawing tools disabled by default
     document.querySelector(".tools").style.display = 'none';
 });
+
+// Called to turn text into speech
+function speakNow(textToSpeak) {
+  // Only use text-to-speech if enabled and the string does not contain 'null'
+  if(settingsState.enableTTS && !textToSpeak.includes('null')){
+    const utterance = new SpeechSynthesisUtterance(textToSpeak); // Synthesize the speech
+    utterance.lang = 'en'; // Specify the language
+    speechSynthesis.speak(utterance); // Speak fido
+  }
+}
 
 //  Pushes current canvas state onto undo stack
 function saveState() {
@@ -155,18 +169,18 @@ function undo_action() {
                 <button type="button" class="Cbutton">🧽 Clear</button>
 
                 <!--creates buttons for colors-->
-                    <div   class="color-field" style="background: red;"></div>
-                    <div   class="color-field" style="background: orange;"></div>
-                    <div   class="color-field" style="background: yellow;"></div>
-                    <div   class="color-field" style="background: green;"></div>
-                    <div   class="color-field" style="background: blue;"></div>
-                    <div   class="color-field" style="background: indigo;"></div>
-                    <div   class="color-field" style="background: violet;"></div>
-                    <div   class="color-field" style="background: black;"></div>
-                    <div   class="color-field" style="background: gray;"></div>
-                    <div   class="color-field" style="background: rgb(114, 24, 24);"></div>
+                    <div @click="speakNow('Red')" class="color-field" style="background: red;"></div>
+                    <div @click="speakNow('Orange')" class="color-field" style="background: orange;"></div>
+                    <div @click="speakNow('Yellow')" class="color-field" style="background: yellow;"></div>
+                    <div @click="speakNow('Green')" class="color-field" style="background: green;"></div>
+                    <div @click="speakNow('Blue')" class="color-field" style="background: blue;"></div>
+                    <div @click="speakNow('Purple')" class="color-field" style="background: indigo;"></div>
+                    <div @click="speakNow('Pink')" class="color-field" style="background: violet;"></div>
+                    <div @click="speakNow('Black')" class="color-field" style="background: black;"></div>
+                    <div @click="speakNow('Gray')" class="color-field" style="background: gray;"></div>
+                    <div @click="speakNow('Brown')" class="color-field" style="background: rgb(114, 24, 24);"></div>
 
-                    <input type="range" min="1" max="100" class="pen-range" value="1">
+                    <input @click="speakNow('Change size')" type="range" min="1" max="100" class="pen-range" value="1">
                 </div>
             </div>
         <div id="app"></div>
