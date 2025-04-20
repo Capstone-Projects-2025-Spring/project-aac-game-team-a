@@ -13,6 +13,21 @@
                 <img :src="settingsState.pathToTTSimg" class="toggle-tts-img">
             </button>
 
+            <!-- TTS Volume slider -->
+            <div class="slider-box">
+                <label @click="speakNow('Speech Volume<')" for="TTSvolume" class="slider-label">Speech Volume</label>
+                <input
+                    id="TTSvolume"
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.01"
+                    :value="settingsState.volumeTTS"
+                    @input="updateVolume($event)"
+                    class="opacity-slider"
+                />
+            </div>
+
             <!-- Background opacity slider -->
             <div class="slider-box">
                 <label @click="speakNow('Background opacity')" for="bgOpacity" class="slider-label">Background Opacity</label>
@@ -61,6 +76,12 @@
                 } 
             }
 
+            // Used for the TTS volume on settings overlay
+            const updateVolume = (e) => {
+                const newVolume = parseFloat(e.target.value)
+                settingsState.setVolumeTTS(newVolume)
+            }
+
             // Used for background opacity
             const updateOpacity = (e) => {
                 const newOpacity = parseFloat(e.target.value)
@@ -72,6 +93,7 @@
                 // Only use text-to-speech if enabled and the string does not contain 'null'
                 if(settingsState.enableTTS && !textToSpeak.includes('null')){
                     const utterance = new SpeechSynthesisUtterance(textToSpeak); // Synthesize the speech
+                    utterance.volume = settingsState.volumeTTS // Set the volume of speech
                     utterance.lang = 'en'; // Specify the language
                     speechSynthesis.speak(utterance); // Speak fido
                 }
@@ -83,7 +105,7 @@
                 settingsState.toggleSettings()
             }
 
-            return { settingsState, toggleTTS, close, updateOpacity, speakNow }
+            return { settingsState, toggleTTS, close, updateVolume, updateOpacity, speakNow }
         },
     }
 </script>

@@ -7,7 +7,8 @@ export const SettingState = defineStore('settings', {
 
         enableTTS: true, // Text to speech should be enabled from the start
         pathToTTSimg: '/TTSenabled.png', // TTS image should show enabled
-        backgroundOpacity: 0,
+        volumeTTS: 0.75, // Volume starts halfway for TTS
+        backgroundOpacity: 0, // Background opacity starts at 0 and is changed by settings overlay
       }),
     // Define a method to set variables
     actions: {
@@ -21,6 +22,11 @@ export const SettingState = defineStore('settings', {
             } else {
                 this.pathToTTSimg = '/TTSdisabled.png'
             }
+        },
+
+        // Used to set the volume for the text-to-speech
+        setVolumeTTS(newVolume: number){
+            this.volumeTTS = newVolume
         },
 
         // Change the opacity of the background
