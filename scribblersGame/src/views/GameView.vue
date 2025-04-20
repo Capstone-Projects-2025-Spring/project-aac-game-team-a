@@ -224,6 +224,7 @@ export default {
             this.socketInstance.on("update-prompt", (updatePrompt, path) => {
 
                 this.promptWord = updatePrompt.word;
+                console.log('PROMPT WORD: ', this.promptWord);
                 this.promptImgPath = path;
                 this.isGuessCorrect = false;
             })
@@ -233,7 +234,8 @@ export default {
 
                 this.mappedPlayerData.get(user).currentGuess = guess;
                 this.mappedPlayerData.get(user).currentGuessImagePath = imagePath;
-                if (guess == this.promptWord)
+                if (guess == this.promptWord && guess)
+                    //console.log(`${this.promptWord} is the prompt and ${guess} is the guess.`)
                     console.log(`${user} guessed correctly!`)
             })
 
@@ -335,11 +337,13 @@ export default {
             this.currentUserMessage.imagePath = imagePath;
             this.mappedPlayerData.get(this.currentUser).currentGuess = item;
             this.mappedPlayerData.get(this.currentUser).currentGuessImagePath = imagePath;
+            
             if (item == this.promptWord){
                 console.log(`You guessed correctly!`)
                 this.mappedPlayerData.get(this.currentUser).currentGuess = "Correct!";
                 this.mappedPlayerData.get(this.currentUser).currentGuessImagePath = '\correct.png';
             }
+            
             this.socketInstance.emit('update-user-guess', 
                 this.roomCodeStr, 
                 this.currentUser, 
