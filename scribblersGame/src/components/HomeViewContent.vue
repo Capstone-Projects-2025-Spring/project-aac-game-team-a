@@ -83,8 +83,8 @@ export default {
 }
 
 .settings-img {
-  width: 80px;
-  height: 75px;
+  width: 60px;
+  height: 55px;
 }
 
 .home-elements {
