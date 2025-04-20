@@ -1,7 +1,11 @@
 <script>
 import { SettingState } from '@/stores/SettingState'
+import SettingsOverlay from '@/components/SettingsOverlay.vue'
 
 export default {
+  components:{
+    SettingsOverlay
+  },
   data () {
     return {
       settingsState: null, // Intialize a variable for the settings
@@ -29,36 +33,59 @@ export default {
       // Navigate to required page
       this.$router.push(route)
     },
-
-    // Toggles text to speech locally for user
-    toggleTTS(){
-      if (this.settingsState.enableTTS == true){
-        this.settingsState.setModeTTS(false)
-      } else {
-        this.settingsState.setModeTTS(true)
-      }
-    }
   }
 }
 </script>
 
-<template class="everything">
-  <div class="home-elements">
+<template>
+  <!-- Opens the settings overlay -->
+  <button @click="settingsState.toggleSettings()" class="settings-button" :class="{ 'blurred': settingsState.showSettings }"> 
+    <img @click="speakNow('Settings')" src="/settingsIcon.png" class="settings-img">
+  </button>
+
+  <!-- Main buttons -->
+  <div class="home-elements" :class="{ 'blurred': settingsState.showSettings }">
     <h1 @click="speakNow('Welcome to Scribblers!')" class="welcome-text">Welcome to Scribblers!</h1>
     <div class="lobby-buttons">
       <button @click="handleClick('Join Lobby', '/joinLobby')" class="join-lobby-button">Join Lobby</button>
       <button @click="handleClick('Create Lobby', '/hostLobby')" class="create-lobby-button">Create Lobby</button>
     </div>
   </div>
-  <div class="settings-elements">
-    <!-- Toggles text to speech in home screen -->
-    <button @click="toggleTTS" class="toggle-tts" :class="{ 'tts-on': settingsState.enableTTS, 'tts-off': !settingsState.enableTTS }">
-      <img v-bind:src=settingsState.pathToTTSimg class="toggle-tts-img">
-    </button>
-  </div>
+
+  <!-- Show Settings Overlay -->
+  <SettingsOverlay v-if="settingsState.showSettings" />
+
 </template>
 
 <style scoped>
+.settings-button {
+  border-radius: 50%;
+  justify-content: center;
+  padding: 5px 5px 5px 5px;
+  border-width: 5px;
+
+  position: relative; /* or 'relative' depending on your layout */
+  top: 20px;   /* moves it down */
+  left: 20px;   /* moves it to the left */
+
+  margin: auto;
+}
+
+.settings-button:hover {
+  background-color: #c0c3c1;
+  transform: scale(1.05);
+}
+
+.settings-button:active {
+  background-color: #1d1c1c;
+  transform: scale(1.05);
+}
+
+.settings-img {
+  width: 80px;
+  height: 75px;
+}
+
 .home-elements {
   max-width: 500px;
   margin: 100px auto 20px auto; 
@@ -72,6 +99,12 @@ export default {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
   text-align: center;
   font-family: 'Segoe UI', sans-serif;
+}
+
+.blurred {
+  filter: blur(5px);
+  pointer-events: none;
+  user-select: none;
 }
 
 .lobby-buttons {

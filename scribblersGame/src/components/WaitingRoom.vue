@@ -80,7 +80,7 @@ import { SettingState } from '@/stores/SettingState'
 //define the emit function to send events to parent
 const emit = defineEmits();
 const props = defineProps(['roomCode', 'maxPlayers', 'players', 'numRounds', 'isHost', 'isHostPlaying']);
-// Define local state of the settings
+// Define state of the settings
 const settingsState = SettingState();
 
 // Shape map

@@ -1,5 +1,10 @@
 <template>
-  <div class="join-screen">
+  <!-- Opens the settings overlay -->
+  <button @click="settingsState.toggleSettings()" class="settings-button" :class="{ 'blurred': settingsState.showSettings }"> 
+    <img @click="speakNow('Settings')" src="/settingsIcon.png" class="settings-img">
+  </button>
+
+  <div class="join-screen" :class="{ 'blurred': settingsState.showSettings }">
     <h1 @click="speakNow('Join a Game')">Join a Game</h1>
 
     <div class="form-group">
@@ -75,9 +80,9 @@ import { ref } from 'vue'
 import { GameState } from '@/stores/GameState'
 import { SettingState } from '@/stores/SettingState'
 
-// Define local state to send user data to Game
-const localGameState = GameState();
-// Define local state of the settings
+// Define state to send user data to Game
+const userGameState = GameState();
+// Define state of the settings
 const settingsState = SettingState();
 
 // Called to turn text into speech
@@ -184,12 +189,46 @@ function joinLobby() {
     return false
   }
 
-  // Use local state to set and save the selection of the user
-  localGameState.setGameState(currentUser, currentUserAvatar, roomCodeArr, false, 0, 0, false)
+  // Use state to set and save the selection of the user
+  userGameState.setGameState(currentUser, currentUserAvatar, roomCodeArr, false, 0, 0, false)
 }
 </script>
 
 <style scoped>
+.settings-button {
+  border-radius: 50%;
+  justify-content: center;
+  padding: 5px 5px 5px 5px;
+  border-width: 5px;
+
+  position: relative; /* or 'relative' depending on your layout */
+  top: 20px;   /* moves it down */
+  left: 20px;   /* moves it to the left */
+
+  margin: auto;
+}
+
+.settings-button:hover {
+  background-color: #c0c3c1;
+  transform: scale(1.05);
+}
+
+.settings-button:active {
+  background-color: #1d1c1c;
+  transform: scale(1.05);
+}
+
+.settings-img {
+  width: 80px;
+  height: 75px;
+}
+
+.blurred {
+  filter: blur(5px);
+  pointer-events: none;
+  user-select: none;
+}
+
 .join-screen {
   max-width: 500px;
   margin: 80px auto;
