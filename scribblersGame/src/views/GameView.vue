@@ -337,12 +337,12 @@ export default {
             this.currentUserMessage.imagePath = imagePath;
             this.mappedPlayerData.get(this.currentUser).currentGuess = item;
             this.mappedPlayerData.get(this.currentUser).currentGuessImagePath = imagePath;
-            //check if the guess was correct
-            if (item == this.promptWord)
-                    console.log('The prompt word is :', this.promptWord);
-                    console.log('your guessed is:', item);
-                    //change guess text to just display "correct!"
-                    //this.mappedPlayerData.get(this.currentUser).currentGuess = "Correct!";
+
+            if (item == this.promptWord){
+                console.log(`You guessed correctly!`)
+                this.mappedPlayerData.get(this.currentUser).currentGuess = "Correct!";
+                this.mappedPlayerData.get(this.currentUser).currentGuessImagePath = '\correct.png';
+            }
             this.socketInstance.emit('update-user-guess', 
                 this.roomCodeStr, 
                 this.currentUser, 
