@@ -2,7 +2,7 @@
 import { ref, onMounted, watch } from "vue";
 import { SettingState } from '@/stores/SettingState'
 
-// Define local state of the settings
+// Define state of the settings
 const settingsState = SettingState();
 
 //define the emit function to send events to parent

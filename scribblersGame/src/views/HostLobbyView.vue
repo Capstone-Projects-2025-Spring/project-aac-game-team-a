@@ -1,5 +1,10 @@
 <template>
-  <div class="host-screen">
+  <!-- Opens the settings overlay -->
+  <button @click="settingsState.toggleSettings()" class="settings-button" :class="{ 'blurred': settingsState.showSettings }"> 
+    <img @click="speakNow('Settings')" src="/settingsIcon.png" class="settings-img">
+  </button>
+
+  <div class="host-screen" :class="{ 'blurred': settingsState.showSettings }">
     <h1 @click="speakNow('Host a New Game')">Host a New Game</h1>
 
     <!-- Max players input -->
@@ -60,9 +65,9 @@ import { ref, onMounted, computed } from 'vue'
 import { GameState } from '@/stores/GameState'
 import { SettingState } from '@/stores/SettingState'
 
-// Define local state to send user data to Game
-const localGameState = GameState();
-// Define local state of the settings
+// Define state to send user data to Game
+const userGameState = GameState();
+// Define state of the settings
 const settingsState = SettingState();
 
 // Room setup state
@@ -137,12 +142,46 @@ function launchRoom() {
   const codeString = randomCodeDigits.value.join('')
   // Add actual hosting logic here
 
-  // Use local state to set and save the selection of the user
-  localGameState.setGameState(currentUser, currentUserAvatar, codeString, true, maxPlayers, rounds, isHostPlaying)
+  // Use state to set and save the selection of the user
+  userGameState.setGameState(currentUser, currentUserAvatar, codeString, true, maxPlayers, rounds, isHostPlaying)
 }
 </script>
 
 <style scoped>
+.settings-button {
+  border-radius: 50%;
+  justify-content: center;
+  padding: 5px 5px 5px 5px;
+  border-width: 5px;
+
+  position: relative; /* or 'relative' depending on your layout */
+  top: 20px;   /* moves it down */
+  left: 20px;   /* moves it to the left */
+
+  margin: auto;
+}
+
+.settings-button:hover {
+  background-color: #c0c3c1;
+  transform: scale(1.05);
+}
+
+.settings-button:active {
+  background-color: #1d1c1c;
+  transform: scale(1.05);
+}
+
+.settings-img {
+  width: 80px;
+  height: 75px;
+}
+
+.blurred {
+  filter: blur(5px);
+  pointer-events: none;
+  user-select: none;
+}
+
 .host-screen {
   max-width: 500px;
   margin: 80px auto;

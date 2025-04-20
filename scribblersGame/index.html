@@ -12,10 +12,21 @@
   </body>
   <style>
     .body{
-      background-image: url("scribbleBackground.avif");
-      background-color: #cccccc; /* Used if the image is unavailable */
-      background-position: center; /* Center the image*/
-      background-size: cover; /* Resize the background image to cover the entire container */
+      background-image: url("shapes.png");
+      background-color: #F8F2E9; /* fallback color */
+      background-position: center;
+      background-repeat: repeat; /* repeats the image */
+      background-size: 300px 300px; /* adjust size of each tile */
+      position: relative;
+    }
+
+    .body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: rgba(235, 222, 200, var(--bg-opacity, 0));
+      z-index: -1;
+      pointer-events: none;
     }
   </style>
 </html>
