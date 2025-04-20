@@ -578,27 +578,12 @@ export default {
         left: 25px;
     }
 
-    .aac-board-box {
-        width: 100%;
-        height: 25%; /* Takes 20% of the page height */
-        border: 5px solid blue; /* Border for the button area */
-        background-color: #e0e0e0; /* Light background for the button box */
-    }
-
-    .aac-buttons{
-        margin: 10px; /* Adds space between buttons */
-        background: white;
-        border: 1px bold black;
-        padding: 10px;
-        cursor: pointer;
-    }
-
     .right-container{
         /* background-color: #e0e0e0; */
         height: 100vh;              /* Full height of the page */
         display: flex;
         flex-direction: column;     /* Vertical stacking */
-        align-items: center;      /*cAlign children to the right side*/
+        align-items: center;      /* Align children to the right side*/
         padding: 1rem;              /* Optional padding */
     }
 
