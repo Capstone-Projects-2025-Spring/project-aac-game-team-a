@@ -39,7 +39,7 @@ Upon joining, each player will be presented with an array of avatars to choose f
 
 Triggering Event: A user has entered a valid room code.
 
-#6**One player is selected at random to be a drawer**  
+#6 **One player is selected at random to be a drawer**  
 Out of all players, including the host, one is randomly selected to be the first drawer. They will be shown the drawing interface.  
 
 Triggering Event: The host pressed start game.
