@@ -94,6 +94,8 @@ const avatarButtons = [
 
 // Called to turn text into speech
 function speakNow(textToSpeak) {
+  // Cancel any current TTS
+  speechSynthesis.cancel();
   // Only use text-to-speech if enabled and the string does not contain 'null'
   if(settingsState.enableTTS && !textToSpeak.includes('null')){
     const utterance = new SpeechSynthesisUtterance(textToSpeak); // Synthesize the speech

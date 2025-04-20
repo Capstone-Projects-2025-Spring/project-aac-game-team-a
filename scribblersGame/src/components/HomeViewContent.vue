@@ -17,7 +17,8 @@ export default {
   methods: {
     // Called to turn text into speech
     speakNow(textToSpeak) {
-      // Only use text-to-speech if enabled
+      // Cancel any current TTS
+      speechSynthesis.cancel();
       // Only use text-to-speech if enabled and the string does not contain 'null'
       if(this.settingsState.enableTTS && !textToSpeak.includes('null')){
         const utterance = new SpeechSynthesisUtterance(textToSpeak); // Synthesize the speech
