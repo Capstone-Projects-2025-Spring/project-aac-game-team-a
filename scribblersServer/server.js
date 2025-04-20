@@ -272,6 +272,7 @@ io.on('connection', (socket) => {
 
         //  Increment round count and verify it is not end of round
         mappedGameData.get(room).currentRound++
+        io.to(room).emit('update-round', mappedGameData.get(room).currentRound);
         if (mappedGameData.get(room).currentRound > mappedGameData.get(room).numberRounds) {
             mappedGameData.get(room).currentRound = 0
             io.to(room).emit('end-game');
