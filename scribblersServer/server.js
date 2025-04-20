@@ -84,7 +84,7 @@ function getPath(promptObject){
 function allGuessesCorrect(room) {
     let output = true
     mappedGameData.get(room).playerData.forEach((value, key) => {
-        if (key != mappedGameData.get(room).drawer && value.currentGuess != mappedGameData.get(room).prompt.word)       
+        if (key != mappedGameData.get(room).drawer && value.currentGuess != "Correct!")       
             output = false
     })
     return output
