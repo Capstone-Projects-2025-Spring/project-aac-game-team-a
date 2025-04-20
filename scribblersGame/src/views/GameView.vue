@@ -335,14 +335,17 @@ export default {
             this.currentUserMessage.imagePath = imagePath;
             this.mappedPlayerData.get(this.currentUser).currentGuess = item;
             this.mappedPlayerData.get(this.currentUser).currentGuessImagePath = imagePath;
+            if (item == this.promptWord){
+                console.log(`You guessed correctly!`)
+                this.mappedPlayerData.get(this.currentUser).currentGuess = "Correct!";
+                this.mappedPlayerData.get(this.currentUser).currentGuessImagePath = '\correct.png';
+            }
             this.socketInstance.emit('update-user-guess', 
                 this.roomCodeStr, 
                 this.currentUser, 
                 this.mappedPlayerData.get(this.currentUser).currentGuess,
                 this.mappedPlayerData.get(this.currentUser).currentGuessImagePath
             )
-            if (item == this.promptWord)
-                    console.log(`You guessed correctly!`)
         },
 
         //  Handles sending initial drawing data to observer canvases (on mouse click)
