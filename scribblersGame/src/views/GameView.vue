@@ -146,7 +146,11 @@ export default {
                 //  Create new lobby, if host is not playing send null for user to add to player data
                 if (GameState().isHostPlaying) {
                     this.players.push(GameState().currentUser)
-                    this.mappedPlayerData.set(GameState().currentUser, {currentGuess: "", score: 0})
+                    this.mappedPlayerData.set(GameState().currentUser, {
+                        currentGuess: "",
+                        currentGuessImagePath: "",
+                        score: 0
+                    })
                     this.socketInstance.emit("create-new-lobby", this.numRounds, this.maxPlayers, this.players, this.currentUser);
                 }
                 else
@@ -225,9 +229,10 @@ export default {
             })
 
             //  Listen for new guesses
-            this.socketInstance.on("update-user-guess", (user, guess) => {
+            this.socketInstance.on("update-user-guess", (user, guess, imagePath) => {
 
                 this.mappedPlayerData.get(user).currentGuess = guess;
+                this.mappedPlayerData.get(user).currentGuessImagePath = imagePath;
                 if (guess == this.promptWord)
                     console.log(`${user} guessed correctly!`)
             })
@@ -329,7 +334,13 @@ export default {
             this.currentUserMessage.text = item; //stores aac button selected by user
             this.currentUserMessage.imagePath = imagePath;
             this.mappedPlayerData.get(this.currentUser).currentGuess = item;
-            this.socketInstance.emit('update-user-guess', this.roomCodeStr, this.currentUser, this.mappedPlayerData.get(this.currentUser).currentGuess)
+            this.mappedPlayerData.get(this.currentUser).currentGuessImagePath = imagePath;
+            this.socketInstance.emit('update-user-guess', 
+                this.roomCodeStr, 
+                this.currentUser, 
+                this.mappedPlayerData.get(this.currentUser).currentGuess,
+                this.mappedPlayerData.get(this.currentUser).currentGuessImagePath
+            )
             if (item == this.promptWord)
                     console.log(`You guessed correctly!`)
         },
