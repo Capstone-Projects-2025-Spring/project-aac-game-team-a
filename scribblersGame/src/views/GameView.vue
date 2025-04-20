@@ -92,6 +92,8 @@ export default {
 
         // Called to turn text into speech
         speakNow(textToSpeak) {
+            // Cancel any current TTS
+            speechSynthesis.cancel();
             // Only use text-to-speech if enabled and the string does not contain 'null'
             if(this.settingsState.enableTTS && !textToSpeak.includes('null')){
                 const utterance = new SpeechSynthesisUtterance(textToSpeak); // Synthesize the speech
@@ -103,6 +105,8 @@ export default {
 
         // TTS for the room code
         speakRoomCode(){
+            // Init a string for room code text
+            let roomCodeText = ""
             // Loop through digits in string
             for(let i=0; i<this.roomCodeArr.length; i++){
                 // Parse digits into int
@@ -113,15 +117,12 @@ export default {
                     
                     if(this.roomCodeShapes[j].value == digit){
                         // TTS the shape
-                        this.speakNow(this.roomCodeShapes[j].label)
+                        roomCodeText += this.roomCodeShapes[j].label + " "
+                        
                     }
-                    // // Find a value that matches the digit
-                    // if (this.roomCodeShapes[j].value == digit) {
-                    //     // TTS the shape
-                    //     this.speakNow(this.roomCodeShapes[j].label)
-                    // }
                 }
             }
+            this.speakNow(roomCodeText)
         },
         getShapeImage(digit) {
             const shape = this.roomCodeShapes.find(shape => shape.value === digit);
@@ -465,7 +466,7 @@ export default {
             <h2 @click="speakNow(roundTimer + 'seconds left')">Timer: {{ roundTimer }}</h2>
             -->
             <!-- Assign the messageBoard in this class to the messageBoard in the MessageBoard component -->
-            <GuessBoard @click="speakNow('Players')" 
+            <GuessBoard 
                 :guesses=this.messageBoard
                 :playerDataMap=this.mappedPlayerData
                 :time="roundTimer"

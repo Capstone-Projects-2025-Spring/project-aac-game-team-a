@@ -98,6 +98,8 @@ const shapes = [
 
 // Called to turn text into speech
 function speakNow(textToSpeak) {
+  // Cancel any current TTS
+  speechSynthesis.cancel();
   // Only use text-to-speech if enabled and the string does not contain 'null'
   if(settingsState.enableTTS && !textToSpeak.includes('null')){
     const utterance = new SpeechSynthesisUtterance(textToSpeak); // Synthesize the speech
@@ -109,6 +111,8 @@ function speakNow(textToSpeak) {
 
 // TTS for the room code
 function speakRoomCode(){
+  // Init a string to entire room code
+  let roomCodeText = ""
   // Loop through digits in string
   for(let i=0; i<props.roomCode.length; i++){
     // Parse digits into int
@@ -119,10 +123,11 @@ function speakRoomCode(){
       // Find a value that matches the digit
       if (shapes[j].value === digit) {
         // TTS the shape
-        speakNow(shapes[j].shape)
+        roomCodeText+=shapes[j].shape + " "
       }
     }
   }
+  speakNow(roomCodeText)
 }
 
 function getShapeImg(digit) {

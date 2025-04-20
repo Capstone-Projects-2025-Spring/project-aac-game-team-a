@@ -1,5 +1,21 @@
 <script setup>
+    import { SettingState } from '@/stores/SettingState'
+
+    const settingsState = SettingState();
     const props = defineProps(['playerDataMap', 'time', 'currentRound', 'totalRounds', 'roomCodeArr', 'getShapeImage', 'getShapeLabel', 'speakRoomCode']);
+    
+    // Called to turn text into speech
+    function speakNow(textToSpeak) {
+        // Cancel any current TTS
+        speechSynthesis.cancel();
+        // Only use text-to-speech if enabled and the string does not contain 'null'
+        if(settingsState.enableTTS && !textToSpeak.includes('null')){
+            const utterance = new SpeechSynthesisUtterance(textToSpeak); // Synthesize the speech
+            utterance.volume = settingsState.volumeTTS // Set the volume of speech
+            utterance.lang = 'en'; // Specify the language
+            speechSynthesis.speak(utterance); // Speak fido
+        }
+    }
 </script>
 
 <template>
@@ -19,23 +35,29 @@
         </div>
 
         <!-- Game status info -->
-        <h1>
-            Timer: {{ props.time }}
+        <h1 @click="speakNow(props.time + ' seconds left')">
+           Timer: {{ props.time }}
+        </h1>
+        <h1 @click="speakNow('Round '+props.currentRound+' out of '+ props.totalRounds)">
             Round: {{ props.currentRound }} / {{ props.totalRounds }}
         </h1>
         
         <!-- Player guesses -->
         <div v-for="[player, data] of props.playerDataMap" :key="player" class="chat-guess">
-            <img :src="player.toLowerCase() + '.png'" :alt="player" class="game-avatar-image" />
+            <img @click="speakNow('player '+player)" :src="player.toLowerCase() + '.png'" :alt="player" class="game-avatar-image" />
             <h1>
-                {{data.currentGuess}}
-                <img 
-                    v-if="data.currentGuessImagePath" 
-                    :src="data.currentGuessImagePath" 
-                    alt="guess icon" 
-                    class="guess-icon-image"
-                />
-                Score:{{data.score}}
+                <div @click="speakNow(data.currentGuess)">
+                    {{data.currentGuess}}
+                    <img 
+                        v-if="data.currentGuessImagePath" 
+                        :src="data.currentGuessImagePath" 
+                        alt="guess icon" 
+                        class="guess-icon-image"
+                    />
+                </div>
+                <div @click="speakNow('score '+ data.score)">
+                    Score:{{data.score}}
+                </div>
             </h1>
         </div>
     </div>
