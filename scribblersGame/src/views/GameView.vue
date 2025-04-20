@@ -203,7 +203,7 @@ export default {
             this.socketInstance.on("update-num-rounds", (updateNumRounds) => {
 
                 this.numRounds = updateNumRounds;
-                console.log(`currentRound: ${this.updateNumRounds}`)
+                console.log(`currentRound: ${this.numRounds}`)
             })
 
             //  Listen for new drawer
@@ -300,11 +300,6 @@ export default {
             // Listen for broadcasted timer update from server
             this.socketInstance.on("timer-update", (serverTime) => {
                 this.roundTimer = serverTime;
-                /*
-                if (serverTime == 0){
-                    HANDLE END OF ROUND LOGIC HERE
-                }
-                */
             });
         },
       
@@ -459,12 +454,16 @@ export default {
         </div>
 
         <div class="right-container">
-            <!--  Remove after testing timer -->
+            <!--  Remove after testing timer
             <h2 @click="speakNow(roundTimer + 'seconds left')">Timer: {{ roundTimer }}</h2>
-                
+            -->
             <!-- Assign the messageBoard in this class to the messageBoard in the MessageBoard component -->
             <GuessBoard @click="speakNow('Players')" 
-                :guesses=this.messageBoard>
+                :guesses=this.messageBoard
+                :playerDataMap=this.mappedPlayerData
+                :time="roundTimer"
+                :currentRound="currentRound"
+                :totalRounds="numRounds">
             </GuessBoard>
         </div>
     </div>

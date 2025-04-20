@@ -1,10 +1,5 @@
-<script>
-    export default{
-        // Declare prop varibales to be used by other classes
-        props: [
-            'guesses',
-        ],
-    }
+<script setup>
+    const props = defineProps(['playerDataMap', 'time', 'currentRound', 'totalRounds']);
 </script>
 
 <template>
@@ -14,15 +9,15 @@
             Each user guess
             Each symbol associated with the guess
         -->
-        <div v-for="guess in guesses" :key="guess.id" class="chat-guess">
-            <img :src="guess.avatar" :alt="guess.user" class="game-avatar-image" />
-            <span class="guess-guess">{{ guess.text }}</span>
-            <img 
-                v-if="guess.imagePath" 
-                :src="guess.imagePath" 
-                alt="Symbol" 
-                class="guess-symbol" 
-            />
+        <h1>
+            Timer: {{ props.time }}
+            Round: {{ props.currentRound }} / {{ props.totalRounds }}
+        </h1>
+        <div v-for="[player, data] of props.playerDataMap" :key="player" class="chat-guess">
+            <img :src="player.toLowerCase() + '.png'" :alt="player" class="game-avatar-image" />
+            <h1>
+                Guess:{{data.currentGuess}}   Score:{{data.score}}
+            </h1>
         </div>
     </div>
 </template>
