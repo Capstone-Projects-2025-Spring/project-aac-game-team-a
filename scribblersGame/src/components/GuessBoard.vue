@@ -16,7 +16,14 @@
         <div v-for="[player, data] of props.playerDataMap" :key="player" class="chat-guess">
             <img :src="player.toLowerCase() + '.png'" :alt="player" class="game-avatar-image" />
             <h1>
-                Guess:{{data.currentGuess}}   Score:{{data.score}}
+                {{data.currentGuess}}
+                <img 
+                    v-if="data.currentGuessImagePath" 
+                    :src="data.currentGuessImagePath" 
+                    alt="guess icon" 
+                    class="guess-icon-image"
+                />
+                Score:{{data.score}}
             </h1>
         </div>
     </div>
@@ -63,9 +70,16 @@
         padding-right: 0.5rem;
     }
 
-    .guess-symbol {
-        width: 50px;
+    .guess-icon-image {
         height: 50px;
+        width: 50px;
+        margin: 0 8px;
+        vertical-align: middle;
+    }
+
+    .guess-symbol {
+        width: 60px;
+        height: 60px;
         margin-left: auto;
         padding-right: 1rem;
     }

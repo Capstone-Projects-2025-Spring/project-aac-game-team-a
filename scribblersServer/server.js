@@ -249,10 +249,10 @@ io.on('connection', (socket) => {
         socket.to(room).emit("cast-draw-undo");
     });
 
-    socket.on("update-user-guess", (room, user, guess) => {
+    socket.on("update-user-guess", (room, user, guess, imagePath) => {
         //  update player's guess in game data map and emit to all players in room except sender
         mappedGameData.get(room).playerData.get(user).currentGuess = guess
-        socket.to(room).emit("update-user-guess", user, guess);
+        socket.to(room).emit("update-user-guess", user, guess, imagePath);
 
         //  handle all users guessing correctly
         if (allGuessesCorrect(room)) {

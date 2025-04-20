@@ -1,5 +1,7 @@
 <!-- Used by App.vue -->
 
+<!-- Used by App.vue -->
+
 <!-- <template>
   <div class="greetings">
     <img class="icon" src="/scribblersIcon.png" alt="scribblersIcon">
