@@ -345,6 +345,7 @@ export default {
                 this.mappedPlayerData.get(this.currentUser).currentGuess = "Correct!";
                 this.mappedPlayerData.get(this.currentUser).currentGuessImagePath = '\correct.png';
             }
+
             this.socketInstance.emit('update-user-guess', 
                 this.roomCodeStr, 
                 this.currentUser, 
