@@ -344,6 +344,7 @@ export default {
                 console.log(`You guessed correctly!`)
                 this.mappedPlayerData.get(this.currentUser).currentGuess = "Correct!";
                 this.mappedPlayerData.get(this.currentUser).currentGuessImagePath = '\correct.png';
+                this.isGuessCorrect = true;
             }
 
             this.socketInstance.emit('update-user-guess', 
@@ -453,7 +454,7 @@ export default {
                 </DrawingBoard>
             </div>
 
-            <div v-if="!isDrawer" class="aac-board-box">
+            <div v-if="!isDrawer && !isGuessCorrect" class="aac-board-box">
                 <!-- AacBoard component is rendered here and we catch item selections here.-->
                 <AacBoard @itemSelected="handleItemSelected"/>
             </div>
