@@ -23,6 +23,7 @@ export default {
         GuessBoard, //register the drawing board as a component
     },
     data() {
+        
         //Check if roomCode is a string and split it, otherwise assume it's already an array
         let roomCodeArr = GameState().roomCode;
 
@@ -161,15 +162,16 @@ export default {
             }
 
             // Listen for new lobby code
-            this.socketInstance.on("update-lobby-code", (newRoomCode) => {
-                
-                //console.log("Updating lobby code: ", newRoomCode);
-                this.roomCodeStr = newRoomCode;
-                this.roomCodeArr = newRoomCode.split('');
+        this.socketInstance.on("update-lobby-code", (newRoomCode) => {
+            
+            //console.log("Updating lobby code: ", newRoomCode);
+            this.roomCodeStr = newRoomCode;
+            // Fix: Convert string digits to numbers properly
+            this.roomCodeArr = newRoomCode.split('').map(digit => parseInt(digit, 10));
 
-                // Connect user to lobby
-                this.socketInstance.emit('join-room', this.roomCodeStr);
-            });
+            // Connect user to lobby
+            this.socketInstance.emit('join-room', this.roomCodeStr);
+        });
 
             // Listen for player leaving
             this.socketInstance.on("remove-player", (user) => {
@@ -422,20 +424,6 @@ export default {
     <!--Display game while started-->
     <div v-if="gameStarted" class="game-container"> 
 
-        <!-- Display room code-->
-        <div class="room-code-block">
-            <span class="room-code-label" @click="speakRoomCode()" >Room Code:</span>
-            <div @click="speakRoomCode()" class="room-code-shapes">
-                <img
-                v-for="(digit, index) in roomCodeArr"
-                :key="index"
-                :src="getShapeImage(digit)"
-                :alt="getShapeLabel(digit)"
-                class="room-code-shape"
-                />
-            </div>
-        </div>
-
         <!-- Left side: Drawing canvas and button box -->
         <div class="left-container">
             <RouterLink 
@@ -480,7 +468,11 @@ export default {
                 :playerDataMap=this.mappedPlayerData
                 :time="roundTimer"
                 :currentRound="currentRound"
-                :totalRounds="numRounds">
+                :totalRounds="numRounds"
+                :roomCodeArr="roomCodeArr"
+                :getShapeImage="getShapeImage"
+                :getShapeLabel="getShapeLabel"
+                :speakRoomCode="speakRoomCode">
             </GuessBoard>
         </div>
     </div>
