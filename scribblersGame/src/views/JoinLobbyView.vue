@@ -58,12 +58,21 @@
     <div class="bottom-buttons">
       <!-- Button to join the waiting room instead of going directly to game -->
       <RouterLink 
+      v-if="currentUser != '' && roomCodeArr.length == 4"
       :to="{
           path: '/game', // Navigates to the game route
       }"
       class="join-btn" 
       @click="joinLobby">
         Join Lobby</RouterLink>
+
+      <RouterLink 
+        v-if="currentUser == '' || roomCodeArr.length != 4"
+        to="#"
+        class="disabled-btn"
+        @click.prevent="showNoAvatarSelectedAlert">
+        Join Lobby
+      </RouterLink>
 
       <RouterLink 
       @click="speakNow('Back')"
@@ -94,6 +103,11 @@ function speakNow(textToSpeak) {
     utterance.lang = 'en'; // Specify the language
     speechSynthesis.speak(utterance); // Speak fido
   }
+}
+
+function showNoAvatarSelectedAlert() {
+  speakNow('Cannot Start game')
+  alert('Please select an avatar!')
 }
 
 // Reactive state for storing selected shapes
@@ -424,5 +438,18 @@ h1 {
 .back-btn:hover {
   background-color: #881915;
   transform: translateY(-2px);
+}
+
+.disabled-btn {
+  margin-top: 25px;
+  padding: 12px 20px;
+  font-size: 1.1rem;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  text-decoration: none;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 </style>
