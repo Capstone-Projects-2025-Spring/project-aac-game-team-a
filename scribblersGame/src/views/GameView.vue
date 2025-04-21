@@ -12,7 +12,7 @@ import GuessBoard from "@/components/GuessBoard.vue";
 import { GameState } from '@/stores/GameState';
 import { SettingState } from '@/stores/SettingState'
 
-const inProduction = true; //change this variable to switch between connecting to public backend server and localhost
+const inProduction = false; //change this variable to switch between connecting to public backend server and localhost
 const socketServer =  "scribblersserver.fly.dev"; //web address for hosted websocket server
 
 export default {
@@ -431,10 +431,11 @@ export default {
     </div>
 
     <!--Display game while started-->
-    <div v-if="gameStarted" class="game-container"> 
+    <div v-if="gameStarted"> 
 
-        <!-- Left side: Drawing canvas and button box -->
-        <div class="left-container">
+        <!-- Top info -->
+        <div class="top-info">
+            <!-- Quit Button -->
             <RouterLink 
             :to="{
                 path: '/', // Navigates to the home route
@@ -442,8 +443,14 @@ export default {
             @click="serverDisconnect"
             class="quit-btn">
             QUIT ❌</RouterLink>
-            <!--Display drawing prompt for drawer-->
-            <div v-if="isDrawer" class="draw-prompt" @click="speakNow('Draw this')">
+        </div>
+
+        <div  class="game-container">
+
+        <!-- Left side: Drawing canvas and button box -->
+        <div class="left-container">
+             <!--Display drawing prompt for drawer-->
+             <div v-if="isDrawer" class="draw-prompt" @click="speakNow('Draw this')">
                 <h2>DRAW: {{ promptWord }}</h2>
                 <img class='prompt-image' :src=promptImgPath :alt=promptWord >
             </div>
@@ -467,23 +474,26 @@ export default {
             </div>
         </div>
 
-        <div class="right-container">
+            <div class="right-container">
             <!--  Remove after testing timer
             <h2 @click="speakNow(roundTimer + 'seconds left')">Timer: {{ roundTimer }}</h2>
             -->
-            <!-- Assign the messageBoard in this class to the messageBoard in the MessageBoard component -->
-            <GuessBoard 
-                :guesses=this.messageBoard
-                :playerDataMap=this.mappedPlayerData
-                :time="roundTimer"
-                :currentRound="currentRound"
-                :totalRounds="numRounds"
-                :roomCodeArr="roomCodeArr"
-                :getShapeImage="getShapeImage"
-                :getShapeLabel="getShapeLabel"
-                :speakRoomCode="speakRoomCode">
-            </GuessBoard>
+                <!-- Assign the messageBoard in this class to the messageBoard in the MessageBoard component -->
+                <GuessBoard 
+                    :guesses=this.messageBoard
+                    :playerDataMap=this.mappedPlayerData
+                    :time="roundTimer"
+                    :currentRound="currentRound"
+                    :totalRounds="numRounds"
+                    :roomCodeArr="roomCodeArr"
+                    :getShapeImage="getShapeImage"
+                    :getShapeLabel="getShapeLabel"
+                    :speakRoomCode="speakRoomCode">
+                </GuessBoard>
+            </div>
         </div>
+
+        
     </div>
 </template>
 
@@ -529,6 +539,12 @@ export default {
         align-items: center;
     }
 
+    .top-info{
+        display: flex;
+        flex-direction: row;
+        min-height: 120px; /* Set this to whatever minimum height you need */
+    }
+
     .game-container{
         display: flex;
         flex-direction: row;
@@ -553,6 +569,8 @@ export default {
         padding: 10px;
         font-size: 24px;
         font-weight: bold;
+        font-family: 'Segoe UI', sans-serif;
+        max-width: fit-content;
         margin-bottom: 20px; /* Space between prompt and drawing area */
         gap: 20px; /* Space between flex items */
     }
@@ -567,7 +585,7 @@ export default {
 
     .drawing-box {
         width: 100%; 
-        height: 60vh;
+        height: 325px;
         border-radius: 25px;
 
         /* background-image: url("whiteBoard.jpg"); */
@@ -608,6 +626,7 @@ export default {
         transition: background-color 0.3s, transform 0.1s;
         font-family: 'Segoe UI', sans-serif;
         font-weight: bold;
+        height: 25px
     }
 
     .quit-btn:hover {
