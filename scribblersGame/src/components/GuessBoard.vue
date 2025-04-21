@@ -55,9 +55,6 @@
                         class="guess-icon-image"
                     />
                 </div>
-                <div @click="speakNow('score '+ data.score)">
-                    Score:{{data.score}}
-                </div>
             </h1>
         </div>
     </div>

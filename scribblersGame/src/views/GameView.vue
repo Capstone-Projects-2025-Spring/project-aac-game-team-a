@@ -12,7 +12,7 @@ import GuessBoard from "@/components/GuessBoard.vue";
 import { GameState } from '@/stores/GameState';
 import { SettingState } from '@/stores/SettingState'
 
-const inProduction = false; //change this variable to switch between connecting to public backend server and localhost
+const inProduction = true; //change this variable to switch between connecting to public backend server and localhost
 const socketServer =  "scribblersserver.fly.dev"; //web address for hosted websocket server
 
 export default {
