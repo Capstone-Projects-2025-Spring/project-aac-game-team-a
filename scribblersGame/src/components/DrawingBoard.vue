@@ -223,7 +223,6 @@ function undo_action() {
         place-items: top center;
         /* 
         min-height: 100vh; */
-        border: solid black;
         border-radius: 25px;
     }
 
