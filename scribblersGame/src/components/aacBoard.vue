@@ -33,7 +33,7 @@ const emit = defineEmits();
 // Define state of the settings
 const settingsState = SettingState();
 
-const currentCategory = ref(null);
+let currentCategory = ref(null);
 
 const categories = {
     Animals: ['Dog', 'Cat', 'Bird', 'Elephant', 'Mouse', 'Horse'],
@@ -87,7 +87,7 @@ function setCurrentCategory(category){
     } else {
         speakNow('back')
     }
-    this.currentCategory = category
+    currentCategory.value = category
 }
 
 </script>
