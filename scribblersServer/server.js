@@ -146,10 +146,10 @@ io.on('connection', (socket) => {
     })
 
     // Listens for user joining room
-    socket.on('join-room', (code, user)  => {
-        
-        //  Prevent users from joining non-existent rooms
-        if (io.sockets.adapter.rooms.has(code)) {
+    socket.on('join-room', (code, user, isHost)  => {
+
+        //  Prevent users from joining non-existent rooms, joining full rooms, or duplicate avatars
+        if (io.sockets.adapter.rooms.has(code) && mappedGameData.get(code).playerData.size < mappedGameData.get(code).maxPlayers && !mappedGameData.get(code).playerData.has(user)) {
             //console.log(`room ${code} exists!`)
             socket.join(code);
             mappedGameData.get(code).players.push(user)
@@ -167,6 +167,8 @@ io.on('connection', (socket) => {
         else{
             //console.log(`room ${code} does not exist!`)
             socket.join(code);
+            if (!isHost)
+                io.to(socket.id).emit("update-user", '');
         }
         console.log(`User ${socket.id} is connected to room ${code}`); // Logs when a new user connects
     })
@@ -174,6 +176,10 @@ io.on('connection', (socket) => {
 
     //  Listens for users leaving the room
     socket.on('leave-room', (code, user) => {
+
+        console.log(`User ${socket.id} with avatar ${user} has disconnected from room ${code}`);
+        socket.leave(code);
+        if (!mappedGameData.has(code) || !mappedGameData.get(code).playerData.has(user)) return;
 
         //  Loop through array to find and remove player from array
         let index = 0;
@@ -185,12 +191,10 @@ io.on('connection', (socket) => {
                 //console.log(mappedGameData.get(code).players);
             }
         }
-        socket.leave(code);
         socket.to(code).emit("update-player-list", mappedGameData.get(code).players);
         mappedGameData.get(code).playerData.delete(user)
         socket.to(code).emit('remove-player', user)
         console.log(mappedGameData.get(code))
-        console.log(`User ${socket.id} has disconnected from room ${code}`);
 
         //  Check if room deleted
         if (!io.of("/").adapter.rooms.get(code)) {
@@ -312,6 +316,11 @@ io.on('connection', (socket) => {
         
         try {
             io.in(room).emit("timer-update", mappedGameData.get(room).timerValue);
+
+            if (!mappedGameData.get(room).playerData) {
+                clearInterval(mappedGameData.get(room).timerID)
+                mappedGameData.delete(room) 
+            }
             
             if (mappedGameData.get(room).timerValue == 0) {
                 clearInterval(mappedGameData.get(room).timerID);

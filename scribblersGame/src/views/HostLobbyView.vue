@@ -357,4 +357,17 @@ input:focus {
   background-color: #881915;
   transform: translateY(-2px);
 }
+
+.disabled-btn {
+  margin-top: 25px;
+  padding: 12px 20px;
+  font-size: 1.1rem;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  text-decoration: none;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
 </style>

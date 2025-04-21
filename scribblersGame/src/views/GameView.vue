@@ -159,7 +159,7 @@ export default {
                     this.socketInstance.emit("create-new-lobby", this.numRounds, this.maxPlayers, this.players, null);
             }
             else {
-                this.socketInstance.emit('join-room', this.roomCodeStr, GameState().currentUser);    
+                this.socketInstance.emit('join-room', this.roomCodeStr, GameState().currentUser, this.isHost);    
             }
 
             // Listen for new lobby code
@@ -171,7 +171,7 @@ export default {
             this.roomCodeArr = newRoomCode.split('').map(digit => parseInt(digit, 10));
 
             // Connect user to lobby
-            this.socketInstance.emit('join-room', this.roomCodeStr);
+            this.socketInstance.emit('join-room', this.roomCodeStr, GameState().currentUser, this.isHost);
         });
 
             // Listen for player leaving
@@ -221,6 +221,12 @@ export default {
                     this.isDrawer = true;
                 else
                     this.isDrawer = false;   
+            })
+
+            //  Listen for update to current user
+            this.socketInstance.on("update-user", (user) => {
+
+                GameState().currentUser = user;
             })
 
             //  Listen for new prompt
