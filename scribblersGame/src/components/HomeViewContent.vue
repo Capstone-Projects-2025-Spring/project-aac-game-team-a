@@ -3,9 +3,6 @@ import { SettingState } from '@/stores/SettingState'
 import SettingsOverlay from '@/components/SettingsOverlay.vue'
 
 export default {
-  components:{
-    SettingsOverlay
-  },
   data () {
     return {
       settingsState: null, // Intialize a variable for the settings
@@ -53,9 +50,6 @@ export default {
       <button @click="handleClick('Create Lobby', '/hostLobby')" class="create-lobby-button">Create Lobby</button>
     </div>
   </div>
-
-  <!-- Show Settings Overlay -->
-  <SettingsOverlay v-if="settingsState.showSettings" />
 
 </template>
 

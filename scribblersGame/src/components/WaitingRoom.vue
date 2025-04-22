@@ -1,4 +1,8 @@
 <template>
+   <button @click="settingsState.toggleSettings()" class="settings-button" :class="{ 'blurred': settingsState.showSettings }"> 
+    <img @click="speakNow('Settings')" src="/settingsIcon.png" class="settings-img">
+  </button>
+
   <div class="waiting-room">
     <h1 @click="speakNow('Game lobby')">Game Lobby</h1>
     
@@ -157,6 +161,34 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.settings-button {
+  border-radius: 50%;
+  justify-content: center;
+  padding: 5px 5px 5px 5px;
+  border-width: 5px;
+
+  position: relative; /* or 'relative' depending on your layout */
+  top: 20px;   /* moves it down */
+  left: 20px;   /* moves it to the left */
+
+  margin: auto;
+}
+
+.settings-button:hover {
+  background-color: #c0c3c1;
+  transform: scale(1.05);
+}
+
+.settings-button:active {
+  background-color: #1d1c1c;
+  transform: scale(1.05);
+}
+
+.settings-img {
+  width: 60px;
+  height: 55px;
+}
+
 .waiting-room {
   max-width: 600px;
   margin: 80px auto;
