@@ -46,6 +46,7 @@ export default {
             currentUser: GameState().currentUser,
             currentUserAvatar: GameState().currentUserAvatar,
             currentUserMessage,
+            currentDrawer: "",
             isGuessCorrect: false, //tracks if current user has guessed correctly
             messageBoard: [
                 currentUserMessage
@@ -162,6 +163,15 @@ export default {
                 this.socketInstance.emit('join-room', this.roomCodeStr, GameState().currentUser, this.isHost);    
             }
 
+        // Listen for new drawer
+        this.socketInstance.on("update-drawer", (drawer) => {
+            this.currentDrawer = drawer; // Add this line to store the current drawer
+            
+            if (GameState().currentUser == drawer)
+                this.isDrawer = true;
+            else
+                this.isDrawer = false;   
+        })
             // Listen for new lobby code
         this.socketInstance.on("update-lobby-code", (newRoomCode) => {
             
@@ -319,7 +329,7 @@ export default {
                 this.roundTimer = serverTime;
             });
         },
-      
+    
         // Disconnects the user when called
         serverDisconnect(){
             try {
@@ -449,8 +459,8 @@ export default {
 
         <!-- Left side: Drawing canvas and button box -->
         <div class="left-container">
-             <!--Display drawing prompt for drawer-->
-             <div v-if="isDrawer" class="draw-prompt" @click="speakNow('Draw this')">
+            <!--Display drawing prompt for drawer-->
+            <div v-if="isDrawer" class="draw-prompt" @click="speakNow('Draw this')">
                 <h2>DRAW: {{ promptWord }}</h2>
                 <img class='prompt-image' :src=promptImgPath :alt=promptWord >
             </div>
@@ -488,7 +498,8 @@ export default {
                     :roomCodeArr="roomCodeArr"
                     :getShapeImage="getShapeImage"
                     :getShapeLabel="getShapeLabel"
-                    :speakRoomCode="speakRoomCode">
+                    :speakRoomCode="speakRoomCode"
+                    :currentDrawer="currentDrawer">
                 </GuessBoard>
             </div>
         </div>
