@@ -56,7 +56,7 @@
                     />
                 </div>
             </h1>
-            <div v-if="player === props.currentDrawer" class="drawer-indicator">Drawer ✏️</div>
+            <div v-if="player === props.currentDrawer" @click="speakNow('player '+player+ ' is drawing')" class="drawer-indicator">Drawer ✏️</div>
         </div>
     </div>
 </template>
