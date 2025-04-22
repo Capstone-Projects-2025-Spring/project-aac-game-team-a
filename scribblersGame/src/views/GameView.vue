@@ -68,6 +68,7 @@ export default {
             gameStarted: false,
             AACboardDisabled: false, // Changed when the user incorrectly guesses
             AACboardDisabledDuration: 5000, // Amount of time for board to be disabled (1 sec = 1000 int)
+            AACboardDisableTimer: 5,
             AACButtons: [// Buttons for game AAC board with associated images and labels
                 {id: 1, imgSrc: 'lion.png', label: 'Lion'},
                 {id: 2, imgSrc: 'tiger.webp', label: 'Tiger'},
@@ -376,9 +377,21 @@ export default {
                     // Disable the AAC board
                     this.AACboardDisabled = true;
 
+                    // Set the value to reset 
+                    let reset = this.AACboardDisableTimer
+
+                    // Used for the disabled AAC countdown
+                    const interval = setInterval(() => {
+                        this.AACboardDisableTimer -= 1
+                        console.log(`Waiting... ${this.AACboardDisableTimer}s`);
+                    }, 1000)
+
+
                     // Re-enable after x seconds
                     setTimeout(() => {
                     this.AACboardDisabled = false;
+                    clearInterval(interval);
+                    this.AACboardDisableTimer = reset
                     }, this.AACboardDisabledDuration);
                 }
 
@@ -468,6 +481,11 @@ export default {
 
         <!-- Top info -->
         <div class="top-info">
+            <!-- Opens the settings overlay -->
+            <button @click="settingsState.toggleSettings()" class="settings-button" :class="{ 'blurred': settingsState.showSettings }"> 
+                <img @click="speakNow('Settings')" src="/settingsIcon.png" class="settings-img">
+            </button>
+
             <!-- Quit Button -->
             <RouterLink 
             :to="{
@@ -503,7 +521,10 @@ export default {
 
             <div v-if="!isDrawer && !isGuessCorrect" class="aac-board-box">
                 <!-- AacBoard component is rendered here and we catch item selections here.-->
-                <AacBoard :disabled="this.AACboardDisabled" @itemSelected="handleItemSelected"/>
+                <AacBoard 
+                    @itemSelected="handleItemSelected"
+                    :disabled="AACboardDisabled"
+                    :time-disabled="AACboardDisableTimer"/>
             </div>
         </div>
 
@@ -531,6 +552,35 @@ export default {
 
 <style>
 @media (min-width: 1024px) {
+    .settings-button {
+        margin-right: 40px; /* adjust value as needed */
+        border-radius: 50%;
+        justify-content: center;
+        padding: 5px 5px 5px 5px;
+        border-width: 5px;
+
+        position: relative; /* or 'relative' depending on your layout */
+        top: 20px;   /* moves it down */
+        left: 20px;   /* moves it to the left */
+
+        margin: auto;
+    }
+
+    .settings-button:hover {
+        background-color: #c0c3c1;
+        transform: scale(1.05);
+    }
+
+    .settings-button:active {
+        background-color: #1d1c1c;
+        transform: scale(1.05);
+    }
+
+    .settings-img {
+        width: 60px;
+        height: 55px;
+    }
+
     .room-code-block {
         display: flex;
         justify-content: flex-end;  /* Align the box to the right */
@@ -549,19 +599,19 @@ export default {
     }
 
     .room-code-label {
-    font-weight: bold;
-    font-size: 1.1rem;
+        font-weight: bold;
+        font-size: 1.1rem;
     }
 
     .room-code-shapes {
-    display: flex;
-    gap: 0.5rem;
+        display: flex;
+        gap: 0.5rem;
     }
 
     .room-code-shape {
-    width: 60px;
-    height: 60px;
-    object-fit: contain;
+        width: 60px;
+        height: 60px;
+        object-fit: contain;
     }
 
     
@@ -572,9 +622,8 @@ export default {
     }
 
     .top-info{
-        display: flex;
-        flex-direction: row;
-        min-height: 120px; /* Set this to whatever minimum height you need */
+        margin-right:1000px;
+        min-height: 100px; /* Set this to whatever minimum height you need */
     }
 
     .game-container{
@@ -645,6 +694,7 @@ export default {
     }
 
     .quit-btn{
+        margin-left: 40px; /* adjust value as needed */
         padding-bottom: 100px;
         padding: 12px 20px;
         font-size: 1.1rem;
@@ -663,7 +713,7 @@ export default {
 
     .quit-btn:hover {
         background-color: #111d76;
-        transform: translateY(-2px);
+        transform: scale(1.05);
     }
 }
 </style>
