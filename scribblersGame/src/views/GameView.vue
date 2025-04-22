@@ -57,7 +57,7 @@ export default {
             isHostPlaying: GameState().isHostPlaying, //track if host is playing or spectating
             promptWord: "", //store the random drawing prompt word
             promptImgPath: "", // store the path to the image to be referenced for prompt
-            context: CanvasRenderingContext2D, // stores drawing context for drawing broadcasted data
+            context: null, // stores drawing context for drawing broadcasted data
             numRounds: GameState().rounds, // tracks number of rounds set by host
             currentRound: 0, //tracks the current round in the lobby
             maxPlayers: GameState().maxPlayers, // tracks maximum number of players allowed in lobby
@@ -66,6 +66,8 @@ export default {
             roomCodeArr: roomCodeArr, // Now roomCodeArr is correctly assigned here
             roomCodeStr: roomCodeArr.join(''),
             gameStarted: false,
+            AACboardDisabled: false, // Changed when the user incorrectly guesses
+            AACboardDisabledDuration: 5000, // Amount of time for board to be disabled (1 sec = 1000 int)
             AACButtons: [// Buttons for game AAC board with associated images and labels
                 {id: 1, imgSrc: 'lion.png', label: 'Lion'},
                 {id: 2, imgSrc: 'tiger.webp', label: 'Tiger'},
@@ -253,9 +255,12 @@ export default {
 
                 this.mappedPlayerData.get(user).currentGuess = guess;
                 this.mappedPlayerData.get(user).currentGuessImagePath = imagePath;
-                if (guess == this.promptWord && guess)
+
+                // If the guess is correct, display it
+                if (guess == this.promptWord && guess){
                     //console.log(`${this.promptWord} is the prompt and ${guess} is the guess.`)
                     console.log(`${user} guessed correctly!`)
+                } 
             })
 
             //  Listen for host to start of new round
@@ -349,27 +354,45 @@ export default {
             }
         },
         
-        //Function that handles a word selection on the AAC board 
+        // Function that handles a word selection on the AAC board 
         handleItemSelected({item, imagePath}) {
-            console.log('Item selected:', item); //logs selected item
-            this.currentUserMessage.text = item; //stores aac button selected by user
-            this.currentUserMessage.imagePath = imagePath;
-            this.mappedPlayerData.get(this.currentUser).currentGuess = item;
-            this.mappedPlayerData.get(this.currentUser).currentGuessImagePath = imagePath;
 
-            if (item == this.promptWord){
-                console.log(`You guessed correctly!`)
-                this.mappedPlayerData.get(this.currentUser).currentGuess = "Correct!";
-                this.mappedPlayerData.get(this.currentUser).currentGuessImagePath = '\correct.png';
-                this.isGuessCorrect = true;
+            // Only allow the action if the AAC board is not disabled
+            if(!this.AACboardDisabled){
+                console.log('Item selected:', item); //logs selected item
+                this.currentUserMessage.text = item; //stores aac button selected by user
+                this.currentUserMessage.imagePath = imagePath;
+                this.mappedPlayerData.get(this.currentUser).currentGuess = item;
+                this.mappedPlayerData.get(this.currentUser).currentGuessImagePath = imagePath;
+
+                //If the user guesses the prompt correctly, display and emit to other sockets
+                // else, disable the AAC board for 'AACboardDisabledDuration' amount of time
+                if (item == this.promptWord){
+                    console.log(`You guessed correctly!`)
+                    this.mappedPlayerData.get(this.currentUser).currentGuess = "Correct!";
+                    this.mappedPlayerData.get(this.currentUser).currentGuessImagePath = '\correct.png';
+                    this.isGuessCorrect = true;
+                } else {
+                    // Disable the AAC board
+                    this.AACboardDisabled = true;
+
+                    // Re-enable after x seconds
+                    setTimeout(() => {
+                    this.AACboardDisabled = false;
+                    }, this.AACboardDisabledDuration);
+                }
+
+                this.socketInstance.emit('update-user-guess', 
+                    this.roomCodeStr, 
+                    this.currentUser, 
+                    this.mappedPlayerData.get(this.currentUser).currentGuess,
+                    this.mappedPlayerData.get(this.currentUser).currentGuessImagePath
+                )
+            } else {
+                // Let the user know the gues board is disabled
+                console.log('AAC board disabled')
+                this.speakNow('Guesses disabled')
             }
-
-            this.socketInstance.emit('update-user-guess', 
-                this.roomCodeStr, 
-                this.currentUser, 
-                this.mappedPlayerData.get(this.currentUser).currentGuess,
-                this.mappedPlayerData.get(this.currentUser).currentGuessImagePath
-            )
         },
 
         //  Handles sending initial drawing data to observer canvases (on mouse click)
@@ -480,7 +503,7 @@ export default {
 
             <div v-if="!isDrawer && !isGuessCorrect" class="aac-board-box">
                 <!-- AacBoard component is rendered here and we catch item selections here.-->
-                <AacBoard @itemSelected="handleItemSelected"/>
+                <AacBoard :disabled="this.AACboardDisabled" @itemSelected="handleItemSelected"/>
             </div>
         </div>
 
@@ -503,8 +526,6 @@ export default {
                 </GuessBoard>
             </div>
         </div>
-
-        
     </div>
 </template>
 
