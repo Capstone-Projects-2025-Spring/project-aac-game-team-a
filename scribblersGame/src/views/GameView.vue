@@ -67,6 +67,7 @@ export default {
             gameStarted: false,
             AACboardDisabled: false, // Changed when the user incorrectly guesses
             AACboardDisabledDuration: 5000, // Amount of time for board to be disabled (1 sec = 1000 int)
+            AACboardDisableTimer: 5,
             AACButtons: [// Buttons for game AAC board with associated images and labels
                 {id: 1, imgSrc: 'lion.png', label: 'Lion'},
                 {id: 2, imgSrc: 'tiger.webp', label: 'Tiger'},
@@ -366,9 +367,21 @@ export default {
                     // Disable the AAC board
                     this.AACboardDisabled = true;
 
+                    // Set the value to reset 
+                    let reset = this.AACboardDisableTimer
+
+                    // Used for the disabled AAC countdown
+                    const interval = setInterval(() => {
+                        this.AACboardDisableTimer -= 1
+                        console.log(`Waiting... ${this.AACboardDisableTimer}s`);
+                    }, 1000)
+
+
                     // Re-enable after x seconds
                     setTimeout(() => {
                     this.AACboardDisabled = false;
+                    clearInterval(interval);
+                    this.AACboardDisableTimer = reset
                     }, this.AACboardDisabledDuration);
                 }
 
@@ -493,7 +506,10 @@ export default {
 
             <div v-if="!isDrawer && !isGuessCorrect" class="aac-board-box">
                 <!-- AacBoard component is rendered here and we catch item selections here.-->
-                <AacBoard :disabled="this.AACboardDisabled" @itemSelected="handleItemSelected"/>
+                <AacBoard 
+                    @itemSelected="handleItemSelected"
+                    :disabled="AACboardDisabled"
+                    :time-disabled="AACboardDisableTimer"/>
             </div>
         </div>
 

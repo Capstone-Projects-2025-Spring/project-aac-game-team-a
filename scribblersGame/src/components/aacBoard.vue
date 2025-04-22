@@ -1,5 +1,10 @@
 <template>
     <div class="aac-board">
+        <!-- Overlay when disabled -->
+        <div v-if="props.disabled" @click="speakNow('Wait')" class="aac-disabled">
+            <p>Disabled for {{ props.timeDisabled }}</p>
+        </div>
+
         <!-- Grid for categories. -->
         <div v-if="!currentCategory" class="grid">
             <button v-for="(items, category) in categories" :key="category" @click="setCurrentCategory(category)" class="aac-buttons">
@@ -30,6 +35,8 @@ import { SettingState } from '@/stores/SettingState'
 
 //define the emit function to send events to paren
 const emit = defineEmits();
+// define props
+const props = defineProps(['disabled', 'timeDisabled'])
 // Define state of the settings
 const settingsState = SettingState();
 
@@ -94,14 +101,38 @@ function setCurrentCategory(category){
 
 <style scoped>
  .aac-board {
+    position: relative; /* Make this the positioning context */
     width: 1000px;
     height: 250px;
     border: 5px solid rgb(39, 114, 254);
-    border-radius: 20px;
+    border-radius: 25px;
     background-color: #e0e0e0;
     padding: 10px;
     box-sizing: border-box;
     overflow: hidden;
+}
+
+/* For when the guesser chooses incorrectly */
+.aac-disabled {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    background-color: rgba(105, 105, 105, 0.6); 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-text-stroke: 2px black;
+    color: white;
+    border-radius: 20px;
+    z-index: 10;
+    
+    font-family: 'Segoe UI', sans-serif;
+    font-weight: bold;
+    font-size: 70px;
+    pointer-events: all;
 }
 
 /* AAC buttons */
