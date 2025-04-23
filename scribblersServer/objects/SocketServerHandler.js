@@ -58,6 +58,12 @@ class SocketHandler{
             gameDataMap.get(room).startNewRound(server, room, gameDataMap);
         })
 
+        //  Listen to play game again
+        client.on('play-again', (room)  => {
+            console.log(`Playing game again in room ${room}`)
+            client.to(room).emit('play-again');
+        })
+
         //  Listen for request to create new lobby
         client.on("create-new-lobby", (numRounds, maxPlayers, players, user) => {
             

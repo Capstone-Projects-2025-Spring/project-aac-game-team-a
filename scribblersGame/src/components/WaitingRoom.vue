@@ -1,8 +1,10 @@
 <template>
+  <!-- Settings -->
    <button @click="settingsState.toggleSettings()" class="settings-button" :class="{ 'blurred': settingsState.showSettings }"> 
     <img @click="speakNow('Settings')" src="/settingsIcon.png" class="settings-img">
   </button>
 
+  <!-- Actual waiting room -->
   <div class="waiting-room">
     <h1 @click="speakNow('Game lobby')">Game Lobby</h1>
     
@@ -167,9 +169,9 @@ onMounted(() => {
   padding: 5px 5px 5px 5px;
   border-width: 5px;
 
-  position: relative; /* or 'relative' depending on your layout */
-  top: 20px;   /* moves it down */
-  left: 20px;   /* moves it to the left */
+  position: relative;
+  top: 20px;
+  left: 20px;
 
   margin: auto;
 }
