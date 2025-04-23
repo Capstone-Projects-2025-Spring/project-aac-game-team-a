@@ -41,6 +41,7 @@ export default {
         };
 
         return {
+            playerScore: 0, // Store the current score of the player
             settingsState: null, // Intialize a variable for the settings
             selectedImagePath: "", //path to current AAC image selected
             currentUser: GameState().currentUser,
@@ -175,11 +176,13 @@ export default {
             else
                 this.isDrawer = false;   
         })
-            // Listen for new lobby code
+        
+        // Listen for new lobby code
         this.socketInstance.on("update-lobby-code", (newRoomCode) => {
             
             //console.log("Updating lobby code: ", newRoomCode);
             this.roomCodeStr = newRoomCode;
+
             // Fix: Convert string digits to numbers properly
             this.roomCodeArr = newRoomCode.split('').map(digit => parseInt(digit, 10));
 
@@ -252,10 +255,17 @@ export default {
             })
 
             //  Listen for new guesses
-            this.socketInstance.on("update-user-guess", (user, guess, imagePath) => {
+            this.socketInstance.on("update-user-guess", ({
+                user,
+                guess,
+                imagePath,
+                score
+                }) => {
 
                 this.mappedPlayerData.get(user).currentGuess = guess;
                 this.mappedPlayerData.get(user).currentGuessImagePath = imagePath;
+                this.mappedPlayerData.get(user).score = score;
+                console.log('data ' + user + ' ' + guess + ' ' + imagePath + ' ' + score)
 
                 // If the guess is correct, display it
                 if (guess == this.promptWord && guess){
@@ -369,6 +379,19 @@ export default {
                 //If the user guesses the prompt correctly, display and emit to other sockets
                 // else, disable the AAC board for 'AACboardDisabledDuration' amount of time
                 if (item == this.promptWord){
+
+                    // Player SCORE is calculatd as such
+                    /* 
+                        Current score += Floor( Current Time / 10 )
+                        Ex:
+                            Current score = 6
+                            x = Floor ( 128 / 10 ) = 12
+                            Current score += x
+                            Current score = 18
+                    */
+                    this.playerScore += Math.floor(this.roundTimer/10)
+                    this.mappedPlayerData.get(this.currentUser).score = this.playerScore
+
                     console.log(`You guessed correctly!`)
                     this.mappedPlayerData.get(this.currentUser).currentGuess = "Correct!";
                     this.mappedPlayerData.get(this.currentUser).currentGuessImagePath = '\correct.png';
@@ -399,10 +422,11 @@ export default {
                     this.roomCodeStr, 
                     this.currentUser, 
                     this.mappedPlayerData.get(this.currentUser).currentGuess,
-                    this.mappedPlayerData.get(this.currentUser).currentGuessImagePath
+                    this.mappedPlayerData.get(this.currentUser).currentGuessImagePath,
+                    this.mappedPlayerData.get(this.currentUser).score
                 )
             } else {
-                // Let the user know the gues board is disabled
+                // Let the user know the guess board is disabled
                 console.log('AAC board disabled')
                 this.speakNow('Guesses disabled')
             }
@@ -543,7 +567,8 @@ export default {
                     :getShapeImage="getShapeImage"
                     :getShapeLabel="getShapeLabel"
                     :speakRoomCode="speakRoomCode"
-                    :currentDrawer="currentDrawer">
+                    :currentDrawer="currentDrawer"
+                    :score="playerScore">
                 </GuessBoard>
             </div>
         </div>
