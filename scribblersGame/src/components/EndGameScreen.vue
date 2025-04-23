@@ -4,12 +4,12 @@
     import { useRouter } from 'vue-router'
 
     // Define the emit function to send events to parent
-    const emit = defineEmits(['playAgain']);
+    const emit = defineEmits(['playAgain', 'leaveLobby']);
     // router to use for home button
     const router = useRouter()
 
     // Props to use
-    const props = defineProps(['isHost']);
+    const props = defineProps(['isHost', 'playerDataMap']);
 
     // Define state of the settings
     const settingsState = SettingState();
@@ -29,7 +29,7 @@
 
     // Sends users back to the lobby to play again
     function playAgain() {
-        speakNow('Back to lobby')
+        speakNow('Play again')
         emit("playAgain");
     }
 
@@ -49,12 +49,29 @@
         <img @click="speakNow('Settings')" src="/settingsIcon.png" class="settings-img">
     </button>
 
+    <!-- End screen -->
     <div class="end-screen">
+        <!-- Header -->
         <h1 @click="speakNow('Game Finished!')">Game Finished!</h1>
+
+        <!-- Leaderboard -->
+        <div class="leaderboard">
+            <h2 @click="speakNow('Leaderboard')">Leaderboard:</h2>
+
+            <!-- Display all users and their score -->
+            <div v-for="[player, data] of props.playerDataMap" :key="player" class="player-scores">
+                <img @click="speakNow('player '+player)" :src="player.toLowerCase() + '.png'" :alt="player" class="game-avatar-image" />
+                <!-- Display the score -->
+                <div @click="speakNow('score '+ data.score )"> 
+                    Score: {{ data.score }}
+                </div>
+                
+            </div>
+        </div>
 
         <div class="bottom-buttons">
             <!-- Button for the host to send everyone back to the lobby -->
-            <button @click="playAgain" v-if="props.isHost" class="back-to-lobby">Back to Lobby</button>
+            <button @click="playAgain" v-if="props.isHost" class="back-to-lobby">Play again</button>
 
             <!-- Button to go to home -->
             <button 
@@ -81,6 +98,29 @@
         text-align: center;
         font-family: 'Segoe UI', sans-serif;
         font-weight: bold;
+    }
+
+    .leaderboard{
+        margin: 20px 0;
+        padding: 15px;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        background-color: #f9f9f9;
+    }
+
+    .player-scores {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        width: 100%;
+        justify-content: center;     /* horizontally center the whole row */
+        gap: 20px;                   /* space between the items */
+    }
+
+    .game-avatar-image {
+        width: auto;
+        height: 50px;
+        padding-left: 1rem;
     }
 
     .bottom-buttons {

@@ -602,6 +602,7 @@ export default {
         @playAgain="playAgain"
         @leaveLobby="leaveLobby"
         :isHost="isHost"
+        :playerDataMap=this.mappedPlayerData
         >
         </EndScreen>
     </div>
