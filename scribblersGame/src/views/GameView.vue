@@ -41,6 +41,7 @@ export default {
         };
 
         return {
+            showTimeRanOutPopup: false, //determines if this popup will be shown
             showAllGuessedCorrectPopup: false, //determines if this popup will be shown
             playerScore: 0, // Store the current score of the player
             settingsState: null, // Intialize a variable for the settings
@@ -101,6 +102,14 @@ export default {
             this.showAllGuessedCorrectPopup = true;
             setTimeout(() =>{
                 this.showAllGuessedCorrectPopup = false;
+            }, 4000); //4 seconds
+        },
+
+        //called to show pop up message
+        triggerTimeRanOutPopup() {
+            this.showTimeRanOutPopup = true;
+            setTimeout(() =>{
+                this.showTimeRanOutPopup = false;
             }, 4000); //4 seconds
         },
 
@@ -251,6 +260,11 @@ export default {
             //  Listen for "everyone guessed correct"
             this.socketInstance.on("all-guessed-correct", (message) => {
                 this.triggerAllGuessedCorrectPopup();
+            })
+
+            //  Listen for "timer ran out"
+            this.socketInstance.on("timer-ran-out", (message) => {
+                this.triggerTimeRanOutPopup();
             })
 
             //  Listen for update to current user
@@ -541,6 +555,11 @@ export default {
             <p>🎉🎉🎉 <br>Everyone Guessed Correctly!</p>
         </div>
 
+        <!-- Popup: Time Ran Out -->
+        <div v-if="showTimeRanOutPopup" class="popup-box">
+            <p>⏰ <br>Time Ran Out!</p>
+        </div>
+
         <!-- Left side: Drawing canvas and button box -->
         <div class="left-container">
             <!--Display drawing prompt for drawer-->
@@ -620,7 +639,6 @@ export default {
         border-radius: 15px;
         box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.25);
         font-size: 4em;
-        font-weight: bold;
         text-align: center;
         z-index: 1000;
         color: white;

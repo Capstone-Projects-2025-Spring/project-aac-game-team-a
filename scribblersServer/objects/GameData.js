@@ -208,6 +208,8 @@ class GameData{
             //  Start new round once timer hits 0
             if (gameDataMap.get(room).timerValue == 0) {
                 console.log("Timer cleared")
+                const message = "Timer Ran Out!"
+                server.to(room).emit("timer-ran-out" , {message}); //emit to everyone
                 clearInterval(gameDataMap.get(room).timerID);
                 gameDataMap.get(room).startNewRound(server, room);
             }
