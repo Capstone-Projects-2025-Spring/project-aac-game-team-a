@@ -41,11 +41,13 @@ export default {
         };
 
         return {
+            playerScore: 0, // Store the current score of the player
             settingsState: null, // Intialize a variable for the settings
             selectedImagePath: "", //path to current AAC image selected
             currentUser: GameState().currentUser,
             currentUserAvatar: GameState().currentUserAvatar,
             currentUserMessage,
+            currentDrawer: "",
             isGuessCorrect: false, //tracks if current user has guessed correctly
             messageBoard: [
                 currentUserMessage
@@ -56,7 +58,7 @@ export default {
             isHostPlaying: GameState().isHostPlaying, //track if host is playing or spectating
             promptWord: "", //store the random drawing prompt word
             promptImgPath: "", // store the path to the image to be referenced for prompt
-            context: CanvasRenderingContext2D, // stores drawing context for drawing broadcasted data
+            context: null, // stores drawing context for drawing broadcasted data
             numRounds: GameState().rounds, // tracks number of rounds set by host
             currentRound: 0, //tracks the current round in the lobby
             maxPlayers: GameState().maxPlayers, // tracks maximum number of players allowed in lobby
@@ -65,6 +67,9 @@ export default {
             roomCodeArr: roomCodeArr, // Now roomCodeArr is correctly assigned here
             roomCodeStr: roomCodeArr.join(''),
             gameStarted: false,
+            AACboardDisabled: false, // Changed when the user incorrectly guesses
+            AACboardDisabledDuration: 5000, // Amount of time for board to be disabled (1 sec = 1000 int)
+            AACboardDisableTimer: 5,
             AACButtons: [// Buttons for game AAC board with associated images and labels
                 {id: 1, imgSrc: 'lion.png', label: 'Lion'},
                 {id: 2, imgSrc: 'tiger.webp', label: 'Tiger'},
@@ -162,11 +167,22 @@ export default {
                 this.socketInstance.emit('join-room', this.roomCodeStr, GameState().currentUser, this.isHost);    
             }
 
-            // Listen for new lobby code
+        // Listen for new drawer
+        this.socketInstance.on("update-drawer", (drawer) => {
+            this.currentDrawer = drawer; // Add this line to store the current drawer
+            
+            if (GameState().currentUser == drawer)
+                this.isDrawer = true;
+            else
+                this.isDrawer = false;   
+        })
+        
+        // Listen for new lobby code
         this.socketInstance.on("update-lobby-code", (newRoomCode) => {
             
             //console.log("Updating lobby code: ", newRoomCode);
             this.roomCodeStr = newRoomCode;
+
             // Fix: Convert string digits to numbers properly
             this.roomCodeArr = newRoomCode.split('').map(digit => parseInt(digit, 10));
 
@@ -239,13 +255,23 @@ export default {
             })
 
             //  Listen for new guesses
-            this.socketInstance.on("update-user-guess", (user, guess, imagePath) => {
+            this.socketInstance.on("update-user-guess", ({
+                user,
+                guess,
+                imagePath,
+                score
+                }) => {
 
                 this.mappedPlayerData.get(user).currentGuess = guess;
                 this.mappedPlayerData.get(user).currentGuessImagePath = imagePath;
-                if (guess == this.promptWord && guess)
+                this.mappedPlayerData.get(user).score = score;
+                console.log('data ' + user + ' ' + guess + ' ' + imagePath + ' ' + score)
+
+                // If the guess is correct, display it
+                if (guess == this.promptWord && guess){
                     //console.log(`${this.promptWord} is the prompt and ${guess} is the guess.`)
                     console.log(`${user} guessed correctly!`)
+                } 
             })
 
             //  Listen for host to start of new round
@@ -319,7 +345,7 @@ export default {
                 this.roundTimer = serverTime;
             });
         },
-      
+    
         // Disconnects the user when called
         serverDisconnect(){
             try {
@@ -339,27 +365,71 @@ export default {
             }
         },
         
-        //Function that handles a word selection on the AAC board 
+        // Function that handles a word selection on the AAC board 
         handleItemSelected({item, imagePath}) {
-            console.log('Item selected:', item); //logs selected item
-            this.currentUserMessage.text = item; //stores aac button selected by user
-            this.currentUserMessage.imagePath = imagePath;
-            this.mappedPlayerData.get(this.currentUser).currentGuess = item;
-            this.mappedPlayerData.get(this.currentUser).currentGuessImagePath = imagePath;
 
-            if (item == this.promptWord){
-                console.log(`You guessed correctly!`)
-                this.mappedPlayerData.get(this.currentUser).currentGuess = "Correct!";
-                this.mappedPlayerData.get(this.currentUser).currentGuessImagePath = '\correct.png';
-                this.isGuessCorrect = true;
+            // Only allow the action if the AAC board is not disabled
+            if(!this.AACboardDisabled){
+                console.log('Item selected:', item); //logs selected item
+                this.currentUserMessage.text = item; //stores aac button selected by user
+                this.currentUserMessage.imagePath = imagePath;
+                this.mappedPlayerData.get(this.currentUser).currentGuess = item;
+                this.mappedPlayerData.get(this.currentUser).currentGuessImagePath = imagePath;
+
+                //If the user guesses the prompt correctly, display and emit to other sockets
+                // else, disable the AAC board for 'AACboardDisabledDuration' amount of time
+                if (item == this.promptWord){
+
+                    // Player SCORE is calculatd as such
+                    /* 
+                        Current score += Floor( Current Time / 10 )
+                        Ex:
+                            Current score = 6
+                            x = Floor ( 128 / 10 ) = 12
+                            Current score += x
+                            Current score = 18
+                    */
+                    this.playerScore += Math.floor(this.roundTimer/10)
+                    this.mappedPlayerData.get(this.currentUser).score = this.playerScore
+
+                    console.log(`You guessed correctly!`)
+                    this.mappedPlayerData.get(this.currentUser).currentGuess = "Correct!";
+                    this.mappedPlayerData.get(this.currentUser).currentGuessImagePath = '\correct.png';
+                    this.isGuessCorrect = true;
+                } else {
+                    // Disable the AAC board
+                    this.AACboardDisabled = true;
+
+                    // Set the value to reset 
+                    let reset = this.AACboardDisableTimer
+
+                    // Used for the disabled AAC countdown
+                    const interval = setInterval(() => {
+                        this.AACboardDisableTimer -= 1
+                        console.log(`Waiting... ${this.AACboardDisableTimer}s`);
+                    }, 1000)
+
+
+                    // Re-enable after x seconds
+                    setTimeout(() => {
+                    this.AACboardDisabled = false;
+                    clearInterval(interval);
+                    this.AACboardDisableTimer = reset
+                    }, this.AACboardDisabledDuration);
+                }
+
+                this.socketInstance.emit('update-user-guess', 
+                    this.roomCodeStr, 
+                    this.currentUser, 
+                    this.mappedPlayerData.get(this.currentUser).currentGuess,
+                    this.mappedPlayerData.get(this.currentUser).currentGuessImagePath,
+                    this.mappedPlayerData.get(this.currentUser).score
+                )
+            } else {
+                // Let the user know the guess board is disabled
+                console.log('AAC board disabled')
+                this.speakNow('Guesses disabled')
             }
-
-            this.socketInstance.emit('update-user-guess', 
-                this.roomCodeStr, 
-                this.currentUser, 
-                this.mappedPlayerData.get(this.currentUser).currentGuess,
-                this.mappedPlayerData.get(this.currentUser).currentGuessImagePath
-            )
         },
 
         //  Handles sending initial drawing data to observer canvases (on mouse click)
@@ -435,6 +505,11 @@ export default {
 
         <!-- Top info -->
         <div class="top-info">
+            <!-- Opens the settings overlay -->
+            <button @click="settingsState.toggleSettings()" class="settings-button" :class="{ 'blurred': settingsState.showSettings }"> 
+                <img @click="speakNow('Settings')" src="/settingsIcon.png" class="settings-img">
+            </button>
+
             <!-- Quit Button -->
             <RouterLink 
             :to="{
@@ -449,8 +524,8 @@ export default {
 
         <!-- Left side: Drawing canvas and button box -->
         <div class="left-container">
-             <!--Display drawing prompt for drawer-->
-             <div v-if="isDrawer" class="draw-prompt" @click="speakNow('Draw this')">
+            <!--Display drawing prompt for drawer-->
+            <div v-if="isDrawer" class="draw-prompt" @click="speakNow('Draw this')">
                 <h2>DRAW: {{ promptWord }}</h2>
                 <img class='prompt-image' :src=promptImgPath :alt=promptWord >
             </div>
@@ -470,7 +545,10 @@ export default {
 
             <div v-if="!isDrawer && !isGuessCorrect" class="aac-board-box">
                 <!-- AacBoard component is rendered here and we catch item selections here.-->
-                <AacBoard @itemSelected="handleItemSelected"/>
+                <AacBoard 
+                    @itemSelected="handleItemSelected"
+                    :disabled="AACboardDisabled"
+                    :time-disabled="AACboardDisableTimer"/>
             </div>
         </div>
 
@@ -488,17 +566,46 @@ export default {
                     :roomCodeArr="roomCodeArr"
                     :getShapeImage="getShapeImage"
                     :getShapeLabel="getShapeLabel"
-                    :speakRoomCode="speakRoomCode">
+                    :speakRoomCode="speakRoomCode"
+                    :currentDrawer="currentDrawer"
+                    :score="playerScore">
                 </GuessBoard>
             </div>
         </div>
-
-        
     </div>
 </template>
 
 <style>
 @media (min-width: 1024px) {
+    .settings-button {
+        margin-right: 40px; /* adjust value as needed */
+        border-radius: 50%;
+        justify-content: center;
+        padding: 5px 5px 5px 5px;
+        border-width: 5px;
+
+        position: relative; /* or 'relative' depending on your layout */
+        top: 20px;   /* moves it down */
+        left: 20px;   /* moves it to the left */
+
+        margin: auto;
+    }
+
+    .settings-button:hover {
+        background-color: #c0c3c1;
+        transform: scale(1.05);
+    }
+
+    .settings-button:active {
+        background-color: #1d1c1c;
+        transform: scale(1.05);
+    }
+
+    .settings-img {
+        width: 60px;
+        height: 55px;
+    }
+
     .room-code-block {
         display: flex;
         justify-content: flex-end;  /* Align the box to the right */
@@ -517,19 +624,19 @@ export default {
     }
 
     .room-code-label {
-    font-weight: bold;
-    font-size: 1.1rem;
+        font-weight: bold;
+        font-size: 1.1rem;
     }
 
     .room-code-shapes {
-    display: flex;
-    gap: 0.5rem;
+        display: flex;
+        gap: 0.5rem;
     }
 
     .room-code-shape {
-    width: 60px;
-    height: 60px;
-    object-fit: contain;
+        width: 60px;
+        height: 60px;
+        object-fit: contain;
     }
 
     
@@ -540,9 +647,8 @@ export default {
     }
 
     .top-info{
-        display: flex;
-        flex-direction: row;
-        min-height: 120px; /* Set this to whatever minimum height you need */
+        margin-right:1000px;
+        min-height: 100px; /* Set this to whatever minimum height you need */
     }
 
     .game-container{
@@ -613,6 +719,7 @@ export default {
     }
 
     .quit-btn{
+        margin-left: 40px; /* adjust value as needed */
         padding-bottom: 100px;
         padding: 12px 20px;
         font-size: 1.1rem;
@@ -631,7 +738,7 @@ export default {
 
     .quit-btn:hover {
         background-color: #111d76;
-        transform: translateY(-2px);
+        transform: scale(1.05);
     }
 }
 </style>

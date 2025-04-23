@@ -2,7 +2,7 @@
     import { SettingState } from '@/stores/SettingState'
 
     const settingsState = SettingState();
-    const props = defineProps(['playerDataMap', 'time', 'currentRound', 'totalRounds', 'roomCodeArr', 'getShapeImage', 'getShapeLabel', 'speakRoomCode']);
+    const props = defineProps(['playerDataMap', 'time', 'currentRound', 'totalRounds', 'roomCodeArr', 'getShapeImage', 'getShapeLabel', 'speakRoomCode','currentDrawer' ]);
     
     // Called to turn text into speech
     function speakNow(textToSpeak) {
@@ -56,6 +56,10 @@
                     />
                 </div>
             </h1>
+            <div v-if="player === props.currentDrawer" @click="speakNow('player '+player+ ' is drawing')" class="drawer-indicator">Drawer ✏️</div>
+
+            <!-- Display the score -->
+            Score: {{ data.score }}
         </div>
     </div>
 </template>
@@ -147,4 +151,10 @@
         margin-left: auto;
         padding-right: 1rem;
     }
+    .drawer-indicator {
+    font-size: 1.8rem; /* Increase the font size to make the pencil bigger */
+    margin-right: auto; /* Push it to the right side */
+    padding-right: 1rem; /* Add some padding */
+    font-weight: bold;
+}
 </style>
