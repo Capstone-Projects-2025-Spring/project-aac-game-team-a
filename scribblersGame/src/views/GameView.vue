@@ -600,6 +600,8 @@ export default {
     <div v-if="gameEnded && !gameStarted">
         <EndScreen
         @playAgain="playAgain"
+        @leaveLobby="leaveLobby"
+        :isHost="isHost"
         >
         </EndScreen>
     </div>
