@@ -255,10 +255,17 @@ export default {
             })
 
             //  Listen for new guesses
-            this.socketInstance.on("update-user-guess", (user, guess, imagePath) => {
+            this.socketInstance.on("update-user-guess", ({
+                user,
+                guess,
+                imagePath,
+                score
+                }) => {
 
                 this.mappedPlayerData.get(user).currentGuess = guess;
                 this.mappedPlayerData.get(user).currentGuessImagePath = imagePath;
+                this.mappedPlayerData.get(user).score = score;
+                console.log('data ' + user + ' ' + guess + ' ' + imagePath + ' ' + score)
 
                 // If the guess is correct, display it
                 if (guess == this.promptWord && guess){
@@ -383,6 +390,7 @@ export default {
                             Current score = 18
                     */
                     this.playerScore += Math.floor(this.roundTimer/10)
+                    this.mappedPlayerData.get(this.currentUser).score = this.playerScore
 
                     console.log(`You guessed correctly!`)
                     this.mappedPlayerData.get(this.currentUser).currentGuess = "Correct!";
@@ -414,7 +422,8 @@ export default {
                     this.roomCodeStr, 
                     this.currentUser, 
                     this.mappedPlayerData.get(this.currentUser).currentGuess,
-                    this.mappedPlayerData.get(this.currentUser).currentGuessImagePath
+                    this.mappedPlayerData.get(this.currentUser).currentGuessImagePath,
+                    this.mappedPlayerData.get(this.currentUser).score
                 )
             } else {
                 // Let the user know the guess board is disabled
