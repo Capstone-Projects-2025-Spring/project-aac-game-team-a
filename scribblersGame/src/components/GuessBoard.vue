@@ -2,7 +2,7 @@
     import { SettingState } from '@/stores/SettingState'
 
     const settingsState = SettingState();
-    const props = defineProps(['playerDataMap', 'time', 'currentRound', 'totalRounds', 'roomCodeArr', 'getShapeImage', 'getShapeLabel', 'speakRoomCode','currentDrawer' ]);
+    const props = defineProps(['playerDataMap', 'time', 'currentRound', 'totalRounds', 'roomCodeArr', 'getShapeImage', 'getShapeLabel', 'speakRoomCode','currentDrawer', 'score' ]);
     
     // Called to turn text into speech
     function speakNow(textToSpeak) {
@@ -57,6 +57,9 @@
                 </div>
             </h1>
             <div v-if="player === props.currentDrawer" @click="speakNow('player '+player+ ' is drawing')" class="drawer-indicator">Drawer ✏️</div>
+
+            <!-- INCORRECT DISPLAY OF SCORE? -->
+            Score: {{ props.score }}
         </div>
     </div>
 </template>
