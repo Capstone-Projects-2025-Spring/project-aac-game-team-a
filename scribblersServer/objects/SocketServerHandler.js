@@ -154,7 +154,7 @@ class SocketHandler{
             }
         })
 
-        client.on("update-user-guess", (room, user, guess, imagePath) => {
+        client.on("update-user-guess", (room, user, guess, imagePath, score) => {
             //  update player's guess in game data map and emit to all players in room except sender
             gameDataMap.get(room).playerData.get(user).currentGuess = guess
             gameDataMap.get(room).playerData.get(user).score = score
