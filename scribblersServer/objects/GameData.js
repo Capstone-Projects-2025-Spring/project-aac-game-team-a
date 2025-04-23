@@ -4,34 +4,40 @@
 //  GAME SETTINGS
 const roundTimerLength = 60; //set length of round timer
 let imagesPerPrompt = 3; // represents the amount of images to choose from per prompt
+let usedPromptIds = []; // Store prompts already used
 
 // Drawing prompt objects categorized by type
 const promptList = [
-    {word: 'Eat', type: 'Actions'},
-    {word: 'Jump', type: 'Actions'},
-    {word: 'Run', type: 'Actions'},
-    {word: 'Sleep', type: 'Actions'},
+    {id: 1, word: 'Eat', type: 'Actions'},
+    {id: 2, word: 'Jump', type: 'Actions'},
+    {id: 3, word: 'Run', type: 'Actions'},
+    {id: 4, word: 'Sleep', type: 'Actions'},
 
-    {word: 'Bird', type: 'Animals'},
-    {word: 'Cat', type: 'Animals'},
-    {word: 'Dog', type: 'Animals'},
-    {word: 'Elephant', type: 'Animals'},
-    {word: 'Horse', type: 'Animals'},
-    {word: 'Mouse', type: 'Animals'},
+    {id: 5, word: 'Bird', type: 'Animals'},
+    {id: 6, word: 'Cat', type: 'Animals'},
+    {id: 7, word: 'Dog', type: 'Animals'},
+    {id: 8, word: 'Elephant', type: 'Animals'},
+    {id: 9, word: 'Horse', type: 'Animals'},
+    {id: 10, word: 'Mouse', type: 'Animals'},
 
-    {word: 'Glasses', type: 'Clothing'},
-    {word: 'Glove', type: 'Clothing'},
-    {word: 'Hat', type: 'Clothing'},
-    {word: 'Pants', type: 'Clothing'},
-    {word: 'Shirt', type: 'Clothing'},
-    {word: 'Shoe', type: 'Clothing'},
+    {id: 11, word: 'Glasses', type: 'Clothing'},
+    {id: 12, word: 'Glove', type: 'Clothing'},
+    {id: 13, word: 'Hat', type: 'Clothing'},
+    {id: 14, word: 'Pants', type: 'Clothing'},
+    {id: 15, word: 'Shirt', type: 'Clothing'},
+    {id: 16, word: 'Shoe', type: 'Clothing'},
 
-    {word: 'Apple', type: 'Food'},
-    {word: 'Banana', type: 'Food'},
-    {word: 'Carrot', type: 'Food'},
-    {word: 'Grapes', type: 'Food'},
-    {word: 'Pizza', type: 'Food'},
-    {word: 'Spaghetti', type: 'Food'}
+    {id: 17, word: 'Apple', type: 'Food'},
+    {id: 18, word: 'Banana', type: 'Food'},
+    {id: 19, word: 'Carrot', type: 'Food'},
+    {id: 20, word: 'Grapes', type: 'Food'},
+    {id: 21, word: 'Pizza', type: 'Food'},
+    {id: 22, word: 'Spaghetti', type: 'Food'},
+
+    {id: 23, word: 'Circle', type: 'Shapes'},
+    {id: 24, word: 'Oval', type: 'Shapes'},
+    {id: 25, word: 'Square', type: 'Shapes'},
+    {id: 26, word: 'Triangle', type: 'Shapes'},
 ]
 
 class GameData{
@@ -117,8 +123,25 @@ class GameData{
      * @returns the selected prompt
      */
     getPromptObject() {
+        // Get a random number based on the length of the promptList
         const randomIndex = Math.floor(Math.random() * promptList.length);
-        return promptList[randomIndex];
+        // Use the random number as the index for the prompt
+        let chosenPromptObj = promptList[randomIndex];
+    
+        // Look through the used prompt ids
+        for (let index in usedPromptIds){
+            // While current used is is equal to the id of the chosen prompt object,
+            while (usedPromptIds[index] == chosenPromptObj.id){
+                // Get a random number based on the length of the promptList
+                const randomIndex = Math.floor(Math.random() * promptList.length);
+                // Use the random number as the index for the prompt
+                chosenPromptObj = promptList[randomIndex];
+            }
+        }
+        // Push the id of the prompt into a used list
+        usedPromptIds.push(chosenPromptObj.id)
+        // Return the chosen prompt
+        return chosenPromptObj;
     }
 
     /**
