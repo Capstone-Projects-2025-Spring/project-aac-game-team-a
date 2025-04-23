@@ -168,6 +168,9 @@ class SocketHandler{
             //  handle all users guessing correctly
             if (gameDataMap.get(room).allGuessesCorrect()) {
                 clearInterval(gameDataMap.get(room).timerID);
+                //send websocket message for "all guessed correctly message"
+                const message = "Everyone Guessed Correctly!"
+                server.to(room).emit("all-guessed-correct" , {message}); //emit to everyone including guesser
                 gameDataMap.get(room).startNewRound(server, room, gameDataMap);
             }
         });

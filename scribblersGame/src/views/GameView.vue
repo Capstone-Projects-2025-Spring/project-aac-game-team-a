@@ -41,6 +41,7 @@ export default {
         };
 
         return {
+            showAllGuessedCorrectPopup: false, //determines if this popup will be shown
             playerScore: 0, // Store the current score of the player
             settingsState: null, // Intialize a variable for the settings
             selectedImagePath: "", //path to current AAC image selected
@@ -94,6 +95,14 @@ export default {
     },
 
     methods: {
+
+        //called to show pop up message
+        triggerAllGuessedCorrectPopup() {
+            this.showAllGuessedCorrectPopup = true;
+            setTimeout(() =>{
+                this.showAllGuessedCorrectPopup = false;
+            }, 4000); //4 seconds
+        },
 
         // Called to turn text into speech
         speakNow(textToSpeak) {
@@ -167,28 +176,28 @@ export default {
                 this.socketInstance.emit('join-room', this.roomCodeStr, GameState().currentUser, this.isHost);    
             }
 
-        // Listen for new drawer
-        this.socketInstance.on("update-drawer", (drawer) => {
-            this.currentDrawer = drawer; // Add this line to store the current drawer
-            
-            if (GameState().currentUser == drawer)
-                this.isDrawer = true;
-            else
-                this.isDrawer = false;   
-        })
+            // Listen for new drawer
+            this.socketInstance.on("update-drawer", (drawer) => {
+                this.currentDrawer = drawer; // Add this line to store the current drawer
+                
+                if (GameState().currentUser == drawer)
+                    this.isDrawer = true;
+                else
+                    this.isDrawer = false;   
+            })
         
-        // Listen for new lobby code
-        this.socketInstance.on("update-lobby-code", (newRoomCode) => {
-            
-            //console.log("Updating lobby code: ", newRoomCode);
-            this.roomCodeStr = newRoomCode;
+            // Listen for new lobby code
+            this.socketInstance.on("update-lobby-code", (newRoomCode) => {
+                
+                //console.log("Updating lobby code: ", newRoomCode);
+                this.roomCodeStr = newRoomCode;
 
-            // Fix: Convert string digits to numbers properly
-            this.roomCodeArr = newRoomCode.split('').map(digit => parseInt(digit, 10));
+                // Fix: Convert string digits to numbers properly
+                this.roomCodeArr = newRoomCode.split('').map(digit => parseInt(digit, 10));
 
-            // Connect user to lobby
-            this.socketInstance.emit('join-room', this.roomCodeStr, GameState().currentUser, this.isHost);
-        });
+                // Connect user to lobby
+                this.socketInstance.emit('join-room', this.roomCodeStr, GameState().currentUser, this.isHost);
+            });
 
             // Listen for player leaving
             this.socketInstance.on("remove-player", (user) => {
@@ -237,6 +246,11 @@ export default {
                     this.isDrawer = true;
                 else
                     this.isDrawer = false;   
+            })
+
+            //  Listen for "everyone guessed correct"
+            this.socketInstance.on("all-guessed-correct", (message) => {
+                this.triggerAllGuessedCorrectPopup();
             })
 
             //  Listen for update to current user
@@ -522,6 +536,11 @@ export default {
 
         <div  class="game-container">
 
+        <!-- Popup: Everyone Guessed Correctly -->
+        <div v-if="showAllGuessedCorrectPopup" class="popup-box">
+            <p>🎉🎉🎉 <br>Everyone Guessed Correctly!</p>
+        </div>
+
         <!-- Left side: Drawing canvas and button box -->
         <div class="left-container">
             <!--Display drawing prompt for drawer-->
@@ -589,6 +608,22 @@ export default {
         left: 20px;   /* moves it to the left */
 
         margin: auto;
+    }
+
+    .popup-box {
+        position: absolute;
+        top: 30%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #0044ffdd;
+        padding: 20px 40px;
+        border-radius: 15px;
+        box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.25);
+        font-size: 4em;
+        font-weight: bold;
+        text-align: center;
+        z-index: 1000;
+        color: white;
     }
 
     .settings-button:hover {
