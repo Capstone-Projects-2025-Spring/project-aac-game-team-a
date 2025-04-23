@@ -24,8 +24,7 @@ class SocketHandler{
         } catch (error) {
             console.log(error);
             return 0;
-        }
-        
+        }   
     }
 
     /**
@@ -44,64 +43,20 @@ class SocketHandler{
     }
 
     /**
-     * Start new round in specified room
-     * @param {SocketServer} server Socket.io server instance
-     * @param {Map} gameDataMap Server-side map of game data
-     * @param {number} room Socket.io room 
-     */
-    startNewRound(server, gameDataMap, room) {
-
-        console.log(`Starting new round in room ${room}...`)
-        clearGuesses(room);
-
-        console.log(gameDataMap.get(room).playerData);
-        if (gameDataMap.get(room).currentRound != 0)
-            server.to(room).emit("cast-draw-clear");
-
-        //  Increment round count and verify it is not end of round
-        gameDataMap.get(room).currentRound++
-        server.to(room).emit('update-round', gameDataMap.get(room).currentRound);
-        if (gameDataMap.get(room).currentRound > gameDataMap.get(room).numberRounds) {
-            gameDataMap.get(room).currentRound = 0
-            server.to(room).emit('end-game');
-            return;
-        }
-
-        //  Select new drawer for room and update current drawer for all users in room
-        let newDrawerSelected = false;
-        while (!newDrawerSelected) {
-            //  Randomly select player from players array
-            randomIndex = Math.floor(Math.random() * gameDataMap.get(room).players.length);
-            
-            //  Verify new drawer is not the current drawer
-            if (gameDataMap.get(room).drawer == gameDataMap.get(room).players[randomIndex])
-                console.log(`${gameDataMap.get(room).drawer} is already drawing, choosing new drawer`)
-            else {
-                //  Set as new drawer and update all users in room
-                gameDataMap.get(room).drawer = gameDataMap.get(room).players[randomIndex];
-                console.log(`${gameDataMap.get(room).drawer} chosen as drawer`)
-                server.to(room).emit('update-drawer', gameDataMap.get(room).drawer);
-                newDrawerSelected = true;
-            }
-        }
-        
-        //  Generate new prompt and update prompt for all users in room
-        gameDataMap.get(room).prompt = getPromptObject();
-        server.to(room).emit('update-prompt', gameDataMap.get(room).prompt, getPath(gameDataMap.get(room).prompt));
-
-        //  Start Round Timer
-        gameDataMap.get(room).timerValue = roundTimerLength;
-        gameDataMap.get(room).timerID = setInterval(updateTimer, 1000, room);
-        console.log(gameDataMap.get(room))
-    }
-
-    /**
      * Initialize Socket.io server listeners to manage client requests
      * @param {*} server Socket.io server instance
      * @param {*} client Socket.io client connecting to server
      * @param {*} gameDataMap Server-side map of game data
      */
     initializeServerListeners(server, client, gameDataMap) {
+
+        //  Listen for start of new game
+        client.on('start-game', (room)  => {
+        
+            console.log(`starting game in room ${room}`)
+            client.to(room).emit('start-game');
+            gameDataMap.get(room).startNewRound(server, room, gameDataMap);
+        })
 
         //  Listen for request to create new lobby
         client.on("create-new-lobby", (numRounds, maxPlayers, players, user) => {
@@ -199,6 +154,18 @@ class SocketHandler{
             }
         })
 
+        client.on("update-user-guess", (room, user, guess, imagePath) => {
+            //  update player's guess in game data map and emit to all players in room except sender
+            gameDataMap.get(room).playerData.get(user).currentGuess = guess
+            client.to(room).emit("update-user-guess", user, guess, imagePath);
+    
+            //  handle all users guessing correctly
+            if (gameDataMap.get(room).allGuessesCorrect()) {
+                clearInterval(gameDataMap.get(room).timerID);
+                gameDataMap.get(room).startNewRound(server, room, gameDataMap);
+            }
+        });
+
         client.on("draw-init", (room, x, y, draw_color, draw_width, context) => {
             client.to(room).emit("cast-draw-init", x, y, draw_color, draw_width, context);
         });
@@ -223,22 +190,6 @@ class SocketHandler{
             console.log(`(2)User ${client.id} disconnected`); // Logs when a user disconnects
         });
     }
-}
-
-//  Clears all user guesses and updates each user in the room
-function clearGuesses(room) {
-
-    gameDataMap.get(room).playerData.forEach((value, key) => {
-        
-        value.currentGuess = ''
-        io.to(room).emit("update-user-guess", key, '')
-    })
-}
-
-// Selects a random prompt object
-function getPromptObject() {
-    const randomIndex = Math.floor(Math.random() * promptList.length);
-    return promptList[randomIndex];
 }
 
 module.exports = SocketHandler;
