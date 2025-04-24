@@ -102,8 +102,18 @@ function start(event) {
     const scaleX = canvasRef.value.width / rect.width;
     const scaleY = canvasRef.value.height / rect.height;
 
-    const x = (event.clientX - rect.left) * scaleX;
-    const y = (event.clientY - rect.top) * scaleY;
+    let x = null
+    let y = null
+
+    if(event.type.includes(`touch`)) {
+        const { touches, changedTouches } = event.originalEvent ?? event;
+        const touch = touches[0] ?? changedTouches[0];
+        x = (touch.pageX - rect.left) * scaleX;
+        y = (touch.pageY - rect.top) * scaleY;
+    } else if (event.type.includes(`mouse`)) {
+        x = (event.clientX - rect.left) * scaleX;
+        y = (event.clientY - rect.top) * scaleY;
+    }
     
     emit("startDrawData", x, y, draw_color, draw_width);
 
@@ -121,8 +131,18 @@ function draw(event) {
     const scaleX = canvasRef.value.width / rect.width;
     const scaleY = canvasRef.value.height / rect.height;
 
-    const x = (event.clientX - rect.left) * scaleX;
-    const y = (event.clientY - rect.top) * scaleY;
+    let x = null
+    let y = null
+
+    if(event.type.includes(`touch`)) {
+        const { touches, changedTouches } = event.originalEvent ?? event;
+        const touch = touches[0] ?? changedTouches[0];
+        x = (touch.pageX - rect.left);
+        y = (touch.pageY - rect.top);
+    } else if (event.type.includes(`mouse`)) {
+        x = (event.clientX - rect.left) * scaleX;
+        y = (event.clientY - rect.top) * scaleY;
+    }
 
     emit("addDrawData", x, y);
 
