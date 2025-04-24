@@ -1,5 +1,5 @@
 <script setup>
-    import { onMounted } from 'vue'
+    // import { onMounted } from 'vue'
     import { SettingState } from '@/stores/SettingState'
     import { useRouter } from 'vue-router'
 

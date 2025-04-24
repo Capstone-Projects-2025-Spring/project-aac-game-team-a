@@ -26,7 +26,6 @@ export default {
         EndScreen, //register the end game screen as a componenet
     },
     data() {
-        
         //Check if roomCode is a string and split it, otherwise assume it's already an array
         let roomCodeArr = GameState().roomCode;
 
