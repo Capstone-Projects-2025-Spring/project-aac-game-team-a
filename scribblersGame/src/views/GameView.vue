@@ -26,7 +26,6 @@ export default {
         EndScreen, //register the end game screen as a componenet
     },
     data() {
-        
         //Check if roomCode is a string and split it, otherwise assume it's already an array
         let roomCodeArr = GameState().roomCode;
 
@@ -286,6 +285,11 @@ export default {
                 this.isGuessCorrect = false;
             })
 
+            // Listen for score reset (to zero)
+            this.socketInstance.on("reset-scores", ({user, score}) => {
+                this.mappedPlayerData.get(user).score = score;
+            })
+
             //  Listen for new guesses
             this.socketInstance.on("update-user-guess", ({
                 user,
@@ -521,7 +525,9 @@ export default {
         playAgain(){
             this.gameStarted = false;
             this.gameEnded = false;
-            console.log(' EMIT PLAY AGAIN ')
+            // Tells server to reset all scores
+            this.socketInstance.emit("reset-scores", this.roomCodeStr)
+            // Tells server to throw users back into the lobby to play again
             this.socketInstance.emit("play-again", this.roomCodeStr);
         },
 

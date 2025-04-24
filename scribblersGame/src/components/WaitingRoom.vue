@@ -84,7 +84,7 @@ import { onMounted } from 'vue'
 import { SettingState } from '@/stores/SettingState'
 
 //define the emit function to send events to parent
-const emit = defineEmits();
+const emit = defineEmits(['startGame', 'leaveLobby']);
 const props = defineProps(['roomCode', 'maxPlayers', 'players', 'numRounds', 'isHost', 'isHostPlaying']);
 // Define state of the settings
 const settingsState = SettingState();

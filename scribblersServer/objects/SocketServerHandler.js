@@ -160,6 +160,22 @@ class SocketHandler{
             }
         })
 
+        // Reset the scores of all players
+        client.on("reset-scores", (room) => {
+            // Get the room map
+            let roomDataMap = gameDataMap.get(room)
+            // For each user player map in the room data map, get the user's data
+            for (const [user, data] of roomDataMap.playerData.entries()) {
+                // Set their score to zero
+                data.score = 0;
+                // Broadcast that all scores are being reset
+                server.to(room).to(room).emit("reset-scores", {
+                    user,
+                    score: 0
+                });
+            }
+        });
+
         client.on("update-user-guess", (room, user, guess, imagePath, score) => {
             //  update player's guess in game data map and emit to all players in room except sender
             gameDataMap.get(room).playerData.get(user).currentGuess = guess
