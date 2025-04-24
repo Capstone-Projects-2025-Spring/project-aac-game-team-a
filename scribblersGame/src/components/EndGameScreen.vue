@@ -39,6 +39,27 @@
         emit("leaveLobby");
         router.push({ path: '/' });  
     }
+
+    // Determines if a player has a highscore based on the score provided
+    function hasHighscore(score){
+        console.log("Checking for high scores...");
+
+        // init high score
+        let highScore = 0
+        // for each player map in all player maps
+        for(const playerMap of props.playerDataMap){
+            // Get the data from each player and get the score from the data
+            if(playerMap[1].score > highScore){
+                highScore = playerMap[1].score
+            }
+        }
+        // Only return true if a player has a highscore
+        if(score == highScore){
+            return true
+        }
+
+        return false
+    }
  
 </script>
 
@@ -60,12 +81,17 @@
 
             <!-- Display all users and their score -->
             <div v-for="[player, data] of props.playerDataMap" :key="player" class="player-scores">
-                <img @click="speakNow('player '+player)" :src="player.toLowerCase() + '.png'" :alt="player" class="game-avatar-image" />
-                <!-- Display the score -->
-                <div @click="speakNow('score '+ data.score )"> 
-                    Score: {{ data.score }}
-                </div>
-                
+                <!-- Only display a crown if the player has one of the high scores -->
+                <img v-if="hasHighscore(data.score)" class="crown" src="/winnerCrown.png">
+                <!-- Main data -->
+                <div class="player-data">
+                    <!-- Display the player's avatar -->
+                    <img @click="speakNow('player '+player)" :src="player.toLowerCase() + '.png'" :alt="player" class="game-avatar-image" />
+                    <!-- Display the score -->
+                    <div @click="speakNow('score '+ data.score )"> 
+                        Score: {{ data.score }}
+                    </div>
+                </div>                
             </div>
         </div>
 
@@ -108,13 +134,28 @@
         background-color: #f9f9f9;
     }
 
+    .crown {
+        position: absolute;
+        top: 5px;      
+        left: 175px;   
+        width: 40px;
+        height: 40px;
+    }
+
     .player-scores {
+        position: relative;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .player-data{
         display: flex;
         flex-direction: row;
         align-items: center;
         width: 100%;
-        justify-content: center;     /* horizontally center the whole row */
-        gap: 20px;                   /* space between the items */
+        justify-content: center;
+        gap: 20px;   
     }
 
     .game-avatar-image {
