@@ -97,36 +97,24 @@ function saveState() {
 function start(event) {
     if (!context || !props.isDrawer) return;
 
-    const rect = canvasRef.value.getBoundingClientRect();
+    let drawCoordinates = calculateDrawCoords(event)
 
-    const scaleX = canvasRef.value.width / rect.width;
-    const scaleY = canvasRef.value.height / rect.height;
-
-    const x = (event.clientX - rect.left) * scaleX;
-    const y = (event.clientY - rect.top) * scaleY;
-    
-    emit("startDrawData", x, y, draw_color, draw_width);
+    emit("startDrawData", drawCoordinates.x, drawCoordinates.y, draw_color, draw_width);
 
     is_drawing = true;
     context.beginPath(); // Start a new path
-    context.moveTo(x, y); // Set starting point at the cursor
+    context.moveTo(drawCoordinates.x, drawCoordinates.y); // Set starting point at the cursor
 }
 
 //  Function to draw on canvas while mouse moves
 function draw(event) {
     if (!is_drawing || !context || !props.isDrawer) return;
+   
+    let drawCoordinates = calculateDrawCoords(event)
 
-    const rect = canvasRef.value.getBoundingClientRect();
+    emit("addDrawData", drawCoordinates.x, drawCoordinates.y);
 
-    const scaleX = canvasRef.value.width / rect.width;
-    const scaleY = canvasRef.value.height / rect.height;
-
-    const x = (event.clientX - rect.left) * scaleX;
-    const y = (event.clientY - rect.top) * scaleY;
-
-    emit("addDrawData", x, y);
-
-    context.lineTo(x, y);
+    context.lineTo(drawCoordinates.x, drawCoordinates.y);
     context.strokeStyle = draw_color;
     context.lineWidth = draw_width;
     context.lineCap = "round";
@@ -159,6 +147,36 @@ function undo_action() {
         context.putImageData(previousState, 0, 0);
         emit("canvasUndo", previousState);
     }
+}
+
+/**
+ * Calculate the coordinate position for mouse and touch events on drawing board
+ * @param event HTML event listener
+ * @returns coordinate object with x and y values
+ */
+function calculateDrawCoords(event){
+
+    const rect = canvasRef.value.getBoundingClientRect();
+    const scaleX = canvasRef.value.width / rect.width;
+    const scaleY = canvasRef.value.height / rect.height;
+    let coordinates = {}
+
+    //  Handle touch events
+    if(event.type.includes(`touch`)) {
+        const { touches, changedTouches } = event.originalEvent ?? event;
+        const touch = touches[0] ?? changedTouches[0];
+        coordinates = {
+            x: (touch.pageX - rect.left), 
+            y: (touch.pageY - rect.top)
+        }
+    //  Handle mouse events
+    } else if (event.type.includes(`mouse`)) {
+        coordinates = {
+            x: (event.pageX - rect.left) * scaleX, 
+            y: (event.pageY - rect.top ) * scaleY
+        }
+    }
+    return coordinates;
 }
 </script>
 

@@ -15,6 +15,7 @@ import { SettingState } from '@/stores/SettingState'
 
 const inProduction = false; //change this variable to switch between connecting to public backend server and localhost
 const socketServer =  "scribblersserver.fly.dev"; //web address for hosted websocket server
+const testServer = "localhost" //set to IP address of test server
 
 export default {
     components: {
@@ -166,7 +167,7 @@ export default {
             if (inProduction) 
                 this.socketInstance = io(socketServer);
             else 
-                this.socketInstance = io("http://localhost:3001"); // CHANGE THIS WHEN YOU WANT THE SERVER TO BE PUBLIC
+                this.socketInstance = io("http://" + testServer + ":3001"); // CHANGE THIS WHEN YOU WANT THE SERVER TO BE PUBLIC
             
             //  Create new lobby if host is connecting to socket, otherwise attempt to join specified lobby
             if (GameState().isHost) {
@@ -361,6 +362,8 @@ export default {
             // Listen for broadcasted drawing data
             this.socketInstance.on("cast-draw", (x, y) => {
                 this.context.lineTo(x, y);
+                this.context.lineCap = "round";
+                this.context.lineJoin = "round";
                 this.context.stroke();
             });
 
