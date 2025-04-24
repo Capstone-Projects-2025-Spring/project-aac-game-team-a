@@ -168,10 +168,16 @@ class GameData{
      */
     clearGuesses(server, room) {
 
+        console.log("\n\nCLEARING ALL GUESSES\n")
+
         this.playerData.forEach((value, key) => {
-            
             value.currentGuess = ''
-            server.to(room).emit("update-user-guess", key, '')
+            server.to(room).emit("update-user-guess", {
+                user: key,
+                guess: '',
+                imagePath: value.imagePath,
+                score: value.score
+            })
         })
     }
 
