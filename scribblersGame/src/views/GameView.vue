@@ -15,7 +15,7 @@ import { SettingState } from '@/stores/SettingState'
 
 const inProduction = false; //change this variable to switch between connecting to public backend server and localhost
 const socketServer =  "scribblersserver.fly.dev"; //web address for hosted websocket server
-const testServer = "192.168.1.167" //set to IP address of test server
+const testServer = "localhost" //set to IP address of test server
 
 export default {
     components: {
@@ -362,6 +362,8 @@ export default {
             // Listen for broadcasted drawing data
             this.socketInstance.on("cast-draw", (x, y) => {
                 this.context.lineTo(x, y);
+                this.context.lineCap = "round";
+                this.context.lineJoin = "round";
                 this.context.stroke();
             });
 
