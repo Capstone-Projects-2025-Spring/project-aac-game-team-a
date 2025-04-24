@@ -9,6 +9,7 @@ import AacBoard from '../components/aacBoard.vue'; //import AACBoard component
 import DrawingBoard from '../components/DrawingBoard.vue'; // import Drawing board component
 import WaitingRoom from '../components/WaitingRoom.vue'; // import Drawing board component
 import GuessBoard from "@/components/GuessBoard.vue";
+import EndScreen from "@/components/EndGameScreen.vue"
 import { GameState } from '@/stores/GameState';
 import { SettingState } from '@/stores/SettingState'
 
@@ -21,6 +22,7 @@ export default {
         DrawingBoard, //register drawing board as a component
         WaitingRoom, //register waiting room as a component
         GuessBoard, //register the drawing board as a component
+        EndScreen, //register the end game screen as a componenet
     },
     data() {
         
@@ -69,6 +71,7 @@ export default {
             roomCodeArr: roomCodeArr, // Now roomCodeArr is correctly assigned here
             roomCodeStr: roomCodeArr.join(''),
             gameStarted: false,
+            gameEnded: false,
             AACboardDisabled: false, // Changed when the user incorrectly guesses
             AACboardDisabledDuration: 5000, // Amount of time for board to be disabled (1 sec = 1000 int)
             AACboardDisableTimer: 5,
@@ -306,13 +309,23 @@ export default {
             this.socketInstance.on("start-game", () => {
 
                 this.gameStarted = true;
+                this.gameEnded = false;
             })
 
             //  Listen for end of game
             this.socketInstance.on("end-game", () => {
 
                 this.gameStarted = false;
+                this.gameEnded = true;
                 this.currentRound = 0;
+            })
+
+            //  Listen for host to play game again
+            this.socketInstance.on("play-again", () => {
+                console.log(' ON PLAY AGAIN ')
+
+                this.gameStarted = false;
+                this.gameEnded = false;
             })
 
             // Listen for the player count from the server
@@ -497,7 +510,16 @@ export default {
         startGame() {
             //console.log("Starting game");
             this.gameStarted = true;
+            this.gameEnded = false;
             this.socketInstance.emit("start-game", this.roomCodeStr);
+        },
+
+        // Handles sending users to lobby when they want to play again from the end game screen
+        playAgain(){
+            this.gameStarted = false;
+            this.gameEnded = false;
+            console.log(' EMIT PLAY AGAIN ')
+            this.socketInstance.emit("play-again", this.roomCodeStr);
         },
 
         //  Handles request to leave lobby
@@ -515,7 +537,7 @@ export default {
 
 <template>
     <!--Display waiting room in between games-->
-    <div v-if="!gameStarted" class="waiting-room">
+    <div v-if="!gameStarted && !gameEnded" class="waiting-room">
         <WaitingRoom
             @startGame="startGame"
             @leaveLobby="leaveLobby"
@@ -529,7 +551,7 @@ export default {
     </div>
 
     <!--Display game while started-->
-    <div v-if="gameStarted"> 
+    <div v-if="gameStarted && !gameEnded"> 
 
         <!-- Top info -->
         <div class="top-info">
@@ -610,6 +632,17 @@ export default {
                 </GuessBoard>
             </div>
         </div>
+    </div>
+
+    <!-- Display end screen if game ended -->
+    <div v-if="gameEnded && !gameStarted">
+        <EndScreen
+        @playAgain="playAgain"
+        @leaveLobby="leaveLobby"
+        :isHost="isHost"
+        :playerDataMap=this.mappedPlayerData
+        >
+        </EndScreen>
     </div>
 </template>
 
