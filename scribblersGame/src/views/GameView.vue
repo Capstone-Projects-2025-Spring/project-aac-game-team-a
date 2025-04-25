@@ -1,21 +1,22 @@
 <script>
 /**
- * This file handles the view for all game components. 
- * Host and Join Lobby point to this file.
- * WaitingRoom, AACboard, DrawingBoard, and GuessBoard are children of this component.
+ * Main file for game view. Waiting room and all game components render here based on game status
  */
-import io from "socket.io-client"; // Import the socket.io-client library to enable WebSocket communication
-import AacBoard from '../components/aacBoard.vue'; //import AACBoard component
-import DrawingBoard from '../components/DrawingBoard.vue'; // import Drawing board component
-import WaitingRoom from '../components/WaitingRoom.vue'; // import Drawing board component
+//  IMPORTING
+import AacBoard from '../components/aacBoard.vue';
+import DrawingBoard from '../components/DrawingBoard.vue';
+import WaitingRoom from '../components/WaitingRoom.vue';
 import GuessBoard from "@/components/GuessBoard.vue";
-import EndScreen from "@/components/EndGameScreen.vue"
+import EndScreen from "@/components/EndGameScreen.vue";
+import SocketClientHandler from "../objects/SocketClientHandler.js";
 import { GameState } from '@/stores/GameState';
 import { SettingState } from '@/stores/SettingState'
 
+//  GAME SETTINGS
 const inProduction = false; //change this variable to switch between connecting to public backend server and localhost
 const socketServer =  "scribblersserver.fly.dev"; //web address for hosted websocket server
 const testServer = "localhost" //set to IP address of test server
+const SocketHandler = new SocketClientHandler;
 
 export default {
     components: {
@@ -146,32 +147,17 @@ export default {
 
         // Connect to the server
         serverConnect(){
-
-            // Establish connection to the WebSocket server
-            if (inProduction) 
-                this.socketInstance = io(socketServer);
-            else 
-                this.socketInstance = io("http://" + testServer + ":3001"); // CHANGE THIS WHEN YOU WANT THE SERVER TO BE PUBLIC
             
-            //  Create new lobby if host is connecting to socket, otherwise attempt to join specified lobby
-            if (this.isHost) {
-                
-                //  Create new lobby, if host is not playing send null for user to add to player data
-                if (this.isHostPlaying) {
-                    this.players.push(GameState().currentUser)
-                    this.mappedPlayerData.set(GameState().currentUser, {
-                        currentGuess: "",
-                        currentGuessImagePath: "",
-                        score: 0
-                    })
-                    this.socketInstance.emit("create-new-lobby", this.numRounds, this.maxPlayers, this.players, GameState().currentUser);
-                }
-                else
-                    this.socketInstance.emit("create-new-lobby", this.numRounds, this.maxPlayers, this.players, null);
-            }
-            else {
+            //  Connect to socket server
+            this.socketInstance = SocketHandler.initSocketConnection(socketServer, testServer, inProduction);
+
+            //  Create or join lobby
+            if (this.isHost)
+                SocketHandler.createLobby(this.socketInstance, GameState().currentUser, this.isHostPlaying, this.players, this.mappedPlayerData, this.numRounds, this.maxPlayers);
+            else 
                 this.socketInstance.emit('join-room', this.roomCodeStr, GameState().currentUser, this.isHost);    
-            }
+
+            //  Initialize socket listeners
 
             // Listen for new drawer
             this.socketInstance.on("update-drawer", (drawer) => {
