@@ -35,31 +35,33 @@
         </div>
 
         <!-- Game status info -->
-        <h1 @click="speakNow(props.time + ' seconds left')">
-           Timer: {{ props.time }}
-        </h1>
-        <h1 @click="speakNow('Round '+props.currentRound+' out of '+ props.totalRounds)">
+        <div @click="speakNow(props.time + ' seconds left')" class="timer-section">
+           ⏳ Timer: {{ props.time }}
+        </div>
+        <div @click="speakNow('Round '+props.currentRound+' out of '+ props.totalRounds)" class="rounds-section">
             Round: {{ props.currentRound }} / {{ props.totalRounds }}
-        </h1>
+        </div>
         
         <!-- Player guesses -->
         <div v-for="[player, data] of props.playerDataMap" :key="player" class="chat-guess">
-            <img @click="speakNow('player '+player)" :src="player.toLowerCase() + '.png'" :alt="player" class="game-avatar-image" />
-            <h1>
-                <div @click="speakNow(data.currentGuess)">
-                    {{data.currentGuess}}
-                    <img 
-                        v-if="data.currentGuessImagePath" 
-                        :src="data.currentGuessImagePath" 
-                        alt="guess icon" 
-                        class="guess-icon-image"
-                    />
-                </div>
-            </h1>
-            <div v-if="player === props.currentDrawer" @click="speakNow('player '+player+ ' is drawing')" class="drawer-indicator">Drawer ✏️</div>
-
             <!-- Display the score -->
             Score: {{ data.score }}
+
+            <div class="player-data">
+                <img @click="speakNow('player '+player)" :src="player.toLowerCase() + '.png'" :alt="player" class="game-avatar-image" />
+                <h1 v-if="player != props.currentDrawer">
+                    <div @click="speakNow(data.currentGuess)">
+                        {{data.currentGuess}}
+                        <img 
+                            v-if="data.currentGuessImagePath" 
+                            :src="data.currentGuessImagePath" 
+                            alt="guess icon" 
+                            class="guess-icon-image"
+                        />
+                    </div>
+                </h1>
+                <div v-if="player === props.currentDrawer" @click="speakNow('player '+player+ ' is drawing')" class="drawer-indicator">Drawer ✏️</div>
+            </div>
         </div>
     </div>
 </template>
@@ -72,19 +74,24 @@
         border: 5px solid black;
         border-radius: 25px;
         resize: none;
-        width: 300px; /* Made slightly wider to accommodate room code */
+        width: 300px;
 
         height: auto;
-        min-height: 150px;
+        min-height: 320px;
         max-height: 80vh;
-        overflow-y: auto;
 
         display: flex;
         flex-direction: column;
-        align-items: flex-start;
+        align-items: center;
         justify-content: center;
         text-align: center;
         padding: 10px;
+        gap: 10px;
+
+        z-index: 10;
+
+        font-weight: bold;
+        font-family: 'Segoe UI', sans-serif;
     }
 
     .room-code-section {
@@ -102,7 +109,6 @@
 
     .room-code-label {
         font-weight: bold;
-        margin-bottom: 5px;
         font-family: 'Segoe UI', sans-serif;
     }
 
@@ -118,10 +124,31 @@
         object-fit: contain;
     }
 
+    .timer-section{
+        font-size: 40px;
+    }
+
+    .rounds-section{
+        font-size: 40px;
+    }
+
     .chat-guess {
+        border: 3px solid rgb(0, 0, 0);
+        border-radius: 25px;
+        font-weight: bold;
+        font-family: 'Segoe UI', sans-serif;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        padding: 3px;
+    }
+
+    .player-data{
         display: flex;
         flex-direction: row;
         width: 100%;
+        align-items: center;
+        gap: 3px;
     }
 
     .game-avatar-image {
@@ -152,9 +179,9 @@
         padding-right: 1rem;
     }
     .drawer-indicator {
-    font-size: 1.8rem; /* Increase the font size to make the pencil bigger */
-    margin-right: auto; /* Push it to the right side */
-    padding-right: 1rem; /* Add some padding */
-    font-weight: bold;
-}
+        font-size: 1.8rem; /* Increase the font size to make the pencil bigger */
+        margin-right: auto; /* Push it to the right side */
+        padding-right: 1rem; /* Add some padding */
+        font-weight: bold;
+    }
 </style>
