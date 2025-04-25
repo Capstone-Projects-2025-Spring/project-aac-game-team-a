@@ -34,28 +34,13 @@ export default {
         else if (Array.isArray(roomCodeArr))
             roomCodeArr = roomCodeArr.map(Number);
         
-        let currentUserMessage = { // Holds all the user message info being sent back and forth between client and server
-            id: 0,
-            avatar: GameState().currentUserAvatar,
-            user: GameState().currentUser,
-            text: "",
-            imagePath: ""
-        };
-
         return {
             showTimeRanOutPopup: false, //determines if this popup will be shown
             showAllGuessedCorrectPopup: false, //determines if this popup will be shown
             playerScore: 0, // Store the current score of the player
             settingsState: null, // Intialize a variable for the settings
-            selectedImagePath: "", //path to current AAC image selected
-            currentUser: GameState().currentUser,
-            currentUserAvatar: GameState().currentUserAvatar,
-            currentUserMessage,
             currentDrawer: "",
             isGuessCorrect: false, //tracks if current user has guessed correctly
-            messageBoard: [
-                currentUserMessage
-            ], // Array to store all received users in message board
             mappedPlayerData: new Map(), //tracks the current guesses submitted by all players 
             isDrawer: false, //track if user is the drawer
             isHost: GameState().isHost,
@@ -169,17 +154,17 @@ export default {
                 this.socketInstance = io("http://" + testServer + ":3001"); // CHANGE THIS WHEN YOU WANT THE SERVER TO BE PUBLIC
             
             //  Create new lobby if host is connecting to socket, otherwise attempt to join specified lobby
-            if (GameState().isHost) {
+            if (this.isHost) {
                 
                 //  Create new lobby, if host is not playing send null for user to add to player data
-                if (GameState().isHostPlaying) {
+                if (this.isHostPlaying) {
                     this.players.push(GameState().currentUser)
                     this.mappedPlayerData.set(GameState().currentUser, {
                         currentGuess: "",
                         currentGuessImagePath: "",
                         score: 0
                     })
-                    this.socketInstance.emit("create-new-lobby", this.numRounds, this.maxPlayers, this.players, this.currentUser);
+                    this.socketInstance.emit("create-new-lobby", this.numRounds, this.maxPlayers, this.players, GameState().currentUser);
                 }
                 else
                     this.socketInstance.emit("create-new-lobby", this.numRounds, this.maxPlayers, this.players, null);
@@ -344,14 +329,6 @@ export default {
                 for(let i=0; i<data.length; i++){
                     console.log("user: " + data[i].user);
                 }
-                // Re-assign the message board
-                this.messageBoard = data;
-            });
-
-            // NOT BEING USED
-            // Listen for incoming messages from the server and update messages array
-            this.socketInstance.on("message:received", (data) => {
-                this.messageBoard = this.messageBoard.concat(data); // Append received message to messages array
             });
             
             // Listen for broadcasted initial drawing data
@@ -419,10 +396,8 @@ export default {
             // Only allow the action if the AAC board is not disabled
             if(!this.AACboardDisabled){
                 console.log('Item selected:', item); //logs selected item
-                this.currentUserMessage.text = item; //stores aac button selected by user
-                this.currentUserMessage.imagePath = imagePath;
-                this.mappedPlayerData.get(this.currentUser).currentGuess = item;
-                this.mappedPlayerData.get(this.currentUser).currentGuessImagePath = imagePath;
+                this.mappedPlayerData.get(GameState().currentUser).currentGuess = item;
+                this.mappedPlayerData.get(GameState().currentUser).currentGuessImagePath = imagePath;
 
                 //If the user guesses the prompt correctly, display and emit to other sockets
                 // else, disable the AAC board for 'AACboardDisabledDuration' amount of time
@@ -438,11 +413,11 @@ export default {
                             Current score = 18
                     */
                     this.playerScore += Math.floor(this.roundTimer/10)
-                    this.mappedPlayerData.get(this.currentUser).score = this.playerScore
+                    this.mappedPlayerData.get(GameState().currentUser).score = this.playerScore
 
                     console.log(`You guessed correctly!`)
-                    this.mappedPlayerData.get(this.currentUser).currentGuess = "Correct!";
-                    this.mappedPlayerData.get(this.currentUser).currentGuessImagePath = '\correct.png';
+                    this.mappedPlayerData.get(GameState().currentUser).currentGuess = "Correct!";
+                    this.mappedPlayerData.get(GameState().currentUser).currentGuessImagePath = '\correct.png';
                     this.isGuessCorrect = true;
                 } else {
                     // Disable the AAC board
@@ -468,10 +443,10 @@ export default {
 
                 this.socketInstance.emit('update-user-guess', 
                     this.roomCodeStr, 
-                    this.currentUser, 
-                    this.mappedPlayerData.get(this.currentUser).currentGuess,
-                    this.mappedPlayerData.get(this.currentUser).currentGuessImagePath,
-                    this.mappedPlayerData.get(this.currentUser).score
+                    GameState().currentUser, 
+                    this.mappedPlayerData.get(GameState().currentUser).currentGuess,
+                    this.mappedPlayerData.get(GameState().currentUser).currentGuessImagePath,
+                    this.mappedPlayerData.get(GameState().currentUser).score
                 )
             } else {
                 // Let the user know the guess board is disabled
@@ -622,12 +597,8 @@ export default {
         </div>
 
             <div class="right-container">
-            <!--  Remove after testing timer
-            <h2 @click="speakNow(roundTimer + 'seconds left')">Timer: {{ roundTimer }}</h2>
-            -->
                 <!-- Assign the messageBoard in this class to the messageBoard in the MessageBoard component -->
                 <GuessBoard 
-                    :guesses=this.messageBoard
                     :playerDataMap=this.mappedPlayerData
                     :time="roundTimer"
                     :currentRound="currentRound"
