@@ -598,6 +598,10 @@ export default {
                 <h2>DRAW: {{ promptWord }}</h2>
                 <img class='prompt-image' :src=promptImgPath :alt=promptWord >
             </div>
+            <!--You are guessing for guesser-->
+            <div v-if="!isDrawer" class="guess-indicator" @click="speakNow('You are guessing')">
+                <h2>Guess the Drawing!</h2>
+            </div>
 
             <!-- Display Drawing board -->
             <div class="drawing-box">
@@ -763,6 +767,21 @@ export default {
 
     .draw-prompt {
         background-color: #ffcc00; /* Light yellow background */
+        border-radius: 25px;
+        margin: auto;
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        font-size: 24px;
+        font-weight: bold;
+        font-family: 'Segoe UI', sans-serif;
+        max-width: fit-content;
+        margin-bottom: 20px; /* Space between prompt and drawing area */
+        gap: 20px; /* Space between flex items */
+    }
+
+    .guess-indicator {
+        background-color: #d9aaff; /* Light yellow background */
         border-radius: 25px;
         margin: auto;
         display: flex;
