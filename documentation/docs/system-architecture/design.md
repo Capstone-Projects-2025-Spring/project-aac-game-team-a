@@ -1,68 +1,454 @@
 ## Component Descriptions
 
-### Frontend (Client-Side) Vue Components:
+### Frontend (Client-Side) Vue/Socket.io-Client/Pinia:
 
-**AACBoard.vue**
-This Vue component is used in GameView.vue. It functions as an AAC board that contains all the possible prompt words and their icons within categories (animals, food, clothing, actions, shapes). The component emits the item selected by the user as well as the path to the file for its icon. Text to speech is also integrated in this component using Speech Synthesis.
+#### 1. Main
+The Main class is responsible for initializing and setting up the core functionality of the application. It creates the App instance, integrates the Pinia state management, and sets up the Router to handle routing between views. It also mounts the application to the DOM.
 
-**DrawingBoard.vue**
-This component is used in GameView.vue and it is responsible for creating a drawing canvas that is shared between users during the game. This component sends out stroke data, allows canvas clearning, allows stroke undo action, keeps track of stroke history in a stack, hides drawing tools for guessers and uses text to speech to narrate drawing tool changes.
+#### 2. Pinia
+Pinia is a state management system used to store and manage the application's state. It works similarly to Vuex but is a more modern and simplified alternative for state management in Vue.js applications.
 
-**GuessBoard.vue**
-This component is ued in GameView.vue and it represents a box with designated positions for each joined player's avatar as well as their most recent guess displayed next to their avatar in text and icon form.
+#### 3. App
+The App class serves as the root of the application. It contains important child components such as RouterView, which handles the routing of views, SettingState, which holds the application's settings, and SettingsOverlay, which provides a UI for overlay settings adjustments.
 
-**HomeViewContent.vue**
-This componenet contains the styling, text, and buttons visible in the HomeView. The component is used in the HomeView.vue file, which is the landing page of Scribbers.
+#### 4. defineStore
+defineStore is used for defining stores in the Pinia state management system. A store holds the state and actions used to manage it across different components in the application.
 
-**SettingsOverlay.vue**
-This component is used in HomeView, and it encompasses a settings menu that contains a toggle for TTS, a TTS volume slider, and a background opacity slider. It also narrates settings changes with text to speech.
+#### 5. RouterLink
+RouterLink is a component used to create links between different routes in the application. It allows navigation from one view to another when clicked.
 
-**WaitingRoom.vue**
-This component is utilized in GameView. It functions as a dashboard to show the room code, joined players, player count, as well as start game and leave lobby buttons. It requires at least two joined players before the host can press Start Game. Once players join the game, they will be presented with this screen until the game starts.
+#### 6. RouterView
+RouterView is a placeholder component that renders the view corresponding to the current route. It is part of the Vue Router, which handles navigation between different components/views in the app.
+
+#### 7. SettingState
+The SettingState class holds various user settings such as whether text-to-speech (TTS) is enabled, the opacity of the background, and the path to TTS images. It also includes methods to modify these settings, such as adjusting TTS volume or background opacity, and toggling the settings overlay.
+
+#### 8. GameState
+GameState manages the state of the game, such as player data (e.g., user, avatar, room code), game rules (e.g., rounds, max players), and the game’s progression (e.g., host status, game state).
+
+#### 9. SettingsOverlay
+The SettingsOverlay class provides a UI overlay for adjusting game settings like TTS. It allows the user to change settings and control the volume and opacity of TTS. It also includes functionality for text-to-speech conversion.
+
+#### 10. Router
+Router handles the routing between different views in the application. It defines routes to the HomeView, GameView, HostLobbyView, and JoinLobbyView components, each corresponding to different parts of the app.
+
+#### 11. HomeView
+HomeView is the main entry point or home page of the application. It displays initial content and provides navigation to other views.
+
+#### 12. GameView
+GameView is the main game interface, where players interact with each other. It includes methods for triggering popups, handling game mechanics (e.g., drawing, guessing), and communicating with the server.
+
+#### 13. aacBoard
+The aacBoard is a communication tool for users with special needs. It allows users to select items and categories, and it provides a text-to-speech function to speak the selected item.
+
+#### 14. DrawingBoard
+The DrawingBoard provides the functionality for users to draw on a canvas. It includes methods for starting, drawing, and stopping the drawing process, as well as undoing and clearing the canvas.
+
+#### 15. WaitingRoom
+WaitingRoom is the lobby area before the game starts. It provides the functionality for players to wait, view the game’s shape images, and either start or leave the game.
+
+#### 16. GuessBoard
+The GuessBoard is the section where players can make guesses during the game. It manages the current round, time, and player data, and communicates with the game state.
+
+#### 17. EndGameScreen
+EndGameScreen shows the final results after the game ends. It provides options to play again or leave the game and checks if a player has achieved a high score.
+
+#### 18. HostLobbyView
+HostLobbyView allows the host to manage game settings such as the number of players, round count, and avatar selection. The host can also start the game from here.
+
+#### 19. JoinLobbyView
+JoinLobbyView is for players joining an existing lobby. It allows players to select their avatar and shape, and it provides the option to join the game.
+
+#### 20. HomeViewContent
+HomeViewContent contains the content displayed on the home page. It handles user interaction, such as clicking on text to navigate to different routes.
+
+#### 21. SpeechSynthesis
+SpeechSynthesis is used to convert text to speech, providing accessibility features like TTS for the application.
 
 
-**GameRoom**  
-The GameRoom class contains elements that pertain to management of game sessions, including players, game rounds, and prompt information. It is the core game logic and controls the flow of the game such as which players are drawing, which players are guessing, the transitions between rounds, and starting and ending the game. It will handle prompts ensuring that none are repeated, and provides references to images pertaining to the prompts. This class also handles server-side functionality but for organization it is under client-side.
+### Backend (Server-Side) Socket.io/Express/Node:
 
-**Player**  
-This class is used to represent individual users who will be playing the game. It will store a player’s details and score pertaining to the game session.
+#### 22. Server
+The Server class manages the server initialization, starting the server, and handling server requests. It is responsible for hosting the game.
 
-**DrawingCanvas**  
-This class handles drawing functionality such as the canvas to draw on, the tools to draw with, and the stroke/color to draw with. It gathers the data from the drawer so it can be sent to the interfaces of the other players. 
+#### 23. SocketServerHandler
+SocketServerHandler listens for socket events and manages communication between the server and clients. It handles setting up the server, client connection, and managing game data over WebSockets.
 
-**ReferenceImageProvider**  
-When a prompt word is displayed to a drawer, it will be accompanied by a reference image icon to assist the drawer to assist players who are unable to read the prompt. This class will aid in storing and presenting the image to the current drawer and only to the current drawer. There will be multiple reference images per prompt to discourage the same drawing being done each time. 
+#### 24. SocketServer
+SocketServer is responsible for managing the socket server instance and handling communication with clients.
 
-**GuessMessage**  
-Players guesses are handled by this class. It is used to broadcast AAC symbols that a player selects to other player interfaces and also to determine the correct guess for a prompt.
+#### 25. ExpressApp
+ExpressApp is responsible for setting up the Express application, typically used for building REST APIs in Node.js.
 
-**GameSettings**  
-This class is used to provide game sessions with rules and configurations such as how much time per round, how many players can join, and if AAC controls are enabled or not.
+#### 26. HttpServer
+HttpServer is used for handling HTTP requests, typically through the Express application, to interact with clients.
 
-**AACBoard**  
-This class manages AAC board integration. We will be creating our own AAC Board and store symbols in this class to be referenced all througout the project. 
-
-**AACSymbol**  
-This class is used to represent symbols to include in our AAC Board with information such as an ID, a label, category, and image. 
-
-### Backend (Server-Side):
-
-**GameSession**  
-This class uses the attributes from the GameRoom class and starts the game. GameSession handles the functionality of game session initiation, progression, and termination. It keeps track of current players in session, rounds completed, and then determines the winning player at the end. 
-
-**DataDrawing**  
-This class is fed by the GameSession class and records the data from drawings made by an individual user.
-
-**StrokeData**  
-The class is used to represent an individual stroke of a drawing, and stores the coordinates, color, and size.
-
-**SocketHandler**  
-This class manages WebSocket integration so that players can interact in real-time. It will handle client-server communication such ad connections, disconnections, drawing and chat events, and round starting or stopping.
+#### 27. GameData
+GameData manages the data specific to the game session, such as player data, game rounds, prompts, and timer. It includes methods for updating the game state, starting new rounds, and checking if all guesses are correct.
 
 ## Class Diagram
 
-<img width="1056" alt="Screenshot 2025-02-22 at 12 23 14 PM" src="https://github.com/user-attachments/assets/8fdaae25-4a33-41b9-982f-71ecc77377da" />
-<img width="1057" alt="Screenshot 2025-02-22 at 12 23 38 PM" src="https://github.com/user-attachments/assets/8601dc7f-ba64-44ad-bb11-e15d2d6d79ed" />
+```mermaid
+classDiagram
+   class Main {
+       +createApp(App)
+       +use(Pinia)
+       +use(Router)
+       +mount()
+   }
+   class Pinia {
+   }
+   class App {
+       +RouterView
+       +SettingState
+       +SettingsOverlay
+   }
+   class defineStore {
+   }
+   class RouterLink {
+   }
+   class RouterView {
+   }
+   class SettingState {
+       -showSettings: boolean
+       -enableTTS: boolean
+       -pathToTTSimg: string
+       -backgroundOpacity: number
+
+
+       +setModeTTS(enableTTS: boolean) void
+       +setVolumeTTS(newVolume: number) void
+       +setBackgroundOpacity(value: number) void
+       +toggleSettings() void
+   }
+   class GameState{
+       +setGameState(user: string, avatar: string, code: number, isHost: boolean, maxPlayers: number, rounds: number, isHostPlaying: boolean)
+   }
+   class SettingsOverlay {
+       +toggleTTS() void
+       +updateVolume(e) void
+       +updateOpacity(e) void
+       +speakNow(textToSpeak: string) void
+       +close() void
+   }
+   class Router {
+       +HomeView
+       +GameView
+       +HostLobbyView
+       +JoinLobbyView
+   }
+   class HomeView {
+       +HomeViewContent
+   }
+   class GameView {
+       +triggerAllGuessedCorrectPopup() void
+       +triggerTimeRanOutPopup() void
+       +speakNow(textToSpeak: string) void
+       +speakRoomCode() void
+       +getShapeImage(digit: number) string
+       +getShapeLabel(digit: number) string
+       +serverConnect() void
+       +serverDisconnect() void
+       +handleItemSelected(item: string, imagePath: string) void
+       +sendDrawDataInit(x: number, y: number, draw_color: string, draw_width: number) void
+       +sendDrawData(x: number, y: number) void
+       +sendDrawDataEnd() void
+       +sendDrawDataClear() void
+       +sendDrawDataUndo() void
+       +sendTimerStart(length: number) void
+       +startGame() void
+       +playAgain() void
+       +leaveLobby() void
+       -roomCodeArr: number
+       -currentUserMessage: object
+       -showTimeRanOutPopup: boolean
+       -showAllGuessedCorrectPopup: boolean
+       -playerScore: number
+       -settingState: boolean
+       -selectedImagePath: string
+       -currentUser: string
+       -currentUserAvatar: string
+       -currentUserMessage: string
+       -currentDrawer: string
+       -isGuessCorrect: boolean
+       -messageBoard: object[]
+       -mappedPlayerData: Map
+       -isDrawer: boolean
+       -isHost: boolean
+       -isHostPlaying: boolean
+       -promptWord: string
+       -promptImgPath: string
+       -context: canvas
+       -numRounds: number
+       -currentRound: number
+       -maxPlayers: number
+       -players: string[]
+       -roundTimer: number
+       -roomCodeArr: number[]
+       -roomCodeStr: string
+       -gameStarted: boolean
+       -gameEnded: boolean
+       -AACboardDisabled: boolean
+       -AACboardDisabledDuration: number
+       -AACboardDisableTimer: number
+       -AACButtons:
+       -roomCodeShapes:
+   }
+   class aacBoard {
+       +selectItem(item: string) void
+       +speakNow(textToSpeak: string) void
+       +setCurrentCategory(category: string|null) void
+       +getCategoryImage(category: string) string
+       +getItemImage(category: string, item: string) string
+
+
+       -currentCategory: string
+       -categories: object
+       -categoryList: string[]
+       -settingsState: SettingState
+       -emit: function
+       -props: [ disabled: boolean, timeDisabled: number ]
+   }
+   class DrawingBoard {
+       +clear_canvas() void
+       +undo_action() void
+       +speakNow(textToSpeak: string) void
+       +saveState() void
+       +start(event: Event) void
+       +draw(event: Event) void
+       +stop(event: Event) void
+       +calculateDrawCoords(event: Event) ( x: number, y: number )
+      
+       -canvasRef: HTMLElement|null
+       -context: CanvasRenderingContext2D|null
+       -undoHistory: any[]
+       -draw_color: string
+       -is_drawing: boolean
+       -draw_width: number
+       -start_background_color: string
+       -props: [ isDrawer: boolean ]
+   }
+   class WaitingRoom {
+       +speakNow(textToSpeak: string) void
+       +speakRoomCode() void
+       +getShapeImg(digit: number) string
+       +showNotEnoughPlayersAlert() void
+       +startGame() void
+       +leaveLobby() void
+
+
+       -props: [ roomCode: string[], maxPlayers: number, players: string[], numRounds: number, isHost: boolean, isHostPlaying: boolean ]
+       -settingsState: object
+       -shapes: [ value: number, imgSrc: string, shape: string ]
+   }
+
+
+   class GuessBoard {
+       +speakNow(textToSpeak: string) void
+       -props: [
+           playerDataMap: Map<String, [ score: number, currentGuess: string, currentGuessImagePath: string ]>,
+           time: number,
+           currentRound: number,
+           totalRounds: number,
+           roomCodeArr: number[],
+           getShapeImage: function,
+           getShapeLabel: function,
+           speakRoomCode: function,
+           currentDrawer: string
+       ]
+   }
+
+
+   class EndGameScreen {
+       +speakNow(textToSpeak: string) void
+       +playAgain() void
+       +leaveLobby() void
+       +hasHighscore(score: number) bool
+       -props: [
+           isHost: boolean,
+           playerDataMap: Map<String, [ score: number ]>
+       ]
+   }
+
+
+   class HostLobbyView {
+       +speakNow(textToSpeak: string) void
+       +validatePlayerCount() void
+       +validateRoundCount() void
+       +toggleAvatars(show: boolean) void
+       +selectAvatar(button) void
+       +launchRoom() void
+       -userGameState: GameState
+       -settingsState: SettingState
+       -maxPlayers: number
+       -rounds: number
+       -randomCodeDigits: number[]
+       -currentUser: string
+       -currentUserAvatar: string
+       -showAvatars: boolean
+       -isHostPlaying: boolean
+       -randomCodeString: string
+       -avatarButtons: string
+   }
+   class JoinLobbyView {
+       +speakNow(textToSpeak: string) void
+       +showNoAvatarSelectedAlert() void
+       +selectShape(shape) void
+       +undoShape() void
+       +clearShapes() void
+       +selectAvatar(button) void
+       +joinLobby() void
+       -userGameState: GameState
+       -settingsState: SettingState
+       -selectedShapes: string[]|null
+       -shapes: string[]
+       -roomCodeArr: number[]
+       -currentUser: string
+       -currentUserAvatar: string
+       -avatarButtons: string[]
+   }
+   class HomeViewContent {
+       +speakNow(textToSpeak: string) void
+       +handleClick(text: string, route: string) void
+   }
+   class SpeechSynthesis {
+   }
+
+
+   Main --> App : uses
+   Main --> Router : uses
+   Main --> Pinia : uses
+
+
+   App --> RouterView : uses
+   App --> SettingState : uses
+   App --> SettingsOverlay : uses
+
+
+   SettingsOverlay --> SettingState : uses
+   SettingState --|> defineStore : based on
+   GameState --|> defineState: based on
+
+
+   RouterView --> Router : depends on
+   RouterLink --> RouterView : depends on
+
+
+   Router --> HomeView : route to
+   Router --> GameView : route to
+   Router --> HostLobbyView : route to
+   Router --> JoinLobbyView : route to
+
+
+   HomeView --> HomeViewContent : uses
+
+
+   HomeViewContent --> SettingState : uses
+   HomeViewContent --> Router : navigates with
+   HomeViewContent --> SpeechSynthesis : uses
+
+
+   HostLobbyView --> GameState : uses
+   HostLobbyView --> SettingState : uses
+   HostLobbyView --> SpeechSynthesis : uses
+   HostLobbyView --> RouterLink : navigates with
+
+
+   JoinLobbyView --> GameState : uses
+   JoinLobbyView --> SettingState : uses
+   JoinLobbyView --> SpeechSynthesis : uses
+   JoinLobbyView --> RouterLink : navigates with
+
+
+   GameView --> aacBoard : uses
+   GameView --> DrawingBoard : uses
+   GameView --> WaitingRoom : uses
+   GameView --> GuessBoard : uses
+   GameView --> EndGameScreen : uses
+   GameView --> GameState : uses
+   GameView --> SettingState : uses
+
+
+   aacBoard --> SettingState : uses
+   
+   DrawingBoard --> SettingState : uses
+
+
+   WaitingRoom --> SettingState : uses
+   WaitingRoom --> RouterLink : uses
+   DrawingBoard --> SettingState : uses
+
+
+   GuessBoard --> SettingState : uses
+
+
+   EndGameScreen --> SettingState : uses
+   EndGameScreen --> Router : uses
+
+
+class Server {
+       +initialize() void
+       +startServer() void
+   }
+
+
+   class SocketServerHandler {
+       +initializeServerListeners(io: SocketIO.Server, socket: SocketIO.Socket, mappedGameData: Map) void
+       +startServer(server: http.Server, port: number) void
+   }
+
+
+   class SocketServer {
+   }
+
+
+   class ExpressApp {
+   }
+
+
+   class HttpServer {
+   }
+
+
+   class SocketServerHandler {
+       +createServerInstance(httpServer: http.Server) SocketIO.Server
+       +startServer(httpServer: http.Server, port: number) void
+       +initializeServerListeners(server: SocketIO.Server, client: SocketIO.Socket, gameDataMap: Map) void
+   }
+
+
+    class GameData {
+       +numberRounds
+       +currentRound
+       +maxPlayers
+       +players
+       +prompt
+       +drawer
+       +timerID
+       +timerValue
+       +playerData
+       +startNewRound(server, room, gameDataMap)
+       +getPromptObject()
+       +getPath(promptObject)
+       +clearGuesses(server, room)
+       +allGuessesCorrect()
+       +updateTimer(server, room, gameDataMap)
+   }
+
+   ExpressApp --> Server : uses
+   HttpServer --> Server : uses
+   SocketServerHandler --> Server : listens to socket events
+   SocketServer --> SocketServerHandler : manages server instance
+   SocketServerHandler --> MappedGameData : manages game state
+   SocketServerHandler --> GameData : uses
+   SocketServerHandler --> SocketIO.Server : creates
+   SocketServerHandler --> SocketIO.Socket : listens to
+   SocketServerHandler --> gameDataMap : uses
+
+
+   GameView --> Server : sends requests to
+   Server --> GameView : sends responses or emits events
+```
 
 ## Sequence Diagrams
 
