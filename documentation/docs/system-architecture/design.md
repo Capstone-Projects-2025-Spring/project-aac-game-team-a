@@ -1,6 +1,25 @@
 ## Component Descriptions
 
-### Frontend (Client-Side):
+### Frontend (Client-Side) Vue Components:
+
+**AACBoard.vue**
+This Vue component is used in GameView.vue. It functions as an AAC board that contains all the possible prompt words and their icons within categories (animals, food, clothing, actions, shapes). The component emits the item selected by the user as well as the path to the file for its icon. Text to speech is also integrated in this component using Speech Synthesis.
+
+**DrawingBoard.vue**
+This component is used in GameView.vue and it is responsible for creating a drawing canvas that is shared between users during the game. This component sends out stroke data, allows canvas clearning, allows stroke undo action, keeps track of stroke history in a stack, hides drawing tools for guessers and uses text to speech to narrate drawing tool changes.
+
+**GuessBoard.vue**
+This component is ued in GameView.vue and it represents a box with designated positions for each joined player's avatar as well as their most recent guess displayed next to their avatar in text and icon form.
+
+**HomeViewContent.vue**
+This componenet contains the styling, text, and buttons visible in the HomeView. The component is used in the HomeView.vue file, which is the landing page of Scribbers.
+
+**SettingsOverlay.vue**
+This component is used in HomeView, and it encompasses a settings menu that contains a toggle for TTS, a TTS volume slider, and a background opacity slider. It also narrates settings changes with text to speech.
+
+**WaitingRoom.vue**
+This component is utilized in GameView. It functions as a dashboard to show the room code, joined players, player count, as well as start game and leave lobby buttons. It requires at least two joined players before the host can press Start Game. Once players join the game, they will be presented with this screen until the game starts.
+
 
 **GameRoom**  
 The GameRoom class contains elements that pertain to management of game sessions, including players, game rounds, and prompt information. It is the core game logic and controls the flow of the game such as which players are drawing, which players are guessing, the transitions between rounds, and starting and ending the game. It will handle prompts ensuring that none are repeated, and provides references to images pertaining to the prompts. This class also handles server-side functionality but for organization it is under client-side.
