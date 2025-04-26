@@ -65,6 +65,7 @@ HomeViewContent contains the content displayed on the home page. It handles user
 #### 21. SpeechSynthesis
 SpeechSynthesis is used to convert text to speech, providing accessibility features like TTS for the application.
 
+
 ### Backend (Server-Side) Socket.io/Express/Node:
 
 #### 22. Server
