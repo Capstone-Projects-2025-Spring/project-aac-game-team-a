@@ -8,6 +8,26 @@ import GameView from "@/views/GameView.vue";
 class SocketClientHandler {
 
     /**
+     * Attempt to connect current client to socket server.
+     * @param {string} socketServer Hosted socket server address
+     * @param {string} testServer Local socket server address
+     * @param {boolean} inProduction determines whether to connect to hosted or local server
+     * @param {object} gameData All game data from game view component
+     * @returns Socket client data object
+     */
+    connectSocketServer(socketServer, testServer, inProduction, gameData) {
+
+        let socket = this.initSocketConnection(socketServer, testServer, inProduction)
+        if (gameData.isHost)
+            this.createLobby(socket, gameData)
+        else 
+            socket.emit('join-room', gameData.roomCodeStr, GameState().currentUser, gameData.isHost);    
+
+        this.initSocketListeners(socket, gameData)
+        return socket
+    }
+
+    /**
      * Initialize connection to socket server.
      * @param {string} socketServer Hosted socket server address
      * @param {string} testServer Local socket server address

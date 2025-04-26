@@ -144,22 +144,6 @@ export default {
             const shape = this.roomCodeShapes.find(shape => shape.value === digit);
             return shape ? shape.label : '';
         },
-
-        // Connect to the server
-        serverConnect(){
-            
-            //  Connect to socket server
-            this.socketInstance = SocketHandler.initSocketConnection(socketServer, testServer, inProduction);
-
-            //  Create or join lobby
-            if (this.isHost)
-                SocketHandler.createLobby(this.socketInstance, this);
-            else 
-                this.socketInstance.emit('join-room', this.roomCodeStr, GameState().currentUser, this.isHost);    
-
-            //  Initialize socket listeners
-            SocketHandler.initSocketListeners(this.socketInstance, this);
-        },
     
         // Disconnects the user when called
         serverDisconnect(){
@@ -303,7 +287,8 @@ export default {
     },
     // Automatically connect to the WebSocket server when the component is mounted
     mounted(){
-        this.serverConnect();
+
+        this.socketInstance = SocketHandler.connectSocketServer(socketServer, testServer, inProduction, this)
     },
     name: "GameView",
 };
