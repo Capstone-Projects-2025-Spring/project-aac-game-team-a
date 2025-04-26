@@ -3,7 +3,7 @@
  */
 //  IMPORTING
 const { Server } = require('socket.io'); // Server class from socket.io
-const GameData = require("./GameData") // Manages game data for each room
+const GameData = require("./GameData"); // Manages game data for each room
 
 class SocketHandler{
 

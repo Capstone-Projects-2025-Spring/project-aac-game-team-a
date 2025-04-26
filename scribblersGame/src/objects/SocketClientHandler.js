@@ -2,6 +2,8 @@
  * Handles all socket client events including server connection and listener initialization.
  */
 import io from "socket.io-client";
+import { GameState } from '@/stores/GameState';
+import GameView from "@/views/GameView.vue";
 
 class SocketClientHandler {
 
@@ -24,31 +26,218 @@ class SocketClientHandler {
         
     }
 
-    //  Create new lobby. If host playing is true, add player to game data
-    createLobby(socket, user, isHostPlaying, players, mappedPlayerData, numRounds, maxPlayers) {
+    /**
+     * Create new lobby. If host playing is true, add player to game data
+     * @param {object} socket Client socket data used to receive and send socket server data
+     * @param {object} gameData All game data from game view component
+     */
+    createLobby(socket, gameData) {
 
         try {
             //  Create new lobby, if host is not playing send null for user to add to player data
-            if (isHostPlaying) {
-                players.push(user)
-                mappedPlayerData.set(user, {
+            if (gameData.isHostPlaying) {
+                gameData.players.push(GameState().currentUser)
+                gameData.mappedPlayerData.set(GameState().currentUser, {
                     currentGuess: "",
                     currentGuessImagePath: "",
                     score: 0
                 })
-                socket.emit("create-new-lobby", numRounds, maxPlayers, players, user);
+                socket.emit("create-new-lobby", gameData.numRounds, gameData.maxPlayers, gameData.players, GameState().currentUser);
             }
             else
-                socket.emit("create-new-lobby", numRounds, maxPlayers, players, null);
+                socket.emit("create-new-lobby", gameData.numRounds, gameData.maxPlayers, gameData.players, null);
         } catch (error) {
             console.log("createLobby error: " + error)
         }
-        
     }
 
-    // Initialize client-side socket listener events
-    initSocketListeners() {
+    /**
+     * Initialize client-side socket listener events
+     * @param {object} socket 
+     * @param {object} gameData 
+     */
+    initSocketListeners(socket, gameData) {
 
+        // Listen for player joining
+        socket.on("add-player", (user, value) => {
+
+            gameData.mappedPlayerData.set(user, value)
+            console.log(gameData.mappedPlayerData)
+        })
+
+        // Listen for player leaving
+        socket.on("remove-player", (user) => {
+
+            gameData.mappedPlayerData.delete(user)
+            console.log(GameView.mappedPlayerData)
+        })
+
+        //  Listen for host to start of new round
+        socket.on("start-game", () => {
+
+            gameData.gameStarted = true;
+            gameData.gameEnded = false;
+        })
+        
+        //  Listen for end of game
+        socket.on("end-game", () => {
+
+            gameData.gameStarted = false;
+            gameData.gameEnded = true;
+            gameData.currentRound = 0;
+        })
+
+        //  Listen for host to play game again
+        socket.on("play-again", () => {
+            console.log(' ON PLAY AGAIN ')
+
+            gameData.gameStarted = false;
+            gameData.gameEnded = false;
+        })
+
+        //  Listen for "everyone guessed correct"
+        socket.on("all-guessed-correct", (message) => {
+            gameData.triggerAllGuessedCorrectPopup();
+        })
+
+        //  Listen for "timer ran out"
+        socket.on("timer-ran-out", (message) => {
+            gameData.triggerTimeRanOutPopup();
+        })
+
+        // Listen for new player list
+        socket.on("update-player-list", (newPlayers) => {
+
+            gameData.players = newPlayers;
+        })
+
+        //  Listen for new guesses
+        socket.on("update-user-guess", ({
+            user,
+            guess,
+            imagePath,
+            score
+            }) => {
+
+            gameData.mappedPlayerData.get(user).currentGuess = guess;
+            gameData.mappedPlayerData.get(user).currentGuessImagePath = imagePath;
+            gameData.mappedPlayerData.get(user).score = score;
+            console.log('data ' + user + ' ' + guess + ' ' + imagePath + ' ' + score)
+
+            // If the guess is correct, display it
+            if (guess == gameData.promptWord && guess){
+                //console.log(`${gameData.promptWord} is the prompt and ${guess} is the guess.`)
+                console.log(`${user} guessed correctly!`)
+            } 
+        })
+
+        // Listen for new lobby code
+        socket.on("update-lobby-code", (newRoomCode) => {
+                
+            console.log("Updating lobby code: ", newRoomCode);
+            gameData.roomCodeStr = newRoomCode;
+
+            // Fix: Convert string digits to numbers properly
+            gameData.roomCodeArr = newRoomCode.split('').map(digit => parseInt(digit, 10));
+
+            // Connect user to lobby
+            socket.emit('join-room', gameData.roomCodeStr, GameState().currentUser, gameData.isHost);
+        });
+
+        // Listen for score reset (to zero)
+        socket.on("reset-scores", ({user, score}) => {
+            gameData.mappedPlayerData.get(user).score = score;
+        })
+        
+        //  Listen for max players for lobby
+        socket.on("update-max-players", (updateMaxPlayers) => {
+
+            gameData.maxPlayers = updateMaxPlayers;
+        })
+
+        //  Listen for new round count
+        socket.on("update-round", (updateRound) => {
+
+            gameData.currentRound = updateRound;
+            console.log(`currentRound: ${gameData.currentRound}`)
+        })
+        
+        //  Listen for number of rounds
+        socket.on("update-num-rounds", (updateNumRounds) => {
+
+            gameData.numRounds = updateNumRounds;
+            console.log(`currentRound: ${gameData.numRounds}`)
+        })
+
+        // Listen for new drawer
+        socket.on("update-drawer", (drawer) => {
+            gameData.drawer = drawer; // Add this line to store the current drawer
+            
+            if (GameState().currentUser == drawer)
+                gameData.isDrawer = true;
+            else
+            gameData.isDrawer = false;   
+        })
+
+        //  Listen for new prompt
+        socket.on("update-prompt", (updatePrompt, path) => {
+
+            gameData.promptWord = updatePrompt.word;
+            console.log('PROMPT WORD: ', gameData.promptWord);
+            gameData.promptImgPath = path;
+            gameData.isGuessCorrect = false;
+        })
+
+        //  Listen for update to current user
+        socket.on("update-user", (user) => {
+
+            GameState().currentUser = user;
+        })
+
+        // Listen for the player count from the server
+        socket.on("player-count-update", (count) => {
+            gameData.playerCount = count;
+            //console.log("Updated player count:", count);
+        });
+        
+        // Listen for broadcasted initial drawing data
+        socket.on("cast-draw-init", (x, y, draw_color, draw_width) => {
+            gameData.context = document.getElementById("canvas").getContext("2d");
+            gameData.context.strokeStyle = draw_color;
+            gameData.context.lineWidth = draw_width;
+            gameData.context.beginPath();
+            gameData.context.moveTo(x, y);
+        });
+
+        // Listen for broadcasted drawing data
+        socket.on("cast-draw", (x, y) => {
+            gameData.context.lineTo(x, y);
+            gameData.context.lineCap = "round";
+            gameData.context.lineJoin = "round";
+            gameData.context.stroke();
+        });
+
+        // Listen for broadcasted final drawing data
+        socket.on("cast-draw-end", () => {
+            gameData.context.closePath();
+        });
+
+        // Listen for broadcasted clear canvas
+        socket.on("cast-draw-clear", () => {
+            gameData.context = document.getElementById("canvas").getContext("2d");
+            gameData.context.fillStyle = "white";
+            gameData.context.clearRect(0, 0, document.getElementById("canvas").width, document.getElementById("canvas").height);
+        });
+
+        // Listen for broadcasted undo canvas
+        socket.on("cast-draw-undo", (previousState) => {
+            gameData.context.putImageData(previousState, 0, 0);
+        });
+
+        // Listen for broadcasted timer update from server
+        socket.on("timer-update", (serverTime) => {
+            gameData.roundTimer = serverTime;
+        });
     }
 
 }
