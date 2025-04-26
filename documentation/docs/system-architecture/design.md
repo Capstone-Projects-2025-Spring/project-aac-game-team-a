@@ -61,8 +61,367 @@ This class manages WebSocket integration so that players can interact in real-ti
 
 ## Class Diagram
 
-<img width="1056" alt="Screenshot 2025-02-22 at 12 23 14 PM" src="https://github.com/user-attachments/assets/8fdaae25-4a33-41b9-982f-71ecc77377da" />
-<img width="1057" alt="Screenshot 2025-02-22 at 12 23 38 PM" src="https://github.com/user-attachments/assets/8601dc7f-ba64-44ad-bb11-e15d2d6d79ed" />
+```mermaid
+classDiagram
+   class Main {
+       +createApp(App)
+       +use(Pinia)
+       +use(Router)
+       +mount()
+   }
+   class Pinia {
+   }
+   class App {
+       +RouterView
+       +SettingState
+       +SettingsOverlay
+   }
+   class defineStore {
+   }
+   class RouterLink {
+   }
+   class RouterView {
+   }
+   class SettingState {
+       -showSettings: boolean
+       -enableTTS: boolean
+       -pathToTTSimg: string
+       -backgroundOpacity: number
+
+
+       +setModeTTS(enableTTS: boolean) void
+       +setVolumeTTS(newVolume: number) void
+       +setBackgroundOpacity(value: number) void
+       +toggleSettings() void
+   }
+   class GameState{
+       +setGameState(user: string, avatar: string, code: number, isHost: boolean, maxPlayers: number, rounds: number, isHostPlaying: boolean)
+   }
+   class SettingsOverlay {
+       +toggleTTS() void
+       +updateVolume(e) void
+       +updateOpacity(e) void
+       +speakNow(textToSpeak: string) void
+       +close() void
+   }
+   class Router {
+       +HomeView
+       +GameView
+       +HostLobbyView
+       +JoinLobbyView
+   }
+   class HomeView {
+       +HomeViewContent
+   }
+   class GameView {
+       +triggerAllGuessedCorrectPopup() void
+       +triggerTimeRanOutPopup() void
+       +speakNow(textToSpeak: string) void
+       +speakRoomCode() void
+       +getShapeImage(digit: number) string
+       +getShapeLabel(digit: number) string
+       +serverConnect() void
+       +serverDisconnect() void
+       +handleItemSelected(item: string, imagePath: string) void
+       +sendDrawDataInit(x: number, y: number, draw_color: string, draw_width: number) void
+       +sendDrawData(x: number, y: number) void
+       +sendDrawDataEnd() void
+       +sendDrawDataClear() void
+       +sendDrawDataUndo() void
+       +sendTimerStart(length: number) void
+       +startGame() void
+       +playAgain() void
+       +leaveLobby() void
+       -roomCodeArr: number
+       -currentUserMessage: object
+       -showTimeRanOutPopup: boolean
+       -showAllGuessedCorrectPopup: boolean
+       -playerScore: number
+       -settingState: boolean
+       -selectedImagePath: string
+       -currentUser: string
+       -currentUserAvatar: string
+       -currentUserMessage: string
+       -currentDrawer: string
+       -isGuessCorrect: boolean
+       -messageBoard: object[]
+       -mappedPlayerData: Map
+       -isDrawer: boolean
+       -isHost: boolean
+       -isHostPlaying: boolean
+       -promptWord: string
+       -promptImgPath: string
+       -context: canvas
+       -numRounds: number
+       -currentRound: number
+       -maxPlayers: number
+       -players: string[]
+       -roundTimer: number
+       -roomCodeArr: number[]
+       -roomCodeStr: string
+       -gameStarted: boolean
+       -gameEnded: boolean
+       -AACboardDisabled: boolean
+       -AACboardDisabledDuration: number
+       -AACboardDisableTimer: number
+       -AACButtons:
+       -roomCodeShapes:
+   }
+   class aacBoard {
+       +selectItem(item: string) void
+       +speakNow(textToSpeak: string) void
+       +setCurrentCategory(category: string|null) void
+       +getCategoryImage(category: string) string
+       +getItemImage(category: string, item: string) string
+
+
+       -currentCategory: string
+       -categories: object
+       -categoryList: string[]
+       -settingsState: SettingState
+       -emit: function
+       -props: [ disabled: boolean, timeDisabled: number ]
+   }
+   class DrawingBoard {
+       +clear_canvas() void
+       +undo_action() void
+       +speakNow(textToSpeak: string) void
+       +saveState() void
+       +start(event: Event) void
+       +draw(event: Event) void
+       +stop(event: Event) void
+       +calculateDrawCoords(event: Event) ( x: number, y: number )
+      
+       -canvasRef: HTMLElement|null
+       -context: CanvasRenderingContext2D|null
+       -undoHistory: any[]
+       -draw_color: string
+       -is_drawing: boolean
+       -draw_width: number
+       -start_background_color: string
+       -props: [ isDrawer: boolean ]
+   }
+   class WaitingRoom {
+       +speakNow(textToSpeak: string) void
+       +speakRoomCode() void
+       +getShapeImg(digit: number) string
+       +showNotEnoughPlayersAlert() void
+       +startGame() void
+       +leaveLobby() void
+
+
+       -props: [ roomCode: string[], maxPlayers: number, players: string[], numRounds: number, isHost: boolean, isHostPlaying: boolean ]
+       -settingsState: object
+       -shapes: [ value: number, imgSrc: string, shape: string ]
+   }
+
+
+   class GuessBoard {
+       +speakNow(textToSpeak: string) void
+       -props: [
+           playerDataMap: Map<String, [ score: number, currentGuess: string, currentGuessImagePath: string ]>,
+           time: number,
+           currentRound: number,
+           totalRounds: number,
+           roomCodeArr: number[],
+           getShapeImage: function,
+           getShapeLabel: function,
+           speakRoomCode: function,
+           currentDrawer: string
+       ]
+   }
+
+
+   class EndGameScreen {
+       +speakNow(textToSpeak: string) void
+       +playAgain() void
+       +leaveLobby() void
+       +hasHighscore(score: number) bool
+       -props: [
+           isHost: boolean,
+           playerDataMap: Map<String, [ score: number ]>
+       ]
+   }
+
+
+   class HostLobbyView {
+       +speakNow(textToSpeak: string) void
+       +validatePlayerCount() void
+       +validateRoundCount() void
+       +toggleAvatars(show: boolean) void
+       +selectAvatar(button) void
+       +launchRoom() void
+       -userGameState: GameState
+       -settingsState: SettingState
+       -maxPlayers: number
+       -rounds: number
+       -randomCodeDigits: number[]
+       -currentUser: string
+       -currentUserAvatar: string
+       -showAvatars: boolean
+       -isHostPlaying: boolean
+       -randomCodeString: string
+       -avatarButtons: string
+   }
+   class JoinLobbyView {
+       +speakNow(textToSpeak: string) void
+       +showNoAvatarSelectedAlert() void
+       +selectShape(shape) void
+       +undoShape() void
+       +clearShapes() void
+       +selectAvatar(button) void
+       +joinLobby() void
+       -userGameState: GameState
+       -settingsState: SettingState
+       -selectedShapes: string[]|null
+       -shapes: string[]
+       -roomCodeArr: number[]
+       -currentUser: string
+       -currentUserAvatar: string
+       -avatarButtons: string[]
+   }
+   class HomeViewContent {
+       +speakNow(textToSpeak: string) void
+       +handleClick(text: string, route: string) void
+   }
+   class SpeechSynthesis {
+   }
+
+
+   Main --> App : uses
+   Main --> Router : uses
+   Main --> Pinia : uses
+
+
+   App --> RouterView : uses
+   App --> SettingState : uses
+   App --> SettingsOverlay : uses
+
+
+   SettingsOverlay --> SettingState : uses
+   SettingState --|> defineStore : based on
+   GameState --|> defineState: based on
+
+
+   RouterView --> Router : depends on
+   RouterLink --> RouterView : depends on
+
+
+   Router --> HomeView : route to
+   Router --> GameView : route to
+   Router --> HostLobbyView : route to
+   Router --> JoinLobbyView : route to
+
+
+   HomeView --> HomeViewContent : uses
+
+
+   HomeViewContent --> SettingState : uses
+   HomeViewContent --> Router : navigates with
+   HomeViewContent --> SpeechSynthesis : uses
+
+
+   HostLobbyView --> GameState : uses
+   HostLobbyView --> SettingState : uses
+   HostLobbyView --> SpeechSynthesis : uses
+   HostLobbyView --> RouterLink : navigates with
+
+
+   JoinLobbyView --> GameState : uses
+   JoinLobbyView --> SettingState : uses
+   JoinLobbyView --> SpeechSynthesis : uses
+   JoinLobbyView --> RouterLink : navigates with
+
+
+   GameView --> aacBoard : uses
+   GameView --> DrawingBoard : uses
+   GameView --> WaitingRoom : uses
+   GameView --> GuessBoard : uses
+   GameView --> EndGameScreen : uses
+   GameView --> GameState : uses
+   GameView --> SettingState : uses
+
+
+   aacBoard --> SettingState : uses
+   
+   DrawingBoard --> SettingState : uses
+
+
+   WaitingRoom --> SettingState : uses
+   WaitingRoom --> RouterLink : uses
+   DrawingBoard --> SettingState : uses
+
+
+   GuessBoard --> SettingState : uses
+
+
+   EndGameScreen --> SettingState : uses
+   EndGameScreen --> Router : uses
+
+
+class Server {
+       +initialize() void
+       +startServer() void
+   }
+
+
+   class SocketServerHandler {
+       +initializeServerListeners(io: SocketIO.Server, socket: SocketIO.Socket, mappedGameData: Map) void
+       +startServer(server: http.Server, port: number) void
+   }
+
+
+   class SocketServer {
+   }
+
+
+   class ExpressApp {
+   }
+
+
+   class HttpServer {
+   }
+
+
+   class SocketServerHandler {
+       +createServerInstance(httpServer: http.Server) SocketIO.Server
+       +startServer(httpServer: http.Server, port: number) void
+       +initializeServerListeners(server: SocketIO.Server, client: SocketIO.Socket, gameDataMap: Map) void
+   }
+
+
+    class GameData {
+       +numberRounds
+       +currentRound
+       +maxPlayers
+       +players
+       +prompt
+       +drawer
+       +timerID
+       +timerValue
+       +playerData
+       +startNewRound(server, room, gameDataMap)
+       +getPromptObject()
+       +getPath(promptObject)
+       +clearGuesses(server, room)
+       +allGuessesCorrect()
+       +updateTimer(server, room, gameDataMap)
+   }
+
+   ExpressApp --> Server : uses
+   HttpServer --> Server : uses
+   SocketServerHandler --> Server : listens to socket events
+   SocketServer --> SocketServerHandler : manages server instance
+   SocketServerHandler --> MappedGameData : manages game state
+   SocketServerHandler --> GameData : uses
+   SocketServerHandler --> SocketIO.Server : creates
+   SocketServerHandler --> SocketIO.Socket : listens to
+   SocketServerHandler --> gameDataMap : uses
+
+
+   GameView --> Server : sends requests to
+   Server --> GameView : sends responses or emits events
+```
 
 ## Sequence Diagrams
 
