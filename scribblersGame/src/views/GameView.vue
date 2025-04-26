@@ -599,7 +599,7 @@ export default {
                 <img class='prompt-image' :src=promptImgPath :alt=promptWord >
             </div>
             <!--You are guessing for guesser-->
-            <div v-if="!isDrawer" class="guess-indicator" @click="speakNow('You are guessing')">
+            <div v-if="!isDrawer" class="guess-indicator" @click="speakNow('guess the drawing')">
                 <h2>Guess the Drawing!</h2>
             </div>
 
