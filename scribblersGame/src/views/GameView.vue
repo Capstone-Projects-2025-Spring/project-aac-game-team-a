@@ -1,21 +1,22 @@
 <script>
 /**
- * This file handles the view for all game components. 
- * Host and Join Lobby point to this file.
- * WaitingRoom, AACboard, DrawingBoard, and GuessBoard are children of this component.
+ * Main file for game view. Waiting room and all game components render here based on game status
  */
-import io from "socket.io-client"; // Import the socket.io-client library to enable WebSocket communication
-import AacBoard from '../components/aacBoard.vue'; //import AACBoard component
-import DrawingBoard from '../components/DrawingBoard.vue'; // import Drawing board component
-import WaitingRoom from '../components/WaitingRoom.vue'; // import Drawing board component
+//  IMPORTING
+import AacBoard from '../components/aacBoard.vue';
+import DrawingBoard from '../components/DrawingBoard.vue';
+import WaitingRoom from '../components/WaitingRoom.vue';
 import GuessBoard from "@/components/GuessBoard.vue";
-import EndScreen from "@/components/EndGameScreen.vue"
+import EndScreen from "@/components/EndGameScreen.vue";
+import SocketClientHandler from "../objects/SocketClientHandler.js";
 import { GameState } from '@/stores/GameState';
 import { SettingState } from '@/stores/SettingState'
 
+//  GAME SETTINGS
 const inProduction = false; //change this variable to switch between connecting to public backend server and localhost
 const socketServer =  "scribblersserver.fly.dev"; //web address for hosted websocket server
 const testServer = "localhost" //set to IP address of test server
+const SocketHandler = new SocketClientHandler;
 
 export default {
     components: {
@@ -34,28 +35,13 @@ export default {
         else if (Array.isArray(roomCodeArr))
             roomCodeArr = roomCodeArr.map(Number);
         
-        let currentUserMessage = { // Holds all the user message info being sent back and forth between client and server
-            id: 0,
-            avatar: GameState().currentUserAvatar,
-            user: GameState().currentUser,
-            text: "",
-            imagePath: ""
-        };
-
         return {
             showTimeRanOutPopup: false, //determines if this popup will be shown
             showAllGuessedCorrectPopup: false, //determines if this popup will be shown
             playerScore: 0, // Store the current score of the player
             settingsState: null, // Intialize a variable for the settings
-            selectedImagePath: "", //path to current AAC image selected
-            currentUser: GameState().currentUser,
-            currentUserAvatar: GameState().currentUserAvatar,
-            currentUserMessage,
             currentDrawer: "",
             isGuessCorrect: false, //tracks if current user has guessed correctly
-            messageBoard: [
-                currentUserMessage
-            ], // Array to store all received users in message board
             mappedPlayerData: new Map(), //tracks the current guesses submitted by all players 
             isDrawer: false, //track if user is the drawer
             isHost: GameState().isHost,
@@ -158,241 +144,6 @@ export default {
             const shape = this.roomCodeShapes.find(shape => shape.value === digit);
             return shape ? shape.label : '';
         },
-
-        // Connect to the server
-        serverConnect(){
-
-            // Establish connection to the WebSocket server
-            if (inProduction) 
-                this.socketInstance = io(socketServer);
-            else 
-                this.socketInstance = io("http://" + testServer + ":3001"); // CHANGE THIS WHEN YOU WANT THE SERVER TO BE PUBLIC
-            
-            //  Create new lobby if host is connecting to socket, otherwise attempt to join specified lobby
-            if (GameState().isHost) {
-                
-                //  Create new lobby, if host is not playing send null for user to add to player data
-                if (GameState().isHostPlaying) {
-                    this.players.push(GameState().currentUser)
-                    this.mappedPlayerData.set(GameState().currentUser, {
-                        currentGuess: "",
-                        currentGuessImagePath: "",
-                        score: 0
-                    })
-                    this.socketInstance.emit("create-new-lobby", this.numRounds, this.maxPlayers, this.players, this.currentUser);
-                }
-                else
-                    this.socketInstance.emit("create-new-lobby", this.numRounds, this.maxPlayers, this.players, null);
-            }
-            else {
-                this.socketInstance.emit('join-room', this.roomCodeStr, GameState().currentUser, this.isHost);    
-            }
-
-            // Listen for new drawer
-            this.socketInstance.on("update-drawer", (drawer) => {
-                this.currentDrawer = drawer; // Add this line to store the current drawer
-                
-                if (GameState().currentUser == drawer)
-                    this.isDrawer = true;
-                else
-                    this.isDrawer = false;   
-            })
-        
-            // Listen for new lobby code
-            this.socketInstance.on("update-lobby-code", (newRoomCode) => {
-                
-                //console.log("Updating lobby code: ", newRoomCode);
-                this.roomCodeStr = newRoomCode;
-
-                // Fix: Convert string digits to numbers properly
-                this.roomCodeArr = newRoomCode.split('').map(digit => parseInt(digit, 10));
-
-                // Connect user to lobby
-                this.socketInstance.emit('join-room', this.roomCodeStr, GameState().currentUser, this.isHost);
-            });
-
-            // Listen for player leaving
-            this.socketInstance.on("remove-player", (user) => {
-
-                this.mappedPlayerData.delete(user)
-                console.log(this.mappedPlayerData)
-            })
-
-            // Listen for player joining
-            this.socketInstance.on("add-player", (user, value) => {
-
-                this.mappedPlayerData.set(user, value)
-                console.log(this.mappedPlayerData)
-            })
-
-            // Listen for new player list
-            this.socketInstance.on("update-player-list", (newPlayers) => {
-
-                this.players = newPlayers;
-            })
-
-            //  Listen for max players for lobby
-            this.socketInstance.on("update-max-players", (updateMaxPlayers) => {
-
-                this.maxPlayers = updateMaxPlayers;
-            })
-
-            //  Listen for new round count
-            this.socketInstance.on("update-round", (updateRound) => {
-
-                this.currentRound = updateRound;
-                console.log(`currentRound: ${this.currentRound}`)
-            })
-
-            //  Listen for number of rounds
-            this.socketInstance.on("update-num-rounds", (updateNumRounds) => {
-
-                this.numRounds = updateNumRounds;
-                console.log(`currentRound: ${this.numRounds}`)
-            })
-
-            //  Listen for new drawer
-            this.socketInstance.on("update-drawer", (drawer) => {
-
-                if (GameState().currentUser == drawer)
-                    this.isDrawer = true;
-                else
-                    this.isDrawer = false;   
-            })
-
-            //  Listen for "everyone guessed correct"
-            this.socketInstance.on("all-guessed-correct", (message) => {
-                this.triggerAllGuessedCorrectPopup();
-            })
-
-            //  Listen for "timer ran out"
-            this.socketInstance.on("timer-ran-out", (message) => {
-                this.triggerTimeRanOutPopup();
-            })
-
-            //  Listen for update to current user
-            this.socketInstance.on("update-user", (user) => {
-
-                GameState().currentUser = user;
-            })
-
-            //  Listen for new prompt
-            this.socketInstance.on("update-prompt", (updatePrompt, path) => {
-
-                this.promptWord = updatePrompt.word;
-                console.log('PROMPT WORD: ', this.promptWord);
-                this.promptImgPath = path;
-                this.isGuessCorrect = false;
-            })
-
-            // Listen for score reset (to zero)
-            this.socketInstance.on("reset-scores", ({user, score}) => {
-                this.mappedPlayerData.get(user).score = score;
-            })
-
-            //  Listen for new guesses
-            this.socketInstance.on("update-user-guess", ({
-                user,
-                guess,
-                imagePath,
-                score
-                }) => {
-
-                this.mappedPlayerData.get(user).currentGuess = guess;
-                this.mappedPlayerData.get(user).currentGuessImagePath = imagePath;
-                this.mappedPlayerData.get(user).score = score;
-                console.log('data ' + user + ' ' + guess + ' ' + imagePath + ' ' + score)
-
-                // If the guess is correct, display it
-                if (guess == this.promptWord && guess){
-                    //console.log(`${this.promptWord} is the prompt and ${guess} is the guess.`)
-                    console.log(`${user} guessed correctly!`)
-                } 
-            })
-
-            //  Listen for host to start of new round
-            this.socketInstance.on("start-game", () => {
-
-                this.gameStarted = true;
-                this.gameEnded = false;
-            })
-
-            //  Listen for end of game
-            this.socketInstance.on("end-game", () => {
-
-                this.gameStarted = false;
-                this.gameEnded = true;
-                this.currentRound = 0;
-            })
-
-            //  Listen for host to play game again
-            this.socketInstance.on("play-again", () => {
-                console.log(' ON PLAY AGAIN ')
-
-                this.gameStarted = false;
-                this.gameEnded = false;
-            })
-
-            // Listen for the player count from the server
-            this.socketInstance.on("player-count-update", (count) => {
-                this.playerCount = count;
-                //console.log("Updated player count:", count);
-            });
-
-            // Listen for "message" array update and update the message
-            this.socketInstance.on('update-user-message-board', (data) => {
-                for(let i=0; i<data.length; i++){
-                    console.log("user: " + data[i].user);
-                }
-                // Re-assign the message board
-                this.messageBoard = data;
-            });
-
-            // NOT BEING USED
-            // Listen for incoming messages from the server and update messages array
-            this.socketInstance.on("message:received", (data) => {
-                this.messageBoard = this.messageBoard.concat(data); // Append received message to messages array
-            });
-            
-            // Listen for broadcasted initial drawing data
-            this.socketInstance.on("cast-draw-init", (x, y, draw_color, draw_width) => {
-                this.context = document.getElementById("canvas").getContext("2d");
-                this.context.strokeStyle = draw_color;
-                this.context.lineWidth = draw_width;
-                this.context.beginPath();
-                this.context.moveTo(x, y);
-            });
-
-            // Listen for broadcasted drawing data
-            this.socketInstance.on("cast-draw", (x, y) => {
-                this.context.lineTo(x, y);
-                this.context.lineCap = "round";
-                this.context.lineJoin = "round";
-                this.context.stroke();
-            });
-
-            // Listen for broadcasted final drawing data
-            this.socketInstance.on("cast-draw-end", () => {
-                this.context.closePath();
-            });
-
-            // Listen for broadcasted clear canvas
-            this.socketInstance.on("cast-draw-clear", () => {
-                this.context = document.getElementById("canvas").getContext("2d");
-                this.context.fillStyle = "white";
-                this.context.clearRect(0, 0, document.getElementById("canvas").width, document.getElementById("canvas").height);
-            });
-
-            // Listen for broadcasted undo canvas
-            this.socketInstance.on("cast-draw-undo", (previousState) => {
-                this.context.putImageData(previousState, 0, 0);
-            });
-
-            // Listen for broadcasted timer update from server
-            this.socketInstance.on("timer-update", (serverTime) => {
-                this.roundTimer = serverTime;
-            });
-        },
     
         // Disconnects the user when called
         serverDisconnect(){
@@ -419,10 +170,8 @@ export default {
             // Only allow the action if the AAC board is not disabled
             if(!this.AACboardDisabled){
                 console.log('Item selected:', item); //logs selected item
-                this.currentUserMessage.text = item; //stores aac button selected by user
-                this.currentUserMessage.imagePath = imagePath;
-                this.mappedPlayerData.get(this.currentUser).currentGuess = item;
-                this.mappedPlayerData.get(this.currentUser).currentGuessImagePath = imagePath;
+                this.mappedPlayerData.get(GameState().currentUser).currentGuess = item;
+                this.mappedPlayerData.get(GameState().currentUser).currentGuessImagePath = imagePath;
 
                 //If the user guesses the prompt correctly, display and emit to other sockets
                 // else, disable the AAC board for 'AACboardDisabledDuration' amount of time
@@ -438,11 +187,11 @@ export default {
                             Current score = 18
                     */
                     this.playerScore += Math.floor(this.roundTimer/10)
-                    this.mappedPlayerData.get(this.currentUser).score = this.playerScore
+                    this.mappedPlayerData.get(GameState().currentUser).score = this.playerScore
 
                     console.log(`You guessed correctly!`)
-                    this.mappedPlayerData.get(this.currentUser).currentGuess = "Correct!";
-                    this.mappedPlayerData.get(this.currentUser).currentGuessImagePath = '\correct.png';
+                    this.mappedPlayerData.get(GameState().currentUser).currentGuess = "Correct!";
+                    this.mappedPlayerData.get(GameState().currentUser).currentGuessImagePath = '\correct.png';
                     this.isGuessCorrect = true;
                 } else {
                     // Disable the AAC board
@@ -468,10 +217,10 @@ export default {
 
                 this.socketInstance.emit('update-user-guess', 
                     this.roomCodeStr, 
-                    this.currentUser, 
-                    this.mappedPlayerData.get(this.currentUser).currentGuess,
-                    this.mappedPlayerData.get(this.currentUser).currentGuessImagePath,
-                    this.mappedPlayerData.get(this.currentUser).score
+                    GameState().currentUser, 
+                    this.mappedPlayerData.get(GameState().currentUser).currentGuess,
+                    this.mappedPlayerData.get(GameState().currentUser).currentGuessImagePath,
+                    this.mappedPlayerData.get(GameState().currentUser).score
                 )
             } else {
                 // Let the user know the guess board is disabled
@@ -538,7 +287,8 @@ export default {
     },
     // Automatically connect to the WebSocket server when the component is mounted
     mounted(){
-        this.serverConnect();
+
+        this.socketInstance = SocketHandler.connectSocketServer(socketServer, testServer, inProduction, this)
     },
     name: "GameView",
 };
@@ -626,12 +376,8 @@ export default {
         </div>
 
             <div class="right-container">
-            <!--  Remove after testing timer
-            <h2 @click="speakNow(roundTimer + 'seconds left')">Timer: {{ roundTimer }}</h2>
-            -->
                 <!-- Assign the messageBoard in this class to the messageBoard in the MessageBoard component -->
                 <GuessBoard 
-                    :guesses=this.messageBoard
                     :playerDataMap=this.mappedPlayerData
                     :time="roundTimer"
                     :currentRound="currentRound"
