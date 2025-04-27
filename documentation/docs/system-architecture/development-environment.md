@@ -4,18 +4,32 @@ sidebar_position: 4
 
 # Development Environment
 
-## Backend
-* The backend server is written in Node.js. with Express.
-* The server uses Socket.IO to transmit data and handle connections.
+## Technology Stack
+### Client-Side (Frontend)
+* Vue.js 3 (v3.5.13) - UI development
+* Vue Router (v4.5.1) - Page navigation
+* Pinia (v3.0.2) - State management
+* HTML5 Canvas - Draw data rendering
+* Socket.IO Client (v4.8.1) - Backend communication
+* SpeechSynthesis API - Text-To-Speech accessibility
 
-## Front end
-* The front end is written in Vue.js. and also uses Socket.IO.
-* Its AACBoard component will be developed from scratch utilizing opensymbols.org's icons.
-* Utilizes Pinia, a state management library for Vue.js. It is used to store and retrieve data between files.
-* Uses Speech Synthesis for text-to-speech functions during gameplay.
+### Server-Side (Backend) 
+*  Node.js (v23) - JavaScript runtime environment
+*  Express.js (v5.1.0) - Web server framework for Node.js
+*  Socket.IO (v4.8.1) - Frontend communication 
 
-## Testing Tool
-* Jest, an open source framework, will be used for testing.
+### Deployment 
+* Docker (v28.0) - Containerized application deployment configuration
+* Fly.io - Full application deployment
+
+## Project Managment
+* Github (v3.16) - Version control and code repository
+* Jira (10.5) - Project management and task tracking
+* Discord (24.4.0) - Team communication and collaboration
+
+## Testing
+* Vitest (v3.1.2) - Vite (Vue) project unit testing 
 
 ## IDE
-* Most development team members will be using Visual Studio Code or Github Codespaces but we are allowing any IDE for development.
+* Visual Studio Code (v1.99.3) - Source code editing (Desktop)
+* GitHub Codespaces (v1.17.3) - Source code editing (Online)
