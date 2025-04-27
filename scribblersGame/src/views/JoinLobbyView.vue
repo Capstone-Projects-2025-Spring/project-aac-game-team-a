@@ -58,16 +58,15 @@
     <div class="bottom-buttons">
       <!-- Button to join the waiting room instead of going directly to game -->
       <RouterLink 
-      v-if="currentUser != '' && roomCodeArr.length == 5"
-      :to="{
-          path: '/game', // Navigates to the game route
-      }"
-      class="join-btn" 
-      @click="joinLobby">
-        Join Lobby</RouterLink>
+        v-if="currentUser !== '' && roomCodeArr.length === 5"
+        :to="{ path: '/game' }"
+        class="join-btn" 
+        @click="joinLobby">
+        Join Lobby
+      </RouterLink>
 
       <RouterLink 
-        v-if="currentUser == '' || roomCodeArr.length != 4"
+        v-else
         to="#"
         class="disabled-btn"
         @click.prevent="showNoAvatarSelectedAlert">
