@@ -12,61 +12,129 @@ This diagram shows the flow of the game and how 3 players interact with it. For 
 
 ## Use Cases
 
-#1 **Host hosts game**  
-The player setting up the game navigates to the website. Upon arrival, they see a large "Host Game" Button. This triggers the creation of a lobby with a room code that the host can share to the other players.
+### 1. Non-Playing User Hosts a Game Lobby
+- User navigates to the [Scribblers!](https://scribblersgame.fly.dev/) website
+- User clicks on the *"Create Lobby"* button
+- User specifies the *"Max Players"* (2-8)
+- User specifies the *"Number of Rounds"* (1-10)
+- User clicks on *"Launch Room"* button to start a game lobby
 
-Triggering Event:
-Host navigates to the game website and clicks a button "Host Game".
+### 2. Playing User Hosts a Game Lobby
+- User navigates to the [Scribblers!](https://scribblersgame.fly.dev/) website
+- User clicks on the *"Create Lobby"* button
+- User specifies the *"Max Players"* (2-8)
+- User specifies the *"Number of Rounds"* (1-10)
+- User clicks on *"I'm playing too"* button
+- User selects their avatar
+- User clicks on *"Launch Room"* button to start a game lobby
 
-#2 **Host gets room code**  
-The host is presented with a short room code that they will tell the players so they can enter it and join.
+### 3. Hosting User Shares Game Lobby Code
+- User follows the steps to host a game lobby
+- User is presented with a randomly generated "shape-based" room code
+- User shares the code with other users who want to join the game lobby
 
-Triggering Event: The host has created a lobby by pressing "Host Game".
+### 4. User Joins an Exisiting Game Lobby
+- User navigates to the [Scribblers!](https://scribblersgame.fly.dev/) website
+- User clicks on *"Join Lobby"*
+- User enters the room code from a user who is hosting a game lobby
+- User selects an avatar
+- User clicks the *"Join Lobby"* button
 
+### 5. User Attempts to Join a Non-Existing Lobby
+- User navigates to the [Scribblers!](https://scribblersgame.fly.dev/) website
+- User clicks on *"Join Lobby"*
+- User enters a random room code
+- User selects an avatar
+- User clicks the *"Join Lobby"* button
+- User is presented with an error
 
-#3 **Host presses start game button**  
-Once everyone has joined, the host will press start game. This will trigger the beginning of the game cycle.  
+### 6. Hosting User Starts a Game
+- User follows the steps to host a game lobby
+- User follows the steps to share a game lobby code
+- User waits until the lobby is filled with other users
+- User presses the *"Start Game"* button
 
-Triggering Event: All players have joined the lobby, and the host wants to start the game.
+## 7. User is Presented with a Drawing Prompt
+- Host starts the game
+- User is selected to draw
+- User is presented with a word to draw above the broadcasted canvas
+- User is presented with an image associated with the prompt word
 
-#4 **Players enter room code**  
-Players use the room code provided by the host to enter it and join the lobby. 
+### 8. User is Assigned to Draw on the Broadcasted Drawing Board
+- User is selcted to draw
+- User's avatar is given "Drawer" status and a pencil icon in the message board
+- User is given access to a set of drawing tools
+- User holds and drags their finger or mouse over the canvas area
 
-Triggering Event: The host receives the room code and shares it with other players.
+### 9. Drawer Undoes a Drawing Stroke
+- User is selcted to draw
+- User holds and drags their finger or mouse over the canvas area
+- User clicks the *"Undo"* button
+- The last stroke the user made is undone and broadcasted to all users
 
-#5 **Players select avatar**  
-Upon joining, each player will be presented with an array of avatars to choose from, and they must tap an avatar to join the lobby with that avatar.  
+### 10. Drawer Clears the Drawing Board
+- User is selcted to draw
+- User holds and drags their finger or mouse over the canvas area
+- User clicks the *"Clear"* button
+- The entire drawing board is cleared for all users
 
-Triggering Event: A user has entered a valid room code.
+### 11. Drawer Changes Stroke Color
+- User is selcted to draw
+- User clicks on any of the colors presented
+- User holds and drags their finger or mouse over the canvas area
+- The stroke color should display the color chosen by the user
 
-#6**One player is selected at random to be a drawer**  
-Out of all players, including the host, one is randomly selected to be the first drawer. They will be shown the drawing interface.  
+### 12. Drawer Changes Stroke Width
+- User is selcted to draw
+- User slides the stroke width slider either left or right
+- User holds and drags their finger or mouse over the canvas area
+- The stroke color should display the stroke width chosen by the user
 
-Triggering Event: The host pressed start game.
+### 13. User is Assigned the Role of Guesser
+- User is assigned to guess the prompt being drawn
+- User is given access to an AAC board with pre-provided prompt guesses
+- User is shown a drawing board that broadcasts the drawing data of the drawer
 
-#7 **The drawer is given 3 random choices to choose from to draw**  
-The drawer is provided with 3 random prompts on their screen as buttons to choose from to draw. They tap on the choice that they want, and then they can begin drawing.  
+### 14. Guesser Selects an Incorrect Guess
+- User clicks/taps an incorrect guess on the AAC board
+- User guess is displayed in the messsage board
+- The AAC board times out for 5 seconds and does not allow user input
 
-Triggering Event: The drawer has been randomly selected.
+### 15. Guesser Selects a Correct Guess
+- User clicks/taps a correct guess on the AAC board
+- User guess is not displayed to the message board
+- A "Correct" message is displayed next to the guesser's avatar
+- A checkmark image is displayed next to the "Correct" message
+- The user's score is calculated based on when they guesses correctly
+- The AAC guess board is taken away from the guesser's display
 
-#8 **Guessers see a guessing interface and drawing as it progresses**  
-Default flow: The guessers spectate the drawing and make guesses using the AAC tablet as the round progresses.  
-Alternative flow: The guessers spectate the drawing and make guesses using the keyboard after clicking the keyboard toggle button.  
-There is a timer counting down during each drawing phase.  
+### 16. All Guessers Guess Correctly
+- Each user assigned as a guesser selects the correct guess
+- Correct guesses are selected before the round timer runs out
+- A popup is displayed indicating everyone guessed correctly
+- The round ends
+- Roles are changed
+- A new round starts
 
-Triggering Event: The drawer has selected one of the three random drawing prompts.  
-Alternate Triggering Event: The drawer ran out of time (15s) to choose a prompt and one has been randomly selected.
+### 17. Round Timer Ends Before All Guessers Guess Correctly
+- Round timer gets to zero
+- A popup is displayed indicating that time has run out
+- The round ends
+- Roles are changed
+- A new round starts
 
-#9 **Phase ends when the timer expires or everyone has guessed correctly**  
-At this point, the correct answer will be displayed, and players will be awarded points. Point award values have not been determined yet.  
+### 18. Game Ends (Regular Player)
+- The number of rounds in the game reaches the maximum set by the host
+- All users are displayed an end game screen with a leaderboard and a *"Leave Lobby"* button
 
-Triggering Event: drawer draws prompt and players try to guess the drawing prompt.
+### 19. Game Ends (Host)
+- The number of rounds in the game reaches the maximum set by the host
+- All users are displayed an end game screen with a leaderboard and a *"Leave Lobby"* button
+- The host is displayed a *"Play again"* button
 
-#10 **Players are awarded points for guessing correctly, drawer is awarded for players guessing the drawing**  
-Players will accumulate points based on their performance in the game, but we want to make sure that the game doesn't feel too competitive.  
-
-#11 **Users see summary screen**  
-After everyone draws for their third time, total points will be displayed, and rankings will be shown at the end of the game.  
-Triggering Event: All players have drawn three times.
-
-
+### 20. Users Chooses to Play Again After Game Ends
+- Users play a game
+- Users reach the end game screen
+- Host clicks the *"Play Again"* button
+- All users are thrown back into the game lobby
+- Host clicks the *"Start Game"* button
