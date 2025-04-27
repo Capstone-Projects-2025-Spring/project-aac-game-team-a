@@ -14,7 +14,7 @@ sidebar_position: 3
 - Vue.js 3 (JavaScript framework)
 - Vue Router (Routing library for Vue.js)
 - Pinia (State management library for Vue.js)
-- Fabric.js (Canvas-based drawing library)
+- HTML5 Canvas (Built-in browser graphics rendering API)
 - Socket.io-client (Real-time communication library)
 - Web browser supporting HTML5, CSS3, JavaScript ES6+
 
