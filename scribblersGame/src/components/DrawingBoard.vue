@@ -47,15 +47,15 @@ onMounted(() => {
     context.fillStyle = start_background_color;
     context.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Drawing Event Listeners
-    canvas.addEventListener("mousedown", saveState);
-    canvas.addEventListener("touchstart", start, false);
+    // Drawing Event Listeners  
     canvas.addEventListener("touchmove", draw, false);
-    canvas.addEventListener("mousedown", start, false);
     canvas.addEventListener("mousemove", draw, false);
     canvas.addEventListener("touchend", stop, false);
     canvas.addEventListener("mouseup", stop, false);
     canvas.addEventListener("mouseout", stop, false);
+    canvas.addEventListener("mousedown", start, false); 
+    canvas.addEventListener("touchstart", start, false);
+
    
     // Button Event Listeners
     document.querySelector(".Cbutton").addEventListener("click", clear_canvas);
@@ -88,7 +88,7 @@ function speakNow(textToSpeak) {
 
 //  Pushes current canvas state onto undo stack
 function saveState() {
-    if (context) {
+    if (context && is_drawing) { // only save the state if drawing is in progress
         undoHistory.push(context.getImageData(0, 0, canvasRef.value.width, canvasRef.value.height));
     }
 }
@@ -97,14 +97,20 @@ function saveState() {
 function start(event) {
     if (!context || !props.isDrawer) return;
 
-    let drawCoordinates = calculateDrawCoords(event)
+// Save the *previous* state now that we're about to draw
+undoHistory.push(context.getImageData(0, 0,
+  canvasRef.value.width,
+  canvasRef.value.height
+));
 
-    emit("startDrawData", drawCoordinates.x, drawCoordinates.y, draw_color, draw_width);
+let drawCoordinates = calculateDrawCoords(event);
+emit("startDrawData", drawCoordinates.x, drawCoordinates.y, draw_color, draw_width);
 
-    is_drawing = true;
-    context.beginPath(); // Start a new path
-    context.moveTo(drawCoordinates.x, drawCoordinates.y); // Set starting point at the cursor
+is_drawing = true;
+context.beginPath();
+context.moveTo(drawCoordinates.x, drawCoordinates.y);
 }
+
 
 //  Function to draw on canvas while mouse moves
 function draw(event) {
@@ -160,15 +166,12 @@ function calculateDrawCoords(event) {
     const scaleY = canvasRef.value.height / rect.height;
     let coordinates = {};
 
-    // Handle touch events
     if (event.type.includes('touch')) {
-        const { touches, changedTouches } = event.originalEvent ?? event;
-        const touch = touches[0] ?? changedTouches[0];
+        const touch = event.touches ? event.touches[0] : event.changedTouches[0]; // Fixed touch access
         coordinates = {
             x: (touch.clientX - rect.left) * scaleX,
             y: (touch.clientY - rect.top) * scaleY
         };
-    // Handle mouse events
     } else if (event.type.includes('mouse')) {
         coordinates = {
             x: (event.clientX - rect.left) * scaleX,
