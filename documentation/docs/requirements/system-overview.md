@@ -12,7 +12,7 @@ Scribblers is a web-based, Pictionary-style game that integrates Augmentative an
 * **Vue.js 3** -  Frontend framework for building the game interface and handling client-side events.
 * **Vue Router** - Library for dynamic navigation between views and components.
 * **Pinia** - State management library for maintaining consistent state across UI components.
-* **Fabric.js** - Canvas library for managing the drawing board and user artwork.
+* **HTML5 Canvas** - API for managing the drawing board and user drawing actions.
 * **Socket.io (Client-Side)** - Library for real-time communication between players via WebSocket.
 
 ### Backend
