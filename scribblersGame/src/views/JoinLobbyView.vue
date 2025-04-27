@@ -209,13 +209,12 @@ function joinLobby() {
 
   // Use state to set and save the selection of the user
   userGameState.setGameState(currentUser, currentUserAvatar, roomCodeArr, false, 0, 0, false)
-  
-  //request taken avatars from backend
+  }
 
-  //receive taken avatars list from backend
-
-  //if currentUser in list of avatars, display an alert() and return false
-}
+  if(GameState.showNoAvatarSelectedAlert){
+    alert("Avatar already taken. Please select another.")
+    GameState.showNoAvatarSelectedAlert = false;
+  }
 </script>
 
 <style scoped>

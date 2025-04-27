@@ -3,6 +3,10 @@
  */
 import { defineStore } from 'pinia' // Import pinia to use as local state for the game
 export const GameState = defineStore('game', { // Define export to use in other files
+  state: () => ({
+    //used to trigger Avatar taken warning message across pages.
+    showAvatarTakenError: false,
+  }),
   actions: {
     /**
      * Sets the values of a gameState object
