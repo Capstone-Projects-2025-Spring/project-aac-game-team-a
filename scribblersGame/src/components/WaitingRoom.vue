@@ -341,7 +341,7 @@ h2 {
   cursor: pointer;
   transition: background-color 0.3s, transform 0.1s;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  width: 200px;
+  width: 250px;
 }
 
 .start-btn:hover {
@@ -372,7 +372,7 @@ h2 {
   text-decoration: none;
   cursor: pointer;
   transition: background-color 0.3s, transform 0.1s;
-  width: 200px;
+  width: 150px;
 }
 
 .leave-btn:hover {

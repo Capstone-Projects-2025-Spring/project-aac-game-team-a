@@ -65,6 +65,7 @@
         Join Lobby
       </RouterLink>
 
+      <!-- Error handling version of join lobby button -->
       <RouterLink 
         v-else
         to="#"
@@ -207,7 +208,12 @@ function joinLobby() {
 
   // Use state to set and save the selection of the user
   userGameState.setGameState(currentUser, currentUserAvatar, roomCodeArr, false, 0, 0, false)
-}
+  }
+
+  if(GameState.showAvatarTakenError){
+    alert("Avatar already taken. Please select another.")
+    GameState.showAvatarTakenError = false;
+  }
 </script>
 
 <style scoped>

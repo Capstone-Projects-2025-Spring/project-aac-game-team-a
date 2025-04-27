@@ -4,6 +4,7 @@
 //  IMPORTING
 const { Server } = require('socket.io'); // Server class from socket.io
 const GameData = require("./GameData"); // Manages game data for each room
+let joinCounter = 0;
 
 class SocketHandler{
 
@@ -101,30 +102,38 @@ class SocketHandler{
 
         // Listens for user joining room
         client.on('join-room', (room, user, isHost)  => {
+            if (!gameDataMap.get(room).playerData.has(user) || joinCounter == 0) {
 
-            //  Prevent users from joining non-existent rooms, joining full rooms, or duplicate avatars
-            if (server.sockets.adapter.rooms.has(room) && gameDataMap.get(room).playerData.size < gameDataMap.get(room).maxPlayers && !gameDataMap.get(room).playerData.has(user)) {
-                //console.log(`room ${room} exists!`)
-                client.join(room);
-                gameDataMap.get(room).players.push(user)
-                gameDataMap.get(room).playerData.set(user, {currentGuess: "", score: 0})
-                gameDataMap.get(room).playerData.forEach((value, key) => {
-                    server.to(client.id).emit("add-player", key, value);
-                })
-                server.to(room).emit("update-player-list", gameDataMap.get(room).players);
-                client.to(room).emit("add-player", user, {currentGuess: "", score: 0});
-                server.to(client.id).emit("update-max-players", gameDataMap.get(room).maxPlayers);
-                server.to(client.id).emit("update-round", gameDataMap.get(room).currentRound);
-                server.to(client.id).emit("update-num-rounds", gameDataMap.get(room).numberRounds);
-                console.log(gameDataMap);
+                //  Prevent users from joining non-existent rooms, joining full rooms, or duplicate avatars
+                if (server.sockets.adapter.rooms.has(room) && gameDataMap.get(room).playerData.size < gameDataMap.get(room).maxPlayers) {
+                    //console.log(`room ${room} exists!`)
+                    client.join(room);
+                    gameDataMap.get(room).players.push(user)
+                    gameDataMap.get(room).playerData.set(user, {currentGuess: "", score: 0})
+                    gameDataMap.get(room).playerData.forEach((value, key) => {
+                        server.to(client.id).emit("add-player", key, value);
+                    })
+                    server.to(room).emit("update-player-list", gameDataMap.get(room).players);
+                    client.to(room).emit("add-player", user, {currentGuess: "", score: 0});
+                    server.to(client.id).emit("update-max-players", gameDataMap.get(room).maxPlayers);
+                    server.to(client.id).emit("update-round", gameDataMap.get(room).currentRound);
+                    server.to(client.id).emit("update-num-rounds", gameDataMap.get(room).numberRounds);
+                    console.log(gameDataMap);
+
+                    
+                }
+                else{
+                    //console.log(`room ${room} does not exist!`)
+                    client.join(room);
+                    if (!isHost)
+                        server.to(client.id).emit("update-user", '');
+                }
+                console.log(`User ${client.id} is connected to room ${room}`); // Logs when a new user connects
+                joinCounter++
+            //avatar is taken
+            } else {
+                server.to(client.id).emit("return-to-join-screen")
             }
-            else{
-                //console.log(`room ${room} does not exist!`)
-                client.join(room);
-                if (!isHost)
-                    server.to(client.id).emit("update-user", '');
-            }
-            console.log(`User ${client.id} is connected to room ${room}`); // Logs when a new user connects
         })
 
         //  Listens for users leaving the room

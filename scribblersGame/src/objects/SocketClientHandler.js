@@ -258,6 +258,13 @@ class SocketClientHandler {
         socket.on("timer-update", (serverTime) => {
             gameData.roundTimer = serverTime;
         });
+
+        //Listen for message sending player back to join screen
+        socket.on("return-to-join-screen", () => {
+            console.log("redirecting to joinlobby");
+            GameState.showAvatarTakenError = true;
+            gameData.$router.push('/joinLobby');
+        });
     }
 
 }
