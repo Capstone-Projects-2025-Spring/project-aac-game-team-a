@@ -4,14 +4,6 @@ sidebar_position: 5
 
 # Use-case descriptions
 
-## Use Case Diagram
-![AAC_use_case_diagram](https://github.com/user-attachments/assets/be1ec26e-8bf2-4118-8e8b-9cffd4c2b6de)
-
-Figure 1: Use Case Diagram  
-This diagram shows the flow of the game and how 3 players interact with it. For clarity, Child 1's interactions with the system are that of a drawer and Child 2 and 3's interactions are that of guessers, when in practice they will all take turns being the drawer.
-
-## Use Cases
-
 ### Use Case 1: Non-Playing User Hosts a Game Lobby
 
 <img width="540" alt="Screenshot 2025-04-27 at 12 11 53 PM" src="https://github.com/user-attachments/assets/05225396-ebf1-479e-8af8-34cdc2e255e8" />
