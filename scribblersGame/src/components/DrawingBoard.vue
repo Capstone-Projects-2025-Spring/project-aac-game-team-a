@@ -154,30 +154,32 @@ function undo_action() {
  * @param event HTML event listener
  * @returns coordinate object with x and y values
  */
-function calculateDrawCoords(event){
-
+function calculateDrawCoords(event) {
     const rect = canvasRef.value.getBoundingClientRect();
     const scaleX = canvasRef.value.width / rect.width;
     const scaleY = canvasRef.value.height / rect.height;
-    let coordinates = {}
+    let coordinates = {};
 
-    //  Handle touch events
-    if(event.type.includes(`touch`)) {
+    // Handle touch events
+    if (event.type.includes('touch')) {
         const { touches, changedTouches } = event.originalEvent ?? event;
         const touch = touches[0] ?? changedTouches[0];
         coordinates = {
-            x: (touch.pageX - rect.left), 
-            y: (touch.pageY - rect.top)
-        }
-    //  Handle mouse events
-    } else if (event.type.includes(`mouse`)) {
+            x: (touch.clientX - rect.left) * scaleX,
+            y: (touch.clientY - rect.top) * scaleY
+        };
+    // Handle mouse events
+    } else if (event.type.includes('mouse')) {
         coordinates = {
-            x: (event.pageX - rect.left) * scaleX, 
-            y: (event.pageY - rect.top ) * scaleY
-        }
+            x: (event.clientX - rect.left) * scaleX,
+            y: (event.clientY - rect.top) * scaleY
+        };
     }
     return coordinates;
 }
+
+
+
 </script>
 
 <template>
