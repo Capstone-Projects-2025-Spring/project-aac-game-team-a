@@ -9,7 +9,7 @@ sidebar_position: 1
 
 ## Testing Library
 
-This project utilizes Vitest, a vite-native testing framework. As this project utilizes Vue, this allows us to utilize one testing framework to not only unit test front-end and back-end components, but also generate a coverage report for the project.
+This project utilizes **Vitest**, a vite-native testing framework. Vitest allows us to utilize one testing framework to unit test front-end and back-end components and generate coverage reports for the project.
 
 ## Execution
 
@@ -17,8 +17,8 @@ Unit tests can be executed using the following steps:
 
 * Install Node.js --> <a target="blank" href={"https://nodejs.org/en/download"}>Node.js Download Page</a>
 * Install vitest with the following command: ```npm install -D vitest```
-* To run the unit tests, execute the following command in the project root folder: ```npm run test```
-* To run the coverage tests, execute the following command in the project root folder: ```npm run coverage```
+* To run the **unit tests**, execute the following command in the project root folder: ```npm run test```
+* To generate a **coverage report**, execute the following command in the project root folder: ```npm run coverage```
 
 All unit tests and coverage reports are generated automatically upon merging to the main branch of the project repository via Github Actions.
 
