@@ -26,6 +26,10 @@ sidebar_position: 3
 #### External APIs
 - SpeechSynthesis API (Browser built-in API for AAC communication support)
 
+## Deployment
+- Docker (Containerization for consistent deployment across environments)
+- Fly.io (Platform for deploying and scaling the app using Docker containers)
+
 ## Project Management Tools
 - GitHub (Version control and code repository)
 - Jira (Project management and task tracking)
