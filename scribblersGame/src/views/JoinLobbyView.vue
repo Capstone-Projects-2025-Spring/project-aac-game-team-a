@@ -211,9 +211,9 @@ function joinLobby() {
   userGameState.setGameState(currentUser, currentUserAvatar, roomCodeArr, false, 0, 0, false)
   }
 
-  if(GameState.showNoAvatarSelectedAlert){
+  if(GameState.showAvatarTakenError){
     alert("Avatar already taken. Please select another.")
-    GameState.showNoAvatarSelectedAlert = false;
+    GameState.showAvatarTakenError = false;
   }
 </script>
 
