@@ -4,43 +4,89 @@ sidebar_position: 4
 
 # Features and Requirements
 
-## Functional
+## Features
 
-1. **Lobby management** 
-    * A host can create a lobby for others to join
-    * Anybody with access to the website can join
+1. **Lobby Management**
+    - Hosts create lobbies with configurable player limits (2-8).
+    - Players join lobbies using a unique room code.
 
-2. **Accessibility chat**
-    * There will be an AAC layout on the tablet browser that will allow the children with aac needs to guess during the drawing phase
+2. **AAC Communication**
+    - An AAC board allows users with communication needs to guess during the drawing phase.
 
 3. **Drawing Interface**
-    * There will be different colors to draw with and an eraser that will help the children draw the prompts
+    - Players can use different colors and an eraser to draw.
 
-4. **Customizable Avatars and Profiles**
-    * Users can choose an avatar upon joining the game, and it will be their identifier for the remainder of the game.
+4. **Avatar Selection**
+    - Players choose an avatar when joining, which is displayed throughout the game.
 
-5. **Turn-Based Gameplay with Visual Timers** 
-    * Clear visual countdown timers and turn indicators to help children understand gameplay flow
+5. **Turn-Based Gameplay**
+    - Visual countdown timers and turn indicators guide players during each round.
 
 6. **LeaderBoard**
-    * Users can see where they placed within the lobby they are playing in
-  
-## Non-Functional
+    - Players see their ranking based on performance at the end of the game.
 
-1. **Error Handling & User Guidance** – Clear error messages, visual prompts, and guided tutorials should be available to assist users in case of issues.
+7. **Game Progression**
+    - The game progresses through multiple rounds until the maximum number of rounds is reached.
 
-2. **Cross-Platform Compatibility** – The application should work seamlessly on desktops, tablets, and mobile devices, with web browser accessibility.
+8. **Real-Time Interaction**
+    - Players interact in real-time (drawing, guessing, and AAC responses) with minimal lag.
 
-3. **Scalability** – The game should support multiple lobbies with 2 or more people without any major performance issues, ensuring smooth gameplay for everybody even with high user traffic.
+9. **Audio and Visual Feedback**
+    - Sound effects and animations provide feedback for correct guesses, round transitions, and errors.
+---
 
-4. **Low-Latency Communication** – The game should have minimal lag in real-time interactions, ensuring smooth drawing, guessing, and AAC responses.
+## Requirements
 
-5. **Data Persistence** – User progress, achievements, and settings should be securely stored and retrievable across different sessions.
+### Functional
 
-6. **Customizable UI & UX** – Players should be able to adjust the interface based on their needs, such as color themes, font sizes, or simplified layouts.
+1. **Lobby Management**
+    - Hosts create lobbies with customizable settings.
+    - Players join using a unique room code.
 
-7. **Auto-Save & Session Recovery** – If a player disconnects or the app crashes, they should be able to resume where they left off.
+2. **AAC Communication**
+    - The AAC board allows users with communication needs to guess during drawing.
 
-8. **Low System Requirements** – The game should function efficiently on older devices or those using old browser versions.
+3. **Drawing Interface**
+    - Players use color options and an eraser to draw their prompt.
 
+4. **Avatar Selection**
+    - Players choose an avatar upon joining the game, displayed for the duration of the session.
 
+5. **Turn-Based Gameplay**
+    - Visual countdown timers and turn indicators guide each round.
+
+6. **LeaderBoard**
+    - Players see their ranking in the current game based on their performance.
+
+7. **Game Progression**
+    - The game progresses through multiple rounds until the set round limit is reached.
+
+---
+
+### Non-Functional
+
+1. **Error Handling**
+    - Clear error messages and user guidance assist players during issues.
+
+2. **Cross-Platform Compatibility**
+    - The game works on desktops, tablets, and mobile devices via a modern web browser.
+
+3. **Scalability**
+    - The game supports multiple lobbies with 2 or more players, ensuring smooth gameplay under load.
+
+4. **Low-Latency Communication**
+    - Real-time interactions (drawing, guessing, and AAC communication) have minimal delay.
+
+5. **Data Persistence**
+    - User data (game progress, settings) is saved and retrievable across sessions.
+
+6. **Customizable UI**
+    - Players can adjust UI elements (e.g., color themes, font sizes) based on personal preferences.
+
+7. **Session Recovery**
+    - Players can resume the game if disconnected or after an app crash.
+
+8. **Low System Requirements**
+    - The game runs efficiently on older devices and browsers with minimal resources.
+
+---
