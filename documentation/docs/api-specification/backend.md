@@ -1,152 +1,195 @@
-# Backend Class Documentation
+# Scribblers Backend Documentation
 
-Documentation for the Scribblers backend classes.
+## Overview
+This document covers the backend server architecture and functionality.
 
-## Controller Classes
+## Project Structure
 
-### LobbyController Class
-The purpose of this class is to handle lobby-related HTTP requests.
+### Main Files
+- **server.js**: Main entry point that initializes the Express server and Socket.io connections
+- **SocketServerHandler.js**: Manages socket server interactions and client event listeners
+- **GameData.js**: Handles game session data and round management
 
-- **createLobby() method**: Creates a new game lobby.
-  - **Pre-condition**: POST /api/lobby/
-  - **Parameters**: Request $request
-  - **Returns**: JSON response with lobby details and HTTP status code
+## Classes
 
-- **joinLobby() method**: Allows a player to join an existing lobby.
-  - **Pre-condition**: POST /api/lobby/join
-  - **Parameters**: Request $request (including lobby ID and player info)
-  - **Returns**: JSON response with lobby details and HTTP status code
+### SocketHandler
+```
+Class: SocketHandler
+Location: SocketServerHandler.js
+```
 
-- **getLobbyInfo() method**: Retrieves the current state of a lobby.
-  - **Pre-condition**: GET /api/lobby/lobbyid
-  - **Parameters**: int $lobbyId
-  - **Returns**: JSON response with lobby state and HTTP status code
+This class manages socket initialization and event listeners for client-server communication.
 
-- **startGame() method**: Begins the game once enough players have joined.
-  - **Pre-condition**: POST /api/lobby/lobbyid/start
-  - **Parameters**: int $lobbyId
-  - **Returns**: JSON response with game state and HTTP status code
+#### Methods
 
-### DrawingController Class
-The DrawingController class manages all drawing-related operations.
+##### `createServerInstance(httpServer)`
+Creates and configures a new Socket.io server instance.
 
-- **submitDrawing() method**: Handles the submission of a drawing.
-  - **Pre-condition**: POST /api/drawing/submit
-  - **Parameters**: Request $request (including image data and player ID)
-  - **Returns**: JSON response with HTTP status code
+- **Parameters**:
+  - `httpServer` - HTTP server created using an Express application
+- **Returns**: 
+  - New Socket.io server instance on success
+  - `0` on failure
+- **Configuration**:
+  - CORS: Allows connections from any origin
+  - Methods: GET, POST
 
-- **getCurrentDrawing() method**: Retrieves the current drawing in progress.
-  - **Pre-condition**: GET /api/drawing/lobbyid
-  - **Parameters**: int $lobbyId
-  - **Returns**: JSON response with drawing data and HTTP status code
+##### `startServer(httpServer, port)`
+Starts the HTTP server on the specified port.
 
-### GuessController Class
-The GuessController class handles user guesses for the drawing.
+- **Parameters**:
+  - `httpServer` - HTTP server created using an Express application
+  - `port` - Port number to listen on
 
-- **submitGuess() method**: Submits a guess for the current drawing.
-  - **Pre-condition**: POST /api/guess/
-  - **Parameters**: Request $request (including guess text and player ID)
-  - **Returns**: JSON response with correctness status and HTTP status code
+##### `initializeServerListeners(server, client, gameDataMap)`
+Initializes Socket.io event listeners to handle client requests.
 
-- **getGuesses() method**: Retrieves all guesses for the current round.
-  - **Pre-condition**: GET /api/guess/lobbyid
-  - **Parameters**: int $lobbyId
-  - **Returns**: JSON response with list of guesses and HTTP status code
+- **Parameters**:
+  - `server` - Socket.io server instance
+  - `client` - Socket.io client connecting to server
+  - `gameDataMap` - Server-side map of game session data
 
-### ScoreController Class
-Manages scoring and ranking in the game.
+#### Event Listeners
 
-- **calculateScores() method**: Computes and updates scores at the end of a round.
-  - **Pre-condition**: POST /api/score/calculate
-  - **Parameters**: int $lobbyId
-  - **Returns**: JSON response with updated scores and HTTP status code
+| Event | Description |
+|-------|-------------|
+| `start-game` | Starts a new game session in the specified room |
+| `play-again` | Resets the game to play another round |
+| `create-new-lobby` | Generates a unique room code and creates a new game session |
+| `join-room` | Handles a player joining an existing room |
+| `leave-room` | Manages player disconnection and room cleanup |
+| `reset-scores` | Resets all player scores in a room |
+| `update-user-guess` | Updates a player's guess and checks if all players guessed correctly |
+| `draw-init` | Initializes drawing parameters for all clients |
+| `draw` | Broadcasts draw coordinates to all clients |
+| `draw-end` | Signals the end of a drawing action |
+| `draw-clear` | Clears the canvas for all clients |
+| `draw-undo` | Undoes the last drawing action |
+| `disconnect` | Handles client disconnection |
 
-- **getLeaderboard() method**: Retrieves the leaderboard for a lobby.
-  - **Pre-condition**: GET /api/score/leaderboard/lobbyid
-  - **Parameters**: int $lobbyId
-  - **Returns**: JSON response with ranking data and HTTP status code
+### GameData
+```
+Class: GameData
+Location: GameData.js
+```
 
-## Model Classes
+This class manages game session data and round mechanics.
 
-### Lobby
-Represents a game lobby with relevant details.
+#### Properties
 
-- **Fields**:
-  - lobby_id: string
-  - players: array
-  - game_status: string (waiting, active, completed)
+| Property | Type | Description |
+|----------|------|-------------|
+| `numberRounds` | number | Total number of rounds configured for the game |
+| `currentRound` | number | Current round number |
+| `maxPlayers` | number | Maximum number of players allowed |
+| `players` | array | Array of player avatars in the game |
+| `prompt` | object | Current drawing prompt |
+| `drawer` | string | Current player assigned to draw |
+| `timerID` | number | Timer interval ID |
+| `timerValue` | number | Current time remaining in seconds |
+| `playerData` | Map | Player-specific data (scores, guesses) |
 
-### Drawing
-Represents a submitted drawing.
+#### Methods
 
-- **Fields**:
-  - drawing_id: string
-  - lobby_id: string
-  - player_id: string
-  - image_data: binary
-  - created_at: timestamp
+##### `constructor(numberRounds, currentRound, maxPlayers, players, prompt, drawer, timerID, timerValue, playerData)`
+Creates a new game session with specified parameters.
 
-### Guess
-Represents a player’s guess.
+##### `startNewRound(server, room, gameDataMap)`
+Begins a new round in the specified room.
 
-- **Fields**:
-  - guess_id: string
-  - lobby_id: string
-  - player_id: string
-  - text: string
-  - is_correct: boolean
-  - created_at: timestamp
+- **Parameters**:
+  - `server` - Socket.io server instance
+  - `room` - Room identifier
+  - `gameDataMap` - Server-side map of game session data
+- **Process**:
+  1. Clears previous guesses
+  2. Increments round number
+  3. Checks if game should end
+  4. Selects a new drawer
+  5. Generates new prompt
+  6. Starts round timer
 
-### Score
-Represents a player's score.
+##### `getPromptObject()`
+Randomly selects a drawing prompt, avoiding previously used prompts.
 
-- **Fields**:
-  - player_id: string
-  - lobby_id: string
-  - score: int
-  - updated_at: timestamp
+- **Returns**: A prompt object containing word and type
 
-## WebSocket Events
+##### `getPath(promptObject)`
+Forms the file path for the prompt image.
 
-### Game Events
+- **Parameters**:
+  - `promptObject` - The selected prompt object
+- **Returns**: Path to the prompt image
 
-- **playerJoined**: Triggered when a player joins a lobby.
-  - **Payload**: player_id, lobby_id
+##### `clearGuesses(server, room)`
+Clears all player guesses and updates clients.
 
-- **drawingSubmitted**: Triggered when a player submits a drawing.
-  - **Payload**: drawing_id, lobby_id
+- **Parameters**:
+  - `server` - Socket.io server instance
+  - `room` - Room identifier
 
-- **guessMade**: Triggered when a player submits a guess.
-  - **Payload**: guess_id, lobby_id, is_correct
+##### `allGuessesCorrect()`
+Checks if all players have guessed correctly.
 
-- **roundEnded**: Triggered at the end of a round.
-  - **Payload**: lobby_id, scores
+- **Returns**: `true` if all non-drawing players guessed correctly, `false` otherwise
 
-- **gameStarted**: Triggered when the game starts.
-  - **Payload**: lobby_id, players
+##### `updateTimer(server, room, gameDataMap)`
+Updates the round timer and handles timer expiration.
 
-## Migrations
+- **Parameters**:
+  - `server` - Socket.io server instance
+  - `room` - Room identifier
+  - `gameDataMap` - Server-side map of game session data
 
-### create_lobbies_table
-Creates the lobbies table in the database.
+## Game Constants
 
-- **run() method**: Defines schema for storing lobby data.
+### Prompts
+The game includes drawing prompts organized by categories:
+- Actions: Eat, Jump, Run, Sleep
+- Animals: Bird, Cat, Dog, Elephant, Horse, Mouse
+- Clothing: Glasses, Glove, Hat, Pants, Shirt, Shoe
+- Food: Apple, Banana, Carrot, Grapes, Pizza, Spaghetti
+- Shapes: Circle, Oval, Square, Triangle
 
-### create_drawings_table
-Creates the drawings table in the database.
+### Game Settings
+- Round duration: 60 seconds
+- Images per prompt: 3
 
-- **run() method**: Defines schema for storing drawing data.
+## Game Flow
 
-### create_guesses_table
-Creates the guesses table in the database.
+1. Players create or join a room using a unique code
+2. Host starts the game
+3. For each round:
+   - A random player is selected as the drawer
+   - A random prompt is assigned
+   - The drawer draws the prompt
+   - Other players attempt to guess the word
+   - Round ends when time expires or all players guess correctly
+4. Game ends after the configured number of rounds
 
-- **run() method**: Defines schema for storing guesses.
+## Server Initialization (server.js)
 
-### create_scores_table
-Creates the scores table in the database.
+```javascript
+/**
+ * This file it the main executable for the Scribblers backend. Node, Express, and Socket.io 
+ * are used to listen for requests and send/receive game data.
+ */
+//  IMPORTING
+const express = require('express'); // Creates backend server
+const http = require('http'); // Creates HTTP server
+const SocketServerHandler = require("./objects/SocketServerHandler.js"); // Manages socket server interactions
 
-- **run() method**: Defines schema for storing player scores.
+//  INITIALIZATIONS
+const app = express(); // Express initialization
+const server = http.createServer(app); // Create HTTP server using Express
+const mappedGameData = new Map(); // Create global map to manage game data objects
+const SocketServer = new SocketServerHandler(); // Create socket manager
+const io = SocketServer.createServerInstance(server); // Create Socket.io server instance
 
----
-This documentation provides an overview of the backend structure for Scribblers, covering controllers, models, WebSocket events, factories, and database migrations.
+// Event listener for new socket connections
+io.on('connection', (socket) => {
+    SocketServer.initializeServerListeners(io, socket, mappedGameData);
+});
 
+SocketServer.startServer(server, 3001);
+```
