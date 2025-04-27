@@ -191,7 +191,7 @@ class SocketClientHandler {
 
         // Listen for new drawer
         socket.on("update-drawer", (drawer) => {
-            gameData.drawer = drawer; // Add this line to store the current drawer
+            gameData.currentDrawer = drawer; // Add this line to store the current drawer
             
             if (GameState().currentUser == drawer)
                 gameData.isDrawer = true;
