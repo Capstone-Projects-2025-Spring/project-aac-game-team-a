@@ -12,129 +12,348 @@ This diagram shows the flow of the game and how 3 players interact with it. For 
 
 ## Use Cases
 
-### 1. Non-Playing User Hosts a Game Lobby
-- User navigates to the [Scribblers!](https://scribblersgame.fly.dev/) website
-- User clicks on the *"Create Lobby"* button
-- User specifies the *"Max Players"* (2-8)
-- User specifies the *"Number of Rounds"* (1-10)
-- User clicks on *"Launch Room"* button to start a game lobby
+### Use Case 1: Non-Playing User Hosts a Game Lobby
 
-### 2. Playing User Hosts a Game Lobby
-- User navigates to the [Scribblers!](https://scribblersgame.fly.dev/) website
-- User clicks on the *"Create Lobby"* button
-- User specifies the *"Max Players"* (2-8)
-- User specifies the *"Number of Rounds"* (1-10)
-- User clicks on *"I'm playing too"* button
-- User selects their avatar
-- User clicks on *"Launch Room"* button to start a game lobby
+**Actor(s):** User
 
-### 3. Hosting User Shares Game Lobby Code
-- User follows the steps to host a game lobby
-- User is presented with a randomly generated "shape-based" room code
-- User shares the code with other users who want to join the game lobby
+**Preconditions:** 
+- User is on the [Scribblers!](https://scribblersgame.fly.dev/) website homepage.
 
-### 4. User Joins an Exisiting Game Lobby
-- User navigates to the [Scribblers!](https://scribblersgame.fly.dev/) website
-- User clicks on *"Join Lobby"*
-- User enters the room code from a user who is hosting a game lobby
-- User selects an avatar
-- User clicks the *"Join Lobby"* button
+**Flow of Events:**
+1. User clicks the "Create Lobby" button.
+2. User specifies the "Max Players" (2–8).
+3. User specifies the "Number of Rounds" (1–10).
+4. User clicks the "Launch Room" button.
 
-### 5. User Attempts to Join a Non-Existing Lobby
-- User navigates to the [Scribblers!](https://scribblersgame.fly.dev/) website
-- User clicks on *"Join Lobby"*
-- User enters a random room code
-- User selects an avatar
-- User clicks the *"Join Lobby"* button
-- User is presented with an error
+**Postconditions:**
+- A new game lobby is created without the host participating as a player.
 
-### 6. Hosting User Starts a Game
-- User follows the steps to host a game lobby
-- User follows the steps to share a game lobby code
-- User waits until the lobby is filled with other users
-- User presses the *"Start Game"* button
+---
 
-## 7. User is Presented with a Drawing Prompt
-- Host starts the game
-- User is selected to draw
-- User is presented with a word to draw above the broadcasted canvas
-- User is presented with an image associated with the prompt word
+### Use Case 2: Playing User Hosts a Game Lobby
 
-### 8. User is Assigned to Draw on the Broadcasted Drawing Board
-- User is selcted to draw
-- User's avatar is given "Drawer" status and a pencil icon in the message board
-- User is given access to a set of drawing tools
-- User holds and drags their finger or mouse over the canvas area
+**Actor(s):** User
 
-### 9. Drawer Undoes a Drawing Stroke
-- User is selcted to draw
-- User holds and drags their finger or mouse over the canvas area
-- User clicks the *"Undo"* button
-- The last stroke the user made is undone and broadcasted to all users
+**Preconditions:** 
+- User is on the [Scribblers!](https://scribblersgame.fly.dev/) website homepage.
 
-### 10. Drawer Clears the Drawing Board
-- User is selcted to draw
-- User holds and drags their finger or mouse over the canvas area
-- User clicks the *"Clear"* button
-- The entire drawing board is cleared for all users
+**Flow of Events:**
+1. User clicks the "Create Lobby" button.
+2. User specifies the "Max Players" (2–8).
+3. User specifies the "Number of Rounds" (1–10).
+4. User clicks the "I'm Playing Too" button.
+5. User selects an avatar.
+6. User clicks the "Launch Room" button.
 
-### 11. Drawer Changes Stroke Color
-- User is selcted to draw
-- User clicks on any of the colors presented
-- User holds and drags their finger or mouse over the canvas area
-- The stroke color should display the color chosen by the user
+**Postconditions:**
+- A new game lobby is created with the host participating as a player.
 
-### 12. Drawer Changes Stroke Width
-- User is selcted to draw
-- User slides the stroke width slider either left or right
-- User holds and drags their finger or mouse over the canvas area
-- The stroke color should display the stroke width chosen by the user
+---
 
-### 13. User is Assigned the Role of Guesser
-- User is assigned to guess the prompt being drawn
-- User is given access to an AAC board with pre-provided prompt guesses
-- User is shown a drawing board that broadcasts the drawing data of the drawer
+### Use Case 3: Hosting User Shares Game Lobby Code
 
-### 14. Guesser Selects an Incorrect Guess
-- User clicks/taps an incorrect guess on the AAC board
-- User guess is displayed in the messsage board
-- The AAC board times out for 5 seconds and does not allow user input
+**Actor(s):** Hosting user
 
-### 15. Guesser Selects a Correct Guess
-- User clicks/taps a correct guess on the AAC board
-- User guess is not displayed to the message board
-- A "Correct" message is displayed next to the guesser's avatar
-- A checkmark image is displayed next to the "Correct" message
-- The user's score is calculated based on when they guesses correctly
-- The AAC guess board is taken away from the guesser's display
+**Preconditions:**
+- A game lobby has been created.
 
-### 16. All Guessers Guess Correctly
-- Each user assigned as a guesser selects the correct guess
-- Correct guesses are selected before the round timer runs out
-- A popup is displayed indicating everyone guessed correctly
-- The round ends
-- Roles are changed
-- A new round starts
+**Flow of Events:**
+1. A shape-based room code is generated automatically.
+2. User views the room code on screen.
+3. User shares the room code with other players.
 
-### 17. Round Timer Ends Before All Guessers Guess Correctly
-- Round timer gets to zero
-- A popup is displayed indicating that time has run out
-- The round ends
-- Roles are changed
-- A new round starts
+**Postconditions:**
+- Other players are able to join the lobby using the shared code.
 
-### 18. Game Ends (Regular Player)
-- The number of rounds in the game reaches the maximum set by the host
-- All users are displayed an end game screen with a leaderboard and a *"Leave Lobby"* button
+---
 
-### 19. Game Ends (Host)
-- The number of rounds in the game reaches the maximum set by the host
-- All users are displayed an end game screen with a leaderboard and a *"Leave Lobby"* button
-- The host is displayed a *"Play again"* button
+### Use Case 4: User Joins an Existing Game Lobby
 
-### 20. Users Chooses to Play Again After Game Ends
-- Users play a game
-- Users reach the end game screen
-- Host clicks the *"Play Again"* button
-- All users are thrown back into the game lobby
-- Host clicks the *"Start Game"* button
+**Actor(s):** User
+
+**Preconditions:**
+- User has received a valid room code.
+
+**Flow of Events:**
+1. User navigates to the [Scribblers!](https://scribblersgame.fly.dev/) website.
+2. User clicks the "Join Lobby" button.
+3. User enters the provided room code.
+4. User selects an avatar.
+5. User clicks the "Join Lobby" button.
+
+**Postconditions:**
+- User successfully joins the existing lobby.
+
+---
+
+### Use Case 5: User Attempts to Join a Non-Existing Lobby
+
+**Actor(s):** User
+
+**Preconditions:**
+- User is on the [Scribblers!](https://scribblersgame.fly.dev/) website.
+
+**Flow of Events:**
+1. User clicks the "Join Lobby" button.
+2. User enters a random or incorrect room code.
+3. User selects an avatar.
+4. User clicks the "Join Lobby" button.
+5. An error message is displayed indicating the room does not exist.
+
+**Postconditions:**
+- User remains on the "Join Lobby" screen.
+
+---
+
+### Use Case 6: Hosting User Starts a Game
+
+**Actor(s):** Hosting user
+
+**Preconditions:**
+- A lobby has been created and players have joined.
+
+**Flow of Events:**
+1. Host waits for players to join the lobby.
+2. Host clicks the "Start Game" button once ready.
+
+**Postconditions:**
+- The game begins, and the first round starts.
+
+---
+
+### Use Case 7: User is Presented with a Drawing Prompt
+
+**Actor(s):** Drawing user
+
+**Preconditions:**
+- Game has started, and it is the user's turn to draw.
+
+**Flow of Events:**
+1. User is selected to draw.
+2. User is shown a prompt word above the drawing board.
+3. User is shown an image associated with the prompt word.
+
+**Postconditions:**
+- User prepares to draw the assigned prompt.
+
+---
+
+### Use Case 8: User is Assigned to Draw on the Drawing Board
+
+**Actor(s):** Drawing user
+
+**Preconditions:**
+- User has been assigned the drawing role.
+
+**Flow of Events:**
+1. User's avatar displays a "Drawer" status and a pencil icon.
+2. User gains access to drawing tools.
+3. User draws by dragging finger or mouse across the canvas.
+
+**Postconditions:**
+- Drawing is broadcasted to all connected users.
+
+---
+
+### Use Case 9: Drawer Undoes a Drawing Stroke
+
+**Actor(s):** Drawing user
+
+**Preconditions:**
+- User is actively drawing.
+
+**Flow of Events:**
+1. User clicks the "Undo" button.
+2. The most recent stroke is undone on the canvas for all users.
+
+**Postconditions:**
+- Canvas updates reflect the undone stroke for all players.
+
+---
+
+### Use Case 10: Drawer Clears the Drawing Board
+
+**Actor(s):** Drawing user
+
+**Preconditions:**
+- User is actively drawing.
+
+**Flow of Events:**
+1. User clicks the "Clear" button.
+2. Entire drawing board is cleared for all users.
+
+**Postconditions:**
+- Canvas is reset to blank for all players.
+
+---
+
+### Use Case 11: Drawer Changes Stroke Color
+
+**Actor(s):** Drawing user
+
+**Preconditions:**
+- User is actively drawing.
+
+**Flow of Events:**
+1. User clicks a color option from the palette.
+2. User continues drawing with the selected stroke color.
+
+**Postconditions:**
+- New stroke color is displayed on the canvas.
+
+---
+
+### Use Case 12: Drawer Changes Stroke Width
+
+**Actor(s):** Drawing user
+
+**Preconditions:**
+- User is actively drawing.
+
+**Flow of Events:**
+1. User adjusts the stroke width slider.
+2. User continues drawing with the selected stroke width.
+
+**Postconditions:**
+- New stroke width is applied to the canvas.
+
+---
+
+### Use Case 13: User is Assigned the Role of Guesser
+
+**Actor(s):** Guessing user
+
+**Preconditions:**
+- A drawing round is in progress.
+
+**Flow of Events:**
+1. User is assigned as a guesser.
+2. User is shown the drawing canvas and an AAC board of possible guesses.
+
+**Postconditions:**
+- User is able to select guesses based on the drawing.
+
+---
+
+### Use Case 14: Guesser Selects an Incorrect Guess
+
+**Actor(s):** Guessing user
+
+**Preconditions:**
+- User is viewing the AAC board during a round.
+
+**Flow of Events:**
+1. User selects an incorrect guess from the AAC board.
+2. Guess is displayed on the message board.
+3. AAC board becomes temporarily disabled for 5 seconds.
+
+**Postconditions:**
+- User must wait before making another guess.
+
+---
+
+### Use Case 15: Guesser Selects a Correct Guess
+
+**Actor(s):** Guessing user
+
+**Preconditions:**
+- User is viewing the AAC board during a round.
+
+**Flow of Events:**
+1. User selects the correct guess.
+2. "Correct" message is displayed next to the user's avatar.
+3. A checkmark image is shown beside the message.
+4. User’s score is calculated based on time remaining.
+5. AAC board disappears from the user's screen.
+
+**Postconditions:**
+- User successfully guessed the drawing.
+
+---
+
+### Use Case 16: All Guessers Guess Correctly
+
+**Actor(s):** All guessing users
+
+**Preconditions:**
+- A drawing round is in progress.
+
+**Flow of Events:**
+1. All guessers select the correct guess before the timer ends.
+2. A popup appears indicating all users guessed correctly.
+3. Round ends and new roles are assigned.
+4. A new round begins.
+
+**Postconditions:**
+- Game progresses to the next round.
+
+---
+
+### Use Case 17: Round Timer Ends Before All Guessers Guess Correctly
+
+**Actor(s):** All players
+
+**Preconditions:**
+- A drawing round is in progress.
+
+**Flow of Events:**
+1. Round timer reaches zero.
+2. A popup appears indicating time has run out.
+3. Round ends and new roles are assigned.
+4. A new round begins.
+
+**Postconditions:**
+- Game progresses to the next round without all correct guesses.
+
+---
+
+### Use Case 18: Game Ends (Regular Player)
+
+**Actor(s):** All players (non-host)
+
+**Preconditions:**
+- The maximum number of rounds is reached.
+
+**Flow of Events:**
+1. Game session ends.
+2. Endgame screen displays final leaderboard.
+3. User clicks the "Leave Lobby" button.
+
+**Postconditions:**
+- User returns to the main website or lobby list.
+
+---
+
+### Use Case 19: Game Ends (Host)
+
+**Actor(s):** Hosting user
+
+**Preconditions:**
+- The maximum number of rounds is reached.
+
+**Flow of Events:**
+1. Game session ends.
+2. Endgame screen displays final leaderboard.
+3. Host is presented with a "Play Again" button and "Leave Lobby" button.
+
+**Postconditions:**
+- Host can choose to start a new game or leave the lobby.
+
+---
+
+### Use Case 20: Users Choose to Play Again After Game Ends
+
+**Actor(s):** Hosting user and players
+
+**Preconditions:**
+- Game session has ended, and players are on the endgame screen.
+
+**Flow of Events:**
+1. Host clicks the "Play Again" button.
+2. All users are returned to the lobby.
+3. Host clicks the "Start Game" button to begin a new session.
+
+**Postconditions:**
+- A new game session starts with the same players.
+
+---
