@@ -14,6 +14,8 @@ This diagram shows the flow of the game and how 3 players interact with it. For 
 
 ### Use Case 1: Non-Playing User Hosts a Game Lobby
 
+<img width="540" alt="Screenshot 2025-04-27 at 12 11 53 PM" src="https://github.com/user-attachments/assets/05225396-ebf1-479e-8af8-34cdc2e255e8" />
+
 **Actor(s):** User
 
 **Preconditions:** 
@@ -31,6 +33,8 @@ This diagram shows the flow of the game and how 3 players interact with it. For 
 ---
 
 ### Use Case 2: Playing User Hosts a Game Lobby
+
+<img width="727" alt="Screenshot 2025-04-27 at 12 22 54 PM" src="https://github.com/user-attachments/assets/de48274d-1182-440b-8d3b-74b42a14653f" />
 
 **Actor(s):** User
 
@@ -52,6 +56,8 @@ This diagram shows the flow of the game and how 3 players interact with it. For 
 
 ### Use Case 3: Hosting User Shares Game Lobby Code
 
+<img width="691" alt="Screenshot 2025-04-27 at 12 34 01 PM" src="https://github.com/user-attachments/assets/a21e8bd6-2bbd-43bf-9207-40e2aceed87f" />
+
 **Actor(s):** Hosting user
 
 **Preconditions:**
@@ -68,6 +74,8 @@ This diagram shows the flow of the game and how 3 players interact with it. For 
 ---
 
 ### Use Case 4: User Joins an Existing Game Lobby
+
+<img width="702" alt="Screenshot 2025-04-27 at 12 38 47 PM" src="https://github.com/user-attachments/assets/2f917009-e6ff-45c5-a6ca-74ee7f741a5f" />
 
 **Actor(s):** User
 
@@ -88,6 +96,8 @@ This diagram shows the flow of the game and how 3 players interact with it. For 
 
 ### Use Case 5: User Attempts to Join a Non-Existing Lobby
 
+<img width="875" alt="Screenshot 2025-04-27 at 12 40 16 PM" src="https://github.com/user-attachments/assets/b2b95c16-bd0c-4d9a-8bbe-92887a945453" />
+
 **Actor(s):** User
 
 **Preconditions:**
@@ -107,6 +117,8 @@ This diagram shows the flow of the game and how 3 players interact with it. For 
 
 ### Use Case 6: Hosting User Starts a Game
 
+<img width="586" alt="Hosting User Starts a Game" src="https://github.com/user-attachments/assets/45f5914d-e7d1-4942-9aa5-893ba72296de" />
+
 **Actor(s):** Hosting user
 
 **Preconditions:**
@@ -122,6 +134,8 @@ This diagram shows the flow of the game and how 3 players interact with it. For 
 ---
 
 ### Use Case 7: User is Presented with a Drawing Prompt
+
+<img width="437" alt="User is Presented with a Drawing Prompt" src="https://github.com/user-attachments/assets/301f9d53-49f2-4a81-be9e-8d648e4515d7" />
 
 **Actor(s):** Drawing user
 
@@ -140,6 +154,8 @@ This diagram shows the flow of the game and how 3 players interact with it. For 
 
 ### Use Case 8: User is Assigned to Draw on the Drawing Board
 
+<img width="532" alt="User is Assigned to Draw on the Drawing Board" src="https://github.com/user-attachments/assets/c691e585-08c7-4fd9-9e12-1b012972d5ce" />
+
 **Actor(s):** Drawing user
 
 **Preconditions:**
@@ -157,6 +173,9 @@ This diagram shows the flow of the game and how 3 players interact with it. For 
 
 ### Use Case 9: Drawer Undoes a Drawing Stroke
 
+<img width="608" alt="Drawer Undoes a Drawing Stroke" src="https://github.com/user-attachments/assets/edafe385-f5eb-4a58-baf4-028ce5b75892" />
+
+
 **Actor(s):** Drawing user
 
 **Preconditions:**
@@ -172,6 +191,8 @@ This diagram shows the flow of the game and how 3 players interact with it. For 
 ---
 
 ### Use Case 10: Drawer Clears the Drawing Board
+
+<img width="579" alt="Drawer Clears the Drawing Board" src="https://github.com/user-attachments/assets/39cfbd63-67ba-47e3-bd7c-eb40e9819e3e" />
 
 **Actor(s):** Drawing user
 
@@ -189,6 +210,8 @@ This diagram shows the flow of the game and how 3 players interact with it. For 
 
 ### Use Case 11: Drawer Changes Stroke Color
 
+<img width="604" alt="Drawer Changes Stroke Color" src="https://github.com/user-attachments/assets/4709849d-35a1-475e-b466-182f487998d0" />
+
 **Actor(s):** Drawing user
 
 **Preconditions:**
@@ -204,6 +227,8 @@ This diagram shows the flow of the game and how 3 players interact with it. For 
 ---
 
 ### Use Case 12: Drawer Changes Stroke Width
+
+<img width="606" alt="Drawer Changes Stroke Width" src="https://github.com/user-attachments/assets/f20db187-241f-4a58-9a7e-76252fc2706f" />
 
 **Actor(s):** Drawing user
 
@@ -221,6 +246,8 @@ This diagram shows the flow of the game and how 3 players interact with it. For 
 
 ### Use Case 13: User is Assigned the Role of Guesser
 
+<img width="606" alt="User is Assigned the Role of Guesser" src="https://github.com/user-attachments/assets/cd1432d4-4514-4949-beec-a4f5e16e1951" />
+
 **Actor(s):** Guessing user
 
 **Preconditions:**
@@ -236,6 +263,8 @@ This diagram shows the flow of the game and how 3 players interact with it. For 
 ---
 
 ### Use Case 14: Guesser Selects an Incorrect Guess
+
+<img width="615" alt="Guesser Selects an Incorrect Guess" src="https://github.com/user-attachments/assets/688be5c1-5d79-4321-af3d-7a6d0df62e79" />
 
 **Actor(s):** Guessing user
 
@@ -253,6 +282,8 @@ This diagram shows the flow of the game and how 3 players interact with it. For 
 ---
 
 ### Use Case 15: Guesser Selects a Correct Guess
+
+<img width="606" alt="Guesser Selects a Correct Guess" src="https://github.com/user-attachments/assets/98e3d560-f643-4cbf-ac41-23fd6271987e" />
 
 **Actor(s):** Guessing user
 
@@ -273,6 +304,9 @@ This diagram shows the flow of the game and how 3 players interact with it. For 
 
 ### Use Case 16: All Guessers Guess Correctly
 
+<img width="626" alt="All Guessers Guess Correctly" src="https://github.com/user-attachments/assets/035c26fd-3824-49a7-a6af-f7d78e79e02f" />
+
+
 **Actor(s):** All guessing users
 
 **Preconditions:**
@@ -290,6 +324,8 @@ This diagram shows the flow of the game and how 3 players interact with it. For 
 ---
 
 ### Use Case 17: Round Timer Ends Before All Guessers Guess Correctly
+
+<img width="773" alt="Round Timer Ends Before All Guessers Guess Correctly" src="https://github.com/user-attachments/assets/f696fdc2-e53a-4410-aa8a-bc3426c1b4f1" />
 
 **Actor(s):** All players
 
@@ -309,6 +345,8 @@ This diagram shows the flow of the game and how 3 players interact with it. For 
 
 ### Use Case 18: Game Ends (Regular Player)
 
+<img width="626" alt="Game Ends (Regular Player)" src="https://github.com/user-attachments/assets/22b0f6f2-6582-4b71-8ec5-825558cd3aa3" />
+
 **Actor(s):** All players (non-host)
 
 **Preconditions:**
@@ -326,6 +364,8 @@ This diagram shows the flow of the game and how 3 players interact with it. For 
 
 ### Use Case 19: Game Ends (Host)
 
+<img width="517" alt="Game Ends (Host)" src="https://github.com/user-attachments/assets/7fe659fb-114b-4a3a-84ee-1c1de7a71413" />
+
 **Actor(s):** Hosting user
 
 **Preconditions:**
@@ -342,6 +382,8 @@ This diagram shows the flow of the game and how 3 players interact with it. For 
 ---
 
 ### Use Case 20: Users Choose to Play Again After Game Ends
+
+<img width="639" alt="Users Choose to Play Again After Game Ends" src="https://github.com/user-attachments/assets/3a0aabe2-bee5-4278-b36e-ef19aca0b378" />
 
 **Actor(s):** Hosting user and players
 
