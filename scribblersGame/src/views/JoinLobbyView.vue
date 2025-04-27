@@ -9,7 +9,7 @@
 
     <div class="form-group">
       <!-- Section for selecting room code using shapes -->
-      <label @click="speakNow('Select Room Code (4 shapes)')">Select Room Code (4 shapes)</label>
+      <label @click="speakNow('Select Room Code (5 shapes)')">Select Room Code (5 shapes)</label>
       <div class="shape-slots">
         <div
           v-for="(shape, index) in selectedShapes"
@@ -58,16 +58,15 @@
     <div class="bottom-buttons">
       <!-- Button to join the waiting room instead of going directly to game -->
       <RouterLink 
-      v-if="currentUser != '' && roomCodeArr.length == 4"
-      :to="{
-          path: '/game', // Navigates to the game route
-      }"
-      class="join-btn" 
-      @click="joinLobby">
-        Join Lobby</RouterLink>
+        v-if="currentUser !== '' && roomCodeArr.length === 5"
+        :to="{ path: '/game' }"
+        class="join-btn" 
+        @click="joinLobby">
+        Join Lobby
+      </RouterLink>
 
       <RouterLink 
-        v-if="currentUser == '' || roomCodeArr.length != 4"
+        v-else
         to="#"
         class="disabled-btn"
         @click.prevent="showNoAvatarSelectedAlert">
@@ -113,7 +112,7 @@ function showNoAvatarSelectedAlert() {
 }
 
 // Reactive state for storing selected shapes
-const selectedShapes = ref([null, null, null, null])
+const selectedShapes = ref([null, null, null, null, null])
 
 // List of available shapes
 const shapes = [
@@ -202,9 +201,9 @@ function selectAvatar(button) {
 function joinLobby() {
   speakNow('Joining lobby')
   if (selectedShapes.value.includes(null) || !currentUserAvatar.value) {
-    alert('Please select all 4 shapes and an avatar.')
-    return false
-  }
+  alert('Please select all 5 shapes and an avatar.')
+  return false
+}
 
   // Use state to set and save the selection of the user
   userGameState.setGameState(currentUser, currentUserAvatar, roomCodeArr, false, 0, 0, false)

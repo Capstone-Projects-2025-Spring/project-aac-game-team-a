@@ -74,7 +74,7 @@ class SocketHandler{
             while (!uniqueCodeFound) {
                 
                 //  Generate random values in array
-                randomCodeDigits.value = Array.from({ length: 4 }, () =>
+                randomCodeDigits.value = Array.from({ length: 5 }, () =>
                     Math.floor(Math.random() * 9) + 1
                 );
 
