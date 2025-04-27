@@ -119,8 +119,8 @@
     }
 
     .room-code-shape {
-        width: 50px;
-        height: 50px;
+        width: 45px;
+        height: 45px;
         object-fit: contain;
     }
 
