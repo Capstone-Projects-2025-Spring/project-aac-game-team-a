@@ -1,18 +1,29 @@
-// client.js
-import { io } from 'socket.io-client';
+import { io } from "socket.io-client";
 
-const socket = io('http://localhost:3000');
+// Connect to your server (replace with your server's URL if needed)
+const socket = io("http://localhost:3000");
 
-socket.on('connect', () => {
-  console.log('connected to server');
+// When connected
+socket.on("connect", () => {
+  console.log("Connected to server with id:", socket.id);
 });
 
-socket.on('message', (data) => {
-  console.log('message received:', data);
+// Listen for a test event
+socket.on("test", (data) => {
+  console.log("Received 'test' event with data:", data);
 });
 
-socket.on('disconnect', () => {
-    console.log('disconnected from server');
-});
+// Emit a test event
+function sendTestMessage() {
+  socket.emit("test", { message: "Hello from client!" });
+}
 
-export default socket;
+// Example: send a message after 2 seconds
+setTimeout(() => {
+  sendTestMessage();
+}, 2000);
+
+// Handle disconnect
+socket.on("disconnect", () => {
+  console.log("Disconnected from server");
+});
