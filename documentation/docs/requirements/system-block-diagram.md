@@ -8,8 +8,19 @@ sidebar_position: 2
 **Figure 1.** High-level design of Scribblers! web application.
 
 ## Description
-The system diagram shown in Figure 1 shows the architecture of the Scribblers application at a high-level.
-AAC and Non-AAC Users access the game through the same webpage interface. 
-The webpage is rendered by the React front-end framework, handling user inputs and updating the webpage with game data processed by the back-end. 
-The back-end, hosted on a server running Node.js, processes any data received from the front-end and handles external API calls as needed.
+The Scribblers! project stack is composed as followed:
+
+#### Front-End: 
+* Vue.js
+* Socket.io (Client)
+
+#### Back-End: 
+* Node.js
+* Express
+* Socket.io (Server)
+
+#### Hosting: 
+* Fly.io
+
+AAC and Non-AAC Users access the game through the same webpage interface. The front-end handles visual rendering, user input for all features, and updating the webpage with game data processed by the back-end. The back-end processes any data sent by the front-end, handles game data functions such as timers and round starting and stopping, and updates the other users with data from the server to maintain syncronization across multiple users.
 
