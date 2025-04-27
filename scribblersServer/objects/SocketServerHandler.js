@@ -4,7 +4,6 @@
 //  IMPORTING
 const { Server } = require('socket.io'); // Server class from socket.io
 const GameData = require("./GameData"); // Manages game data for each room
-let joinCounter = 0;
 
 class SocketHandler{
 
@@ -102,7 +101,7 @@ class SocketHandler{
 
         // Listens for user joining room
         client.on('join-room', (room, user, isHost)  => {
-            if (!gameDataMap.get(room).playerData.has(user) || joinCounter == 0) {
+            if (!gameDataMap.get(room).playerData.has(user) || isHost) {
 
                 //  Prevent users from joining non-existent rooms, joining full rooms, or duplicate avatars
                 if (server.sockets.adapter.rooms.has(room) && gameDataMap.get(room).playerData.size < gameDataMap.get(room).maxPlayers) {
@@ -129,7 +128,6 @@ class SocketHandler{
                         server.to(client.id).emit("update-user", '');
                 }
                 console.log(`User ${client.id} is connected to room ${room}`); // Logs when a new user connects
-                joinCounter++
             //avatar is taken
             } else {
                 server.to(client.id).emit("return-to-join-screen")
