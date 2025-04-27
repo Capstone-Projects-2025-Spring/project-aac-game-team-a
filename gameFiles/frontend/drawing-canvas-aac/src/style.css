@@ -109,6 +109,11 @@ canvas {
 
 }
 
+.tools .button-container {
+  display: flex;
+  gap: 10px; /* Space between the buttons */
+}
+
 /* style for buttons */
 .tools .button{
   border-radius: 0;
