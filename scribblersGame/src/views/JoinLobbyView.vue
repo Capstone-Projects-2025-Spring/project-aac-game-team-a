@@ -66,6 +66,7 @@
       @click="joinLobby">
         Join Lobby</RouterLink>
 
+      <!-- Error handling version of join lobby button -->
       <RouterLink 
         v-if="currentUser == '' || roomCodeArr.length != 4"
         to="#"
@@ -208,6 +209,12 @@ function joinLobby() {
 
   // Use state to set and save the selection of the user
   userGameState.setGameState(currentUser, currentUserAvatar, roomCodeArr, false, 0, 0, false)
+  
+  //request taken avatars from backend
+
+  //receive taken avatars list from backend
+
+  //if currentUser in list of avatars, display an alert() and return false
 }
 </script>
 
