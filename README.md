@@ -17,23 +17,58 @@ Section #, as well as any words that quickly give your peers insights into the a
 
 ## Project Abstract
 
-This document proposes a novel application of a text message (SMS or Email) read-out and hands-free call interacted between an Android Smartphone and an infotainment platform (headunit) in a car environment. When a phone receives an SMS or Email, the text message is transferred from the phone to the headunit through a Bluetooth connection. On the headunit, user can control which and when the received SMS or E-mail to be read out through the in-vehicle audio system. The user may press one button on the headunit to activate the hands-free feature to call back the SMS sender.
+The goal of "Scribblers!" is to create a fun experience for children who struggle with communicating verbally or who prefer to use other forms of communication. This project emulates the game "Pictionary", but includes the use of a custom AAC (Augmented and Alternative Communication) board along with other accesibility features. Users will take turns drawing a random prompt, and those who take on the role of a guesser will use the AAC board to select their guesses.
 
 ## High Level Requirement
 
-Describe the requirements – i.e., what the product does and how it does it from a user point of view – at a high level.
+The requirements that will be needed for the game to flow as intended will include: 
+* Lobby Management
+* Drawing Interface
+* Avatar Selection
+* Turn-Based Gameplay
+* LeaderBoard
+* Game Progression
+* Real-Time Interaction
+
+The requirements for accessibility functionality include:
+* AAC Communication
+* Audio and Visual Feedback
+* Customization Options for Audio and Visual Feedback
 
 ## Conceptual Design
 
-Describe the initial design concept: Hardware/software architecture, programming language, operating system, etc.
+### Frontend  
+* **Vue.js 3** -  Frontend framework for building the game interface and handling client-side events.
+* **Vue Router** - Library for dynamic navigation between views and components.
+* **Pinia** - State management library for maintaining consistent state across UI components.
+* **HTML5 Canvas** - API for managing the drawing board and user drawing actions.
+* **Socket.io (Client-Side)** - Library for real-time communication between players via WebSocket.
 
+### Backend
+* **Node.js** - Backend runtime environment for processing game logic, managing server-side state, and handling real-time events.
+* **Express** - Web server framework for establishing API endpoints and managing HTTP requests.
+* **Socket.io (Server-Side)** - Library for broadcasting real-time updates between clients through WebSocket connections.
+
+### Deployment
+* **Fly.io** - Cloud deployment platform to deploy the frontend and backend
+* **Docker Container** - Package that will bundle the application's build and run environment configuration to be deployed by Fly.io
+  
 ## Background
 
-The background will contain a more detailed description of the product and a comparison to existing similar projects/products. A literature search should be conducted and the results listed. Proper citation of sources is required. If there are similar open-source products, you should state whether existing source will be used and to what extent. If there are similar closed-source/proprietary products, you should state how the proposed product will be similar and different.
+"Scribblers!" draws inspiration from the game "Pictionary" where a drawer is given a word to draw at the start of the round, and guessers will take turns to try and guess what the word is based on how the drawing looks. The number of rounds and number of players is specifed by the users, and the game includes a timer that is used to calculate a user's score. 
+
+Inspiration for the AAC board is drawn from the [AsTeRICS Grid](https://grid.asterics.eu/#grid/grid-data-1739806952446-161) project that includes examples and open source AAC boards.
 
 ## Required Resources
 
-Discuss what you need to develop this project. This includes background information you will need to acquire, hardware resources, and software resources. If these are not part of the standard Computer Science Department lab resources, these must be identified early and discussed with the instructor.
+### Hardware
+* Laptop device
+* Tablet device
+* Mobile device (Out of scope)
+
+### Software
+* Deployment service
+* IDE (Web or Desktop service)
 
 ## Collaborators
 
@@ -60,7 +95,29 @@ Discuss what you need to develop this project. This includes background informat
             <br/>
             <sub><b>Terrell Heyward</b></sub>
         </a>
-    </td></tr>
+    </td>
+    <td align="center">
+        <a href="https://github.com/ljtron">
+              <img src="" width="100;" alt="McloudLincoln"/>
+              <br/>
+              <sub><b>Lincoln Mcloud</b></sub>
+        </a>
+    </td>
+    <td align="center">
+        <a href="https://github.com/Vasil132">
+            <img src="" width="100;" alt="KladasVasilios"/>
+            <br/>
+            <sub><b>Vasilios Kladas</b></sub>
+        </a>
+    </td>
+    <td align="center">
+          <a href="https://github.com/Dex215">
+              <img src="" width="100;" alt="GiglioDex"/>
+              <br/>
+              <sub><b>Dex Giglio</b></sub>
+          </a>
+    </td>
+</tr>
 </table>
 
 [//]: # ( readme: collaborators -end )
