@@ -1,5 +1,6 @@
 /**
  * Handles all socket client events including server connection and listener initialization.
+ * @class SocketClientHandler
  */
 import io from "socket.io-client";
 import { GameState } from '@/stores/GameState';

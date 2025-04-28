@@ -1,5 +1,6 @@
 /**
  * This class handles socket initialization and listening events
+ * @class SocketHandler
  */
 //  IMPORTING
 const { Server } = require('socket.io'); // Server class from socket.io
@@ -210,7 +211,6 @@ class SocketHandler{
 
         client.on("draw", (room, x, y) => {
             client.to(room).emit("cast-draw", x, y);
-            console.log("x: " + x + "    y: " + y)
         });
 
         client.on("draw-end", (room) => {
