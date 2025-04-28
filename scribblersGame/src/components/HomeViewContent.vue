@@ -20,9 +20,9 @@ export default {
   this.music.volume = 0.5;
 
   // Try to play the music immediately (it may fail due to autoplay restrictions)
-  this.music.play().catch(err => {
-    console.warn('Autoplay prevented:', err);
-  });
+  // this.music.play().catch(err => {
+  //   console.warn('Autoplay prevented:', err);
+  // });
 },
 
 beforeUnmount() {
