@@ -111,7 +111,7 @@ Inspiration for the AAC board is drawn from the [AsTeRICS Grid](https://grid.ast
         </a>
     </td>
     <td align="center">
-          <a href="https://github.com/dexjg || https://github.com/Dex215">
+          <a href="https://github.com/Dex215">
               <img src="" width="100;" alt="GiglioDex"/>
               <br/>
               <sub><b>Dex Giglio</b></sub>
