@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Home</title>
+    <title>JSDoc: Source: SpeechHelper.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,32 +17,39 @@
 
 <div id="main">
 
-    <h1 class="page-title">Home</h1>
+    <h1 class="page-title">Source: SpeechHelper.js</h1>
 
     
 
 
 
     
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Handles Text-to-Speech requests 
+ */
 
+class SpeechHelper {
 
-    <h3> </h3>
+    // Called to turn text into speech
+    speakNow(textToSpeak, settingsState) {
+        // Cancel any current TTS
+        speechSynthesis.cancel();
 
+        // Only use text-to-speech if enabled and the string does not contain 'null'
+        if(settingsState.enableTTS &amp;&amp; !textToSpeak.includes('null')){
+            const utterance = new SpeechSynthesisUtterance(textToSpeak); // Synthesize the speech
+            utterance.volume = settingsState.volumeTTS // Set the volume of speech
+            utterance.lang = 'en'; // Specify the language
+            speechSynthesis.speak(utterance); // Speak fido
+        }
+    }
+}
 
-
-
-
-
-
-
-
-
-    
-
-
-
-
-
+export default SpeechHelper</code></pre>
+        </article>
+    </section>
 
 
 
