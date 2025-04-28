@@ -133,7 +133,8 @@
     }
 
     .chat-guess {
-        border: 3px solid rgb(0, 0, 0);
+        /* border: 3px solid rgb(0, 0, 0); */
+        background-color: rgb(227, 227, 227);
         border-radius: 25px;
         font-weight: bold;
         font-family: 'Segoe UI', sans-serif;
