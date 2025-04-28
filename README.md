@@ -55,13 +55,20 @@ The requirements for accessibility functionality include:
   
 ## Background
 
-"Scribblers!" draws inspiration from the game "Pictionary" where a drawer is given a word to draw at the start of the round, and guessers will take turns to try and guess what the word is based on how the drawing looks. The number of rounds and number of players is specifed by the users, and the game includes a timer that is used to calculate a user's score. Inspiration for the AAC board is drawn from the [AsTeRICS Grid](https://grid.asterics.eu/#grid/grid-data-1739806952446-161) project that includes examples and open source AAC boards.
+"Scribblers!" draws inspiration from the game "Pictionary" where a drawer is given a word to draw at the start of the round, and guessers will take turns to try and guess what the word is based on how the drawing looks. The number of rounds and number of players is specifed by the users, and the game includes a timer that is used to calculate a user's score. 
 
-The background will contain a more detailed description of the product and a comparison to existing similar projects/products. A literature search should be conducted and the results listed. Proper citation of sources is required. If there are similar open-source products, you should state whether existing source will be used and to what extent. If there are similar closed-source/proprietary products, you should state how the proposed product will be similar and different.
+Inspiration for the AAC board is drawn from the [AsTeRICS Grid](https://grid.asterics.eu/#grid/grid-data-1739806952446-161) project that includes examples and open source AAC boards.
 
 ## Required Resources
 
-Discuss what you need to develop this project. This includes background information you will need to acquire, hardware resources, and software resources. If these are not part of the standard Computer Science Department lab resources, these must be identified early and discussed with the instructor.
+### Hardware
+* Laptop device
+* Tablet device
+* Mobile device (Out of scope)
+
+### Software
+* Deployment service
+* IDE (Web or Desktop service)
 
 ## Collaborators
 
@@ -88,7 +95,29 @@ Discuss what you need to develop this project. This includes background informat
             <br/>
             <sub><b>Terrell Heyward</b></sub>
         </a>
-    </td></tr>
+    </td>
+    <td align="center">
+        <a href="https://github.com/ljtron">
+              <img src="" width="100;" alt="McloudLincoln"/>
+              <br/>
+              <sub><b>Lincoln Mcloud</b></sub>
+        </a>
+    </td>
+    <td align="center">
+        <a href="https://github.com/Vasil132">
+            <img src="" width="100;" alt="KladasVasilios"/>
+            <br/>
+            <sub><b>Vasilios Kladas</b></sub>
+        </a>
+    </td>
+    <td align="center">
+          <a href="https://github.com/dexjg || https://github.com/Dex215">
+              <img src="" width="100;" alt="GiglioDex"/>
+              <br/>
+              <sub><b>Dex Giglio</b></sub>
+          </a>
+    </td>
+</tr>
 </table>
 
 [//]: # ( readme: collaborators -end )
