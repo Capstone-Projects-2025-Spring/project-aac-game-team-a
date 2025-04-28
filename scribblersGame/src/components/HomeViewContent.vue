@@ -5,13 +5,39 @@ import SettingsOverlay from '@/components/SettingsOverlay.vue'
 export default {
   data () {
     return {
+      music: null, //music
+      isMusicPlaying: false,
       settingsState: null, // Intialize a variable for the settings
     }
   },
+
+  mounted() {
+  this.settingsState = SettingState();
+
+  // Create the audio object
+  this.music = new Audio('/menuTheme.mp3');
+  this.music.loop = true;
+  this.music.volume = 0.5;
+
+  // Try to play the music immediately (it may fail due to autoplay restrictions)
+  // this.music.play().catch(err => {
+  //   console.warn('Autoplay prevented:', err);
+  // });
+},
+
+beforeUnmount() {
+  if (this.music) {
+    this.music.pause();
+    this.music.currentTime = 0;
+    this.music = null;
+  }
+},
+
   created() {
     this.settingsState = SettingState() // Set the settings to the current state
   },
   methods: {
+    
     // Called to turn text into speech
     speakNow(textToSpeak) {
       // Cancel any current TTS
@@ -32,6 +58,18 @@ export default {
       // Navigate to required page
       this.$router.push(route)
     },
+
+    toggleMusic() {
+    if (this.isMusicPlaying) {
+      this.music.pause();
+      this.isMusicPlaying = false;
+    } else {
+      this.music.play().catch(err => {
+        console.warn('Autoplay prevented:', err);
+      });
+      this.isMusicPlaying = true;
+    }
+   }
   }
 }
 </script>
@@ -48,6 +86,9 @@ export default {
     <div class="lobby-buttons">
       <button @click="handleClick('Join Lobby', '/joinLobby')" class="join-lobby-button">Join Lobby</button>
       <button @click="handleClick('Create Lobby', '/hostLobby')" class="create-lobby-button">Create Lobby</button>
+      <button @click="toggleMusic" class="music-button">
+      {{ isMusicPlaying ? 'Pause Music' : 'Play Music' }}
+    </button>
     </div>
   </div>
 
@@ -196,5 +237,27 @@ export default {
 .toggle-tts-img {
   width:50px;
   height:55px;
+}
+
+.music-button {
+  position: fixed; /* Fixed position at the bottom left */
+  left: 20px;
+  bottom: 20px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.music-button:hover {
+  background-color: rgba(0, 0, 0, 0.9);
+}
+
+.music-button:active {
+  transform: scale(0.98); /* Slightly shrink button on press */
 }
 </style>

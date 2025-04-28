@@ -1,15 +1,16 @@
 /**
  * This class handles socket initialization and listening events
+ * @class SocketServerHandler
  */
 //  IMPORTING
 const { Server } = require('socket.io'); // Server class from socket.io
 const GameData = require("./GameData"); // Manages game data for each room
 
-class SocketHandler{
+class SocketServerHandler{
 
     /**
      * Initialize new Socket.io server instance. Return new server to caller, returns null if fails
-     * @param {httpServerInstance} httpServer HTTP server created using express application
+     * @param {object} httpServer HTTP server created using express application
      * @returns new server instance on success, 0 on failure
      */
     createServerInstance(httpServer) {
@@ -29,8 +30,8 @@ class SocketHandler{
 
     /**
      * Start the requested server on the requested port
-     * @param {*} httpServer HTTP server created using express application
-     * @param {*} port port number to be exposed for client listeners
+     * @param {object} httpServer HTTP server created using express application
+     * @param {number} port port number to be exposed for client listeners
      */
     startServer(httpServer, port) {
         try {
@@ -44,9 +45,9 @@ class SocketHandler{
 
     /**
      * Initialize Socket.io server listeners to manage client requests
-     * @param {*} server Socket.io server instance
-     * @param {*} client Socket.io client connecting to server
-     * @param {*} gameDataMap Server-side map of game data
+     * @param {object} server Socket.io server instance
+     * @param {object} client Socket.io client connecting to server
+     * @param {Map} gameDataMap Server-side map of game data
      */
     initializeServerListeners(server, client, gameDataMap) {
 
@@ -210,7 +211,6 @@ class SocketHandler{
 
         client.on("draw", (room, x, y) => {
             client.to(room).emit("cast-draw", x, y);
-            console.log("x: " + x + "    y: " + y)
         });
 
         client.on("draw-end", (room) => {
@@ -231,4 +231,4 @@ class SocketHandler{
     }
 }
 
-module.exports = SocketHandler;
+module.exports = SocketServerHandler;

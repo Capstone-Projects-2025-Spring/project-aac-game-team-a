@@ -1,4 +1,5 @@
 ## Component Descriptions
+---
 
 ### Frontend (Client-Side) Vue/Socket.io-Client/Pinia:
 
@@ -65,7 +66,7 @@ HomeViewContent contains the content displayed on the home page. It handles user
 #### 21. SpeechSynthesis
 SpeechSynthesis is used to convert text to speech, providing accessibility features like TTS for the application.
 
-
+----
 ### Backend (Server-Side) Socket.io/Express/Node:
 
 #### 22. Server
@@ -85,6 +86,8 @@ HttpServer is used for handling HTTP requests, typically through the Express app
 
 #### 27. GameData
 GameData manages the data specific to the game session, such as player data, game rounds, prompts, and timer. It includes methods for updating the game state, starting new rounds, and checking if all guesses are correct.
+
+---
 
 ## Class Diagram
 
@@ -128,7 +131,6 @@ classDiagram
        +toggleTTS() void
        +updateVolume(e) void
        +updateOpacity(e) void
-       +speakNow(textToSpeak: string) void
        +close() void
    }
    class Router {
@@ -137,13 +139,15 @@ classDiagram
        +HostLobbyView
        +JoinLobbyView
    }
+   class SpeechHelper{
+      +speakNow(textToSpeak: string, settinsState: boolean) void
+   }
    class HomeView {
        +HomeViewContent
    }
    class GameView {
        +triggerAllGuessedCorrectPopup() void
        +triggerTimeRanOutPopup() void
-       +speakNow(textToSpeak: string) void
        +speakRoomCode() void
        +getShapeImage(digit: number) string
        +getShapeLabel(digit: number) string
@@ -194,9 +198,14 @@ classDiagram
        -AACButtons:
        -roomCodeShapes:
    }
+   class SocketClientHandler{
+      +connectSocketServer(socketServer: string, testServer: string, inProduction: boolean, gameData: object) Socket
+      +initSocketConnection(socketServer: string, testServer: string, inProduction: boolean) void
+      +reateLobby(socket: object, gameData: object) void
+      +initSocketListeners(socket: object, gameData: object) void
+   }
    class aacBoard {
        +selectItem(item: string) void
-       +speakNow(textToSpeak: string) void
        +setCurrentCategory(category: string|null) void
        +getCategoryImage(category: string) string
        +getItemImage(category: string, item: string) string
@@ -212,7 +221,6 @@ classDiagram
    class DrawingBoard {
        +clear_canvas() void
        +undo_action() void
-       +speakNow(textToSpeak: string) void
        +saveState() void
        +start(event: Event) void
        +draw(event: Event) void
@@ -229,7 +237,6 @@ classDiagram
        -props: [ isDrawer: boolean ]
    }
    class WaitingRoom {
-       +speakNow(textToSpeak: string) void
        +speakRoomCode() void
        +getShapeImg(digit: number) string
        +showNotEnoughPlayersAlert() void
@@ -244,7 +251,6 @@ classDiagram
 
 
    class GuessBoard {
-       +speakNow(textToSpeak: string) void
        -props: [
            playerDataMap: Map<String, [ score: number, currentGuess: string, currentGuessImagePath: string ]>,
            time: number,
@@ -260,7 +266,6 @@ classDiagram
 
 
    class EndGameScreen {
-       +speakNow(textToSpeak: string) void
        +playAgain() void
        +leaveLobby() void
        +hasHighscore(score: number) bool
@@ -272,7 +277,6 @@ classDiagram
 
 
    class HostLobbyView {
-       +speakNow(textToSpeak: string) void
        +validatePlayerCount() void
        +validateRoundCount() void
        +toggleAvatars(show: boolean) void
@@ -291,7 +295,6 @@ classDiagram
        -avatarButtons: string
    }
    class JoinLobbyView {
-       +speakNow(textToSpeak: string) void
        +showNoAvatarSelectedAlert() void
        +selectShape(shape) void
        +undoShape() void
@@ -308,7 +311,6 @@ classDiagram
        -avatarButtons: string[]
    }
    class HomeViewContent {
-       +speakNow(textToSpeak: string) void
        +handleClick(text: string, route: string) void
    }
    class SpeechSynthesis {
@@ -319,46 +321,42 @@ classDiagram
    Main --> Router : uses
    Main --> Pinia : uses
 
-
    App --> RouterView : uses
    App --> SettingState : uses
    App --> SettingsOverlay : uses
 
-
    SettingsOverlay --> SettingState : uses
+   SettingsOverlay --> SpeechHelper: uses
+
    SettingState --|> defineStore : based on
    GameState --|> defineState: based on
 
-
    RouterView --> Router : depends on
    RouterLink --> RouterView : depends on
-
 
    Router --> HomeView : route to
    Router --> GameView : route to
    Router --> HostLobbyView : route to
    Router --> JoinLobbyView : route to
 
-
    HomeView --> HomeViewContent : uses
-
 
    HomeViewContent --> SettingState : uses
    HomeViewContent --> Router : navigates with
    HomeViewContent --> SpeechSynthesis : uses
-
+   HomwViewContent --> SpeechHelper: uses
 
    HostLobbyView --> GameState : uses
    HostLobbyView --> SettingState : uses
    HostLobbyView --> SpeechSynthesis : uses
    HostLobbyView --> RouterLink : navigates with
-
+   HostLobbyView --> SpeechHelper: uses
 
    JoinLobbyView --> GameState : uses
    JoinLobbyView --> SettingState : uses
    JoinLobbyView --> SpeechSynthesis : uses
    JoinLobbyView --> RouterLink : navigates with
-
+   JoinLobbyView --> SpeechHelper: uses
 
    GameView --> aacBoard : uses
    GameView --> DrawingBoard : uses
@@ -367,23 +365,25 @@ classDiagram
    GameView --> EndGameScreen : uses
    GameView --> GameState : uses
    GameView --> SettingState : uses
-
+   GameView --> SocketClientHandler : uses
+   GameView --> SpeechHelper: uses
 
    aacBoard --> SettingState : uses
+   aacBoard --> SpeechHelper: uses
    
    DrawingBoard --> SettingState : uses
-
+   DrawingBoard --> SpeechHelper: uses
 
    WaitingRoom --> SettingState : uses
    WaitingRoom --> RouterLink : uses
-   DrawingBoard --> SettingState : uses
-
+   WaitingRoom --> SpeechHelper: uses
 
    GuessBoard --> SettingState : uses
-
+   GuessBoard --> SpeechHelper: uses
 
    EndGameScreen --> SettingState : uses
    EndGameScreen --> Router : uses
+   EndGameScreen --> SpeechHelper: uses
 
 
 class Server {
