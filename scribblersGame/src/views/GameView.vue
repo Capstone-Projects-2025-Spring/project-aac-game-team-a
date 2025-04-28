@@ -13,9 +13,9 @@ import { GameState } from '@/stores/GameState';
 import { SettingState } from '@/stores/SettingState'
 
 //  GAME SETTINGS
-const inProduction = true; //change this variable to switch between connecting to public backend server and localhost
+const inProduction = false; //change this variable to switch between connecting to public backend server and localhost
 const socketServer =  "scribblersserver.fly.dev"; //web address for hosted websocket server
-const testServer = "localhost" //set to IP address of test server
+const testServer = window.location.hostname //set to IP address of front-end host
 const SocketHandler = new SocketClientHandler;
 
 export default {
