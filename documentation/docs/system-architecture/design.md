@@ -730,39 +730,75 @@ After everyone draws for their third time, total points will be displayed, and r
 Triggering Event: All players have drawn three times.
 
 ## Algorithms
-
 ### 1. Player Selection (Random Drawer)
-- Selects one player randomly from the active lobby.
-- Uses `Math.random()` to pick an index from the player list.
+Goal: To Choose one player to be the “drawer” each round, at random, from the active lobby.
+
+Inputs:
+players: string[] – list of active player IDs (or avatars) in the room.
+currentDrawer: string – player ID of the drawer from the previous round .
+
+Output:
+newDrawer: string – the selected drawer for this round.
 
 ### 2. Word Selection (Random Prompt Assignment)
-- Retrieves three random words from a predefined list.
-- Uses Fisher-Yates shuffle or a similar algorithm.
-- If no selection in 15s, a word is randomly assigned.
+Goal: To assign a random prompt for the drawer
+
+Inputs:
+promptList: Prompt[] – array of all { id, word, type } objects.
+imagesPerPrompt: number – number of drawing variations for each prompt.
+
+Outputs:
+selectedPrompt: Prompt – the prompt object that was randomly chosen.
+imagePath: string – path to the image file for that prompt variation.
 
 ### 3. Guess Matching Algorithm
-- Converts guess and answer to lowercase, removes punctuation.
-- Awards correct answer points 
+Goal: To determine whether the guesser pressed the correct button in respect to what the current prompt is.
+
+Inputs
+userId: string — the ID of the guessing player (from the socket session).
+buttonId: string (or number) — identifier of the AAC board button they clicked.
+currentPromptId: number — the ID of the word prompt assigned to the drawer this round.
+
+Output
+isCorrect: boolean — true if buttonId === currentPromptId, else false.
+Side-effect: updates the guess record in memory and emits an "update-guess" event to clients with { userId, isCorrect }.
 
 ### 4. Score Calculation
-- Guessers earn points based on time taken.
-- Drawer earns points based on correct guesses.
-- Balanced scoring to avoid excessive competitiveness.
-  
+Goal: Award each guesser points in relation to how quickly they correctly identify the prompt via the AAC board.
 
+Inputs
+timeTakenMs: number – milliseconds elapsed from the start of the round until the guesser clicked the correct button.
+roundDurationMs: number – total allowed time per round.
+
+Output
+pointsAwarded: number – integer points given to the guesser..
+
+  
 ### Collection Schemas
 **Users Collection**  
 ```json
 {
-  "avatar": "String",
-  "room_code": "String"
+  "userId": "user_123",
+  "avatar": "cat_icon.png",
+  "room_code": {3,6,7,8,1}, //shown as shapes
+   "score": 10,
+  "aac_board": {
+    "categories": ["shapes","animals","actions"],
+    "layout": "grid",
+   },
 }
-```
 
 #### Collection Schemas
 **Guess**  
 ```json
 {
-  "guess": "String",
+  "guessId": "guess_789",
+  "userId": "user_123",
+  "promptId": 42,
+  "guess": "Elephant",
+  "isCorrect": true,
+  "timeTaken": 12000 ms
 }
 ```
+
+
