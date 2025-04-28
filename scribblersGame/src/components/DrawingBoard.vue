@@ -59,7 +59,7 @@ onMounted(() => {
    
     // Button Event Listeners
     document.querySelector(".Cbutton").addEventListener("click", clear_canvas);
-    // document.querySelector(".Ubutton").addEventListener("click", undo_action);   
+    document.querySelector(".Ubutton").addEventListener("click", undo_action);   
     document.querySelectorAll(".color-field").forEach((div) => {
         div.addEventListener("click", () => {
             draw_color = div.style.background;
@@ -188,7 +188,7 @@ function calculateDrawCoords(event) {
             <canvas id="canvas" ref="canvasRef"></canvas>
             <div class="tools"> 
                 <!--creates buttons for undo and clear-->
-                <!-- <button type="button" class="Ubutton">↩️ Undo</button>  -->
+                <button type="button" class="Ubutton">↩️ Undo</button> 
                 <button type="button" class="Cbutton">🧽 Clear</button>
 
                 <!--creates buttons for colors-->
