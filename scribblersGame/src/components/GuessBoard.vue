@@ -47,8 +47,6 @@
             <!-- Display the score -->
             Score: {{ data.score }}
 
-            Drawer: {{ props.currentDrawer }}
-
             <div class="player-data">
                 <img @click="speakNow('player '+player)" :src="player.toLowerCase() + '.png'" :alt="player" class="game-avatar-image" />
                 <h1 v-if="player != props.currentDrawer">
