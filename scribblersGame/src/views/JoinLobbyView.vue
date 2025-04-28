@@ -171,7 +171,9 @@ function undoShape() {
 // Function to clear all selected shapes
 function clearShapes() {
   speakNow('Clear'); // TTS
-  selectedShapes.value = [null, null, null, null]
+  for(let i = 0; i < selectedShapes.value.length; i++) {
+    selectedShapes.value[i] = null
+  }
   roomCodeArr.value = []
 }
 
