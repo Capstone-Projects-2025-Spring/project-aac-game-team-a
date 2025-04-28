@@ -1,0 +1,16 @@
+services:
+  # Vue.js front-end
+  webapp:
+    container_name: scribblers-front-end
+    build:
+      context: ./scribblersGame
+    ports:
+      - "80:80"
+
+  # Express back-end
+  server:
+    container_name: scribblers-back-end
+    build:
+      context: ./scribblersServer
+    ports:
+      - "3001:3001"
