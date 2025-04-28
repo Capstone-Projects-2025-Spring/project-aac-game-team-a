@@ -17,7 +17,7 @@ Section #, as well as any words that quickly give your peers insights into the a
 
 ## Project Abstract
 
-The goal of this project is to create a fun experience for children who struggle with communicating verbally or who prefer to use other forms of communication. This project emulates the game "Pictionary", but includes the use of a custom AAC (Augmented and Alternative Communication) board along with other accesibility features. Users will take turns drawing a random prompt, and those who take on the role of a guesser will use the AAC board to select their guesses.
+The goal of "Scribblers!" is to create a fun experience for children who struggle with communicating verbally or who prefer to use other forms of communication. This project emulates the game "Pictionary", but includes the use of a custom AAC (Augmented and Alternative Communication) board along with other accesibility features. Users will take turns drawing a random prompt, and those who take on the role of a guesser will use the AAC board to select their guesses.
 
 ## High Level Requirement
 
@@ -37,9 +37,25 @@ The requirements for accessibility functionality include:
 
 ## Conceptual Design
 
-Describe the initial design concept: Hardware/software architecture, programming language, operating system, etc.
+### Frontend  
+* **Vue.js 3** -  Frontend framework for building the game interface and handling client-side events.
+* **Vue Router** - Library for dynamic navigation between views and components.
+* **Pinia** - State management library for maintaining consistent state across UI components.
+* **HTML5 Canvas** - API for managing the drawing board and user drawing actions.
+* **Socket.io (Client-Side)** - Library for real-time communication between players via WebSocket.
 
+### Backend
+* **Node.js** - Backend runtime environment for processing game logic, managing server-side state, and handling real-time events.
+* **Express** - Web server framework for establishing API endpoints and managing HTTP requests.
+* **Socket.io (Server-Side)** - Library for broadcasting real-time updates between clients through WebSocket connections.
+
+### Deployment
+* **Fly.io** - Cloud deployment platform to deploy the frontend and backend
+* **Docker Container** - Package that will bundle the application's build and run environment configuration to be deployed by Fly.io
+  
 ## Background
+
+"Scribblers!" draws inspiration from the game "Pictionary" where a drawer is given a word to draw at the start of the round, and guessers will take turns to try and guess what the word is based on how the drawing looks. The number of rounds and number of players is specifed by the users, and the game includes a timer that is used to calculate a user's score. Inspiration for the AAC board is drawn from the [AsTeRICS Grid](https://grid.asterics.eu/#grid/grid-data-1739806952446-161) project that includes examples and open source AAC boards.
 
 The background will contain a more detailed description of the product and a comparison to existing similar projects/products. A literature search should be conducted and the results listed. Proper citation of sources is required. If there are similar open-source products, you should state whether existing source will be used and to what extent. If there are similar closed-source/proprietary products, you should state how the proposed product will be similar and different.
 
