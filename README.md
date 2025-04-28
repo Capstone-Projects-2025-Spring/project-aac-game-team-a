@@ -17,11 +17,23 @@ Section #, as well as any words that quickly give your peers insights into the a
 
 ## Project Abstract
 
-This document proposes a novel application of a text message (SMS or Email) read-out and hands-free call interacted between an Android Smartphone and an infotainment platform (headunit) in a car environment. When a phone receives an SMS or Email, the text message is transferred from the phone to the headunit through a Bluetooth connection. On the headunit, user can control which and when the received SMS or E-mail to be read out through the in-vehicle audio system. The user may press one button on the headunit to activate the hands-free feature to call back the SMS sender.
+The goal of this project is to create a fun experience for children who struggle with communicating verbally or who prefer to use other forms of communication. This project emulates the game "Pictionary", but includes the use of a custom AAC (Augmented and Alternative Communication) board along with other accesibility features. Users will take turns drawing a random prompt, and those who take on the role of a guesser will use the AAC board to select their guesses.
 
 ## High Level Requirement
 
-Describe the requirements – i.e., what the product does and how it does it from a user point of view – at a high level.
+The requirements that will be needed for the game to flow as intended will include: 
+* Lobby Management
+* Drawing Interface
+* Avatar Selection
+* Turn-Based Gameplay
+* LeaderBoard
+* Game Progression
+* Real-Time Interaction
+
+The requirements for accessibility functionality include:
+* AAC Communication
+* Audio and Visual Feedback
+* Customization Options for Audio and Visual Feedback
 
 ## Conceptual Design
 
