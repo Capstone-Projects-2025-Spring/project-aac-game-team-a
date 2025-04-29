@@ -544,7 +544,7 @@ class Server {
 #1 **Non-Playing User Hosts a Game Lobby**
 ```mermaid
 sequenceDiagram
-    participant Player
+    actor Player
     participant HomeView.vue
     participant CreateLobbyView.vue
     participant GameView.vue
@@ -573,7 +573,7 @@ After navigating to the home screen, the user clicks the "Create Lobby" button. 
 #2 **Playing User Hosts a Game Lobby**
 ```mermaid
 sequenceDiagram
-    participant Player
+    actor Player
     participant HomeView.vue
     participant CreateLobbyView.vue
     participant GameView.vue
@@ -605,7 +605,7 @@ After navigating to the home screen, the user clicks the "Create Lobby" button. 
 #3 **User Joins an Existing Game Lobby**
 ```mermaid
 sequenceDiagram
-    participant Player
+    actor Player
     participant HomeView.vue
     participant JoinLobbyView.vue
     participant GameView.vue
@@ -638,7 +638,7 @@ After being provided a valid room code, a new user is ready to attempt to join t
 #4 **User Attempts to Join a Non-Existing Lobby**
 ```mermaid
 sequenceDiagram
-    participant Player
+    actor Player
     participant HomeView.vue
     participant JoinLobbyView.vue
     participant GameView.vue
@@ -670,10 +670,10 @@ After being provided an invalid room code, a new user is ready to attempt to joi
 #5 **Hosting User Starts a Game**
 ```mermaid
 sequenceDiagram
-    participant Host
+    actor Host
     participant GameView.vue
     participant server.js
-    participant Player
+    actor Player
 
     Host->>GameView.vue: Clicks "Start Game"
     GameView.vue->>server.js: "start-game" (room code)
