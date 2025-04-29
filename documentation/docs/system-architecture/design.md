@@ -628,9 +628,12 @@ Sequence Diagram 14
 
 #16 **All Guessers Guess Correctly**
 
-
-
 #17 **Round Timer Ends Before All Guessers Guess Correctly**
+
+Preconditons: A drawing round is in progress.
+
+The backend (GameData.js) detects that the round's timer has expired and emits a timer-ran-out event through the SocketServer. The frontend (SocketClientHandler.js) catches this event and triggers the triggerTimeRanOutPopup() function in GameView.vue. This sets the showTimeRanOutPopup flag to true, causing a "Time Ran Out!" popup to appear on the screen for the player. The popup automatically disappears after 4 seconds.
+
 ```mermaid
    sequenceDiagram
       participant GameData.js (Backend)
@@ -646,9 +649,13 @@ Sequence Diagram 14
       GameView.vue (Frontend) -->> Player: Display "Time Ran Out!" popup
       Note over Player: Popup disappears after 4 seconds
 ```
-This diagram shows a game in progess where the timer ends before all users guess correctly. A popup is shown to explain the occurence.
 
 #18 **Game Ends (Regular Player)**
+
+Precondtion: The maximum number of rounds is reached.
+
+When all rounds are completed, GameData.js (backend) emits an end-game event via SocketServer. On the frontend, SocketClientHandler.js receives the event and updates the gameEnded and gameStarted flags inside GameView.vue. This triggers GameView.vue to render the EndGameScreen.vue component. The non-host player is shown a leaderboard displaying the final scores, along with a "Leave Lobby" button (but not a "Play Again" button, since they are not the host).
+
 ```mermaid
    sequenceDiagram
       participant GameData.js (Backend)
@@ -664,9 +671,13 @@ This diagram shows a game in progess where the timer ends before all users guess
       GameView.vue (Frontend) ->> EndGameScreen.vue (Frontend): render EndGameScreen component
       EndGameScreen.vue (Frontend) -->> Player (Non-Host): display end screen with leaderboard
 ```
-This diagram demonstrates how the end game screen is displayed to a user who IS NOT the host of the game lobby.
 
 #19 **Game Ends (Host)**
+
+Preconditions: The maximum number of rounds is reached.
+
+After the final round, the backend (GameData.js) sends an end-game event through the SocketServer. The frontend (SocketClientHandler.js) processes the event by setting gameEnded to true and gameStarted to false in GameView.vue. This causes the host to see the EndGameScreen.vue component, similar to non-hosts, but with two additional buttons: "Play Again" and "Leave Lobby", giving the host special control over restarting the game.
+
 ```mermaid
    sequenceDiagram
       participant GameData.js (Backend)
@@ -682,9 +693,13 @@ This diagram demonstrates how the end game screen is displayed to a user who IS 
       GameView.vue (Frontend) ->> EndGameScreen.vue (Frontend): render EndGameScreen component
       EndGameScreen.vue (Frontend) -->> Player (Host): display end screen with leaderboard + Play Again and Leave Lobby buttons
 ```
-This diagram demonstrates how the end game screen is displayed to a user who IS the host of the game lobby.
 
 #20 **Users Choose to Play Again After Game Ends**
+
+Preconditons: Game session has ended, and players are on the endgame screen.
+
+When the host clicks the "Play Again" button on the EndScreen.vue, it emits a playAgain event to GameView.vue. GameView.vue then emits two WebSocket messages to the SocketServer: one to reset-scores and another to play-again (sending the room code along). The server broadcasts both messages to all players. The frontend clients (SocketClientHandler.js) listen for these events, resetting all player scores to 0 and setting gameStarted = false and gameEnded = false. After this, GameView.vue displays the WaitingRoom.vue component again, allowing all players, including the host, to wait for the next game to start.
+
 ```mermaid
 sequenceDiagram
     actor Player (Host)
@@ -703,7 +718,6 @@ sequenceDiagram
     GameView.vue (Frontend) ->> WaitingRoom.vue (Frontend): render WaitingRoom component
     WaitingRoom.vue (Frontend) -->> Player (Host): Display Waiting Room
 ```
-This diagram demonstrates how the host will click the "Play again" button to throw all players back into the waiting room to start another game
 
 ------------------------------------------------OLD DIAGRAMS ARE BELOW------------------------------------------------------
 
