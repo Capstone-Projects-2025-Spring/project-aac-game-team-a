@@ -452,6 +452,8 @@ class Server {
 
 ## Sequence Diagrams
 
+------------------------------------------------OLD DIAGRAMS ARE BELOW------------------------------------------------------
+
 #1 **Host hosts game**  
 
 ```mermaid
