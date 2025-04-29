@@ -452,6 +452,28 @@ class Server {
 
 ## Sequence Diagrams
 
+#1 **Non-Playing User Hosts a Game Lobby**
+
+#2 **Playing User Hosts a Game Lobby**
+
+#3 **Hosting User Shares Game Lobby Code**
+
+#4 **User Joins an Existing Game Lobby**
+
+#5 **User Attempts to Join a Non-Existing Lobby**
+
+#6 **Hosting User Starts a Game**
+
+#7 **User is Presented with a Drawing Prompt**
+
+#8 **User is Assigned to Draw on the Drawing Board**
+
+#9 **Drawer Undoes a Drawing Stroke**
+
+#10 **Drawer Clears the Drawing Board**
+
+
+
 ------------------------------------------------OLD DIAGRAMS ARE BELOW------------------------------------------------------
 
 #1 **Host hosts game**  
