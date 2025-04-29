@@ -456,22 +456,23 @@ class Server {
 
 ```mermaid
 sequenceDiagram
+    actor User
+    participant JoinLobbyView.vue
+    participant server.js
+    participant WaitingRoom.vue
 
-actor host
-participant landingPage.js
-participant backend.js
-
-host ->> landingPage.js: clicks host game button
-landingPage.js -) backend.js: hostGame websocket message
-backend.js -->> landingPage.js: you are the host (websocket)
-landingPage.js ->> lobby.js: navigates to
-lobby.js ->> host: host sees lobby page
+    User->>JoinLobbyView.vue: click "host game"
+    JoinLobbyView.vue->>server.js: "create-lobby" (via websocket)
+    server.js->>server.js: create Lobby instance
+    server.js-->>JoinLobbyView.vue: "you-are-host"
+    JoinLobbyView.vue->>JoinLobbyView.vue: mark as host
+    JoinLobbyView.vue->>WaitingRoom.vue: navigate
 ```
 Sequence Diagram 1
 
-The player setting up the game navigates to the website. Upon arrival, they see a large "Host Game" Button. This triggers the creation of a lobby with a room code that the host can share to the other players.
+The player setting up the game navigates to the host lobby screen. Upon arrival, they see a large "Host Game" Button. This triggers the creation of a lobby with a room code that the host can share to the other players.
 
-The host navigates to the website, and they click the large "host game" button. This triggers landingPage.js to send a message to the backend notifying that the host has hosted a game. This returns a websocket message back to the landingPage that relays stores a isHost boolean on the host's LandingPage. Then the landingPage immediately navigates to lobby.js, bringing with it information including the isHost boolean. Then thes host can see the lobby page with the necessary host componenets.
+The host navigates to the website's host lobby screen (JoinLobbyView.vue), and after configuring the lobby settings, they click the large "host game" button. This triggers a websocket message to server.js to create a new lobby instance. Server.js also sends a "you-are-host" websocket message back to JoinLobbyView.vue informing the frontend's stored memory that the user is host. Then the user is navigated to WaitingRoom.vue.
 
 Triggering Event:
 Host navigates to the game website and clicks a button "Host Game".
