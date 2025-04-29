@@ -472,6 +472,26 @@ class Server {
 
 #10 **Drawer Clears the Drawing Board**
 
+#11 **Drawer Changes Stroke Color**
+
+#12 **Drawer Changes Stroke Width**
+
+#13 **User is Assigned the Role of Guesser**
+
+#14 **Guesser Selects an Incorrect Guess**
+
+#15 **Guesser Selects a Correct Guess**
+
+#16 **All Guessers Guess Correctly**
+
+#17 **Round Timer Ends Before All Guessers Guess Correctly**
+
+#18 **Game Ends (Regular Player)**
+
+#19 **Game Ends (Host)**
+
+#20 **Users Choose to Play Again After Game Ends**
+
 
 
 ------------------------------------------------OLD DIAGRAMS ARE BELOW------------------------------------------------------
