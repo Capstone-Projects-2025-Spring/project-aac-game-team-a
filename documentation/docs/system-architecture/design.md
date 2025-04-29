@@ -493,6 +493,25 @@ Sequence Diagram 7
 
 #13 **User is Assigned the Role of Guesser**
 
+Precondition: A drawing round if in progress.
+
+Server.js updates the current drawer with a "update-drawer" websocket message after randomly selecting a new drawer at the start of a round. The message data contains which player is the drawer. All users in the room receive the websocket message at the frontend file GameView.vue which checks if they were assigned to be the drawer. If not, they become a guesser. The players do this by storing the drawer in a variable drawer and check if it referrs to themself.
+
+```mermaid
+sequenceDiagram
+    participant server.js
+    participant gameView.vue (All Users)
+    actor User (New Drawer)
+    actor User (Guessers)
+
+    server.js ->> server.js: Randomly select new drawer
+    server.js ->> gameView.vue (All Users): send "update-drawer" (WebSocket)
+
+    gameView.vue (All Users) ->> User (New Drawer): update drawer variable
+    gameView.vue (All Users) ->> User (Guessers): update drawer variable
+```
+Sequence Diagram 13
+
 #14 **Guesser Selects an Incorrect Guess**
 
 #15 **Guesser Selects a Correct Guess**
