@@ -194,7 +194,7 @@ Precondition: The user is viewing the AAC board during a round.
 
 The user selects a word on the AAC board on gameView.vue, and the selected word is recognized as matching the current prompt stored on the frontend. This triggers the guess text to change to Correct, and the image to change to a check mark. "Correct" and the check mark are displayed on the guess board. The "correct" guess is sent to server.js through an "update-user-guess" message and server.js echoes this message to all other gameView.vue frontends. 
 
-```Mermaid
+```mermaid
 sequenceDiagram
     participant User
     participant gameView.vue
@@ -219,7 +219,7 @@ Precondition: All guessers have entered a guess.
 
 After a user enters a guess, server.js checks if all guessers have entered a guess and all of their guesses match the current prompt word. If they all guessed correctly, an "all-guessed-correct" websocket message is sent to all users. This triggers a popup message in gameView.vue with the function triggerAllGuessedCorrectPopup().
 
-```Mermaid
+```mermaid
 sequenceDiagram
     actor User (Guesser)
     participant gameView.vue
