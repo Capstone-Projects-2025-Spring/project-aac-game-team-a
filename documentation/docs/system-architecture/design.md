@@ -643,7 +643,6 @@ sequenceDiagram
 
     User ->> gameView.vue: Select word on AAC board
     gameView.vue ->> gameView.vue: Check if word matches current prompt
-    alt Word matches prompt
         gameView.vue ->> gameView.vue: Change guess text to "Correct"
         gameView.vue ->> gameView.vue: Change image to check mark
         gameView.vue ->> gameView.vue: Display "Correct" + check mark on guess board
