@@ -24,9 +24,20 @@ RouterView is a placeholder component that renders the view corresponding to the
 #### 7. SettingState
 The SettingState class holds various user settings such as whether text-to-speech (TTS) is enabled, the opacity of the background, and the path to TTS images. It also includes methods to modify these settings, such as adjusting TTS volume or background opacity, and toggling the settings overlay.
 
+#### 8. GameState
+GameState manages the state of the game, such as player data (e.g., user, avatar, room code), game rules (e.g., rounds, max players), and the game’s progression (e.g., host status, game state).
 
+#### 9. SettingsOverlay
+The SettingsOverlay class provides a UI overlay for adjusting game settings like TTS. It allows the user to change settings and control the volume and opacity of TTS. It also includes functionality for text-to-speech conversion.
 
+#### 10. Router
+Router handles the routing between different views in the application. It defines routes to the HomeView, GameView, HostLobbyView, and JoinLobbyView components, each corresponding to different parts of the app.
 
+#### 11. HomeView
+HomeView is the main entry point or home page of the application. It displays initial content and provides navigation to other views.
+
+#### 12. GameView
+GameView is the main game interface, where players interact with each other. It includes methods for triggering popups, handling game mechanics (e.g., drawing, guessing), and communicating with the server.
 
 #### 13. aacBoard
 The aacBoard is a communication tool for users with special needs. It allows users to select items and categories, and it provides a text-to-speech function to speak the selected item.
