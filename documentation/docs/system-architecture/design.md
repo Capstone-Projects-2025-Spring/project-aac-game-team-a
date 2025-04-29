@@ -514,6 +514,27 @@ Sequence Diagram 13
 
 #14 **Guesser Selects an Incorrect Guess**
 
+Precondition: User is viewing the AAC board during a around as a guesser.
+
+The user selects a word on the AAC board, and the guess is displayed on the guess board along with the symbol. The user experiences a 5 second cooldown that locks the AAC board temporarily after guessing. This guess word is also sent through a websocket message "update-user-guess" from gameView.vue to server.js. Server.js sends out the guess to all other players with another "update-user-guess" message. Those players also see the guess appear on the guessboard beside the guesser's avatar.
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant gameView.vue
+    participant server.js
+    participant Other Players' gameView.vue
+
+    User ->> gameView.vue: Select word on AAC board
+    gameView.vue ->> gameView.vue: Display guess and symbol on guess board
+    gameView.vue ->> gameView.vue: Start 5 second AAC board cooldown
+    gameView.vue ->> server.js: send "update-user-guess" (WebSocket)
+    server.js ->> Other Players' gameView.vue: send "update-user-guess" (WebSocket)
+    Other Players' gameView.vue ->> Other Players' gameView.vue: Display guess on guess board
+
+```
+Sequence Diagram 14
+
 #15 **Guesser Selects a Correct Guess**
 
 #16 **All Guessers Guess Correctly**
