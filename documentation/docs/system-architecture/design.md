@@ -466,6 +466,21 @@ class Server {
 
 #7 **User is Presented with a Drawing Prompt**
 
+Precondition: Game has started, and it's the user's turn to draw.
+
+When it becomes a user's turn to draw, server.js sends that user an "update-drawer" as well as an "update-prompt" websocket message to the drawer. The user is on the frontend file gameView.vue, and the frontend renders the drawing prompt on the screen for them to see.
+```mermaid
+sequenceDiagram
+    participant server.js
+    participant gameView.vue
+    actor User (Drawer)
+
+    server.js ->> gameView.vue: send "update-drawer" (WebSocket)
+    server.js ->> gameView.vue: send "update-prompt" (WebSocket)
+    gameView.vue ->> User (Drawer): Render drawing prompt on screen
+```
+Sequence Diagram 7
+
 #8 **User is Assigned to Draw on the Drawing Board**
 
 #9 **Drawer Undoes a Drawing Stroke**
