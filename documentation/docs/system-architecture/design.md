@@ -24,6 +24,23 @@ RouterView is a placeholder component that renders the view corresponding to the
 #### 7. SettingState
 The SettingState class holds various user settings such as whether text-to-speech (TTS) is enabled, the opacity of the background, and the path to TTS images. It also includes methods to modify these settings, such as adjusting TTS volume or background opacity, and toggling the settings overlay.
 
+#7 **User is Presented with a Drawing Prompt**
+
+Precondition: Game has started, and it's the user's turn to draw.
+
+When it becomes a user's turn to draw, server.js sends that user an "update-drawer" as well as an "update-prompt" websocket message to the drawer. The user is on the frontend file gameView.vue, and the frontend renders the drawing prompt on the screen for them to see.
+```mermaid
+sequenceDiagram
+    participant server.js
+    participant gameView.vue
+    actor User (Drawer)
+
+    server.js ->> gameView.vue: send "update-drawer" (WebSocket)
+    server.js ->> gameView.vue: send "update-prompt" (WebSocket)
+    gameView.vue ->> User (Drawer): Render drawing prompt on screen
+```
+Sequence Diagram 7
+
 #8 **User is Assigned to Draw on the Drawing Board**
 
 Precondition
@@ -126,6 +143,102 @@ sequenceDiagram
 
 ```
 Sequence Diagram 12
+
+#13 **User is Assigned the Role of Guesser**
+
+Precondition: A drawing round if in progress.
+
+Server.js updates the current drawer with a "update-drawer" websocket message after randomly selecting a new drawer at the start of a round. The message data contains which player is the drawer. All users in the room receive the websocket message at the frontend file GameView.vue which checks if they were assigned to be the drawer. If not, they become a guesser. The players do this by storing the drawer in a variable drawer and check if it referrs to themself.
+
+```mermaid
+sequenceDiagram
+    participant server.js
+    participant gameView.vue (All Users)
+    actor User (New Drawer)
+    actor User (Guessers)
+
+    server.js ->> server.js: Randomly select new drawer
+    server.js ->> gameView.vue (All Users): send "update-drawer" (WebSocket)
+
+    gameView.vue (All Users) ->> User (New Drawer): update drawer variable
+    gameView.vue (All Users) ->> User (Guessers): update drawer variable
+```
+Sequence Diagram 13
+
+#14 **Guesser Selects an Incorrect Guess**
+
+Precondition: User is viewing the AAC board during a around as a guesser.
+
+The user selects a word on the AAC board, and the guess is displayed on the guess board along with the symbol. The user experiences a 5 second cooldown that locks the AAC board temporarily after guessing. This guess word is also sent through a websocket message "update-user-guess" from gameView.vue to server.js. Server.js sends out the guess to all other players with another "update-user-guess" message. Those players also see the guess appear on the guessboard beside the guesser's avatar.
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant gameView.vue
+    participant server.js
+    participant Other Players' gameView.vue
+
+    User ->> gameView.vue: Select word on AAC board
+    gameView.vue ->> gameView.vue: Display guess and symbol on guess board
+    gameView.vue ->> gameView.vue: Start 5 second AAC board cooldown
+    gameView.vue ->> server.js: send "update-user-guess" (WebSocket)
+    server.js ->> Other Players' gameView.vue: send "update-user-guess" (WebSocket)
+    Other Players' gameView.vue ->> Other Players' gameView.vue: Display guess on guess board
+
+```
+Sequence Diagram 14
+
+#15 **Guesser Selects a Correct Guess**
+
+Precondition: The user is viewing the AAC board during a round.
+
+The user selects a word on the AAC board on gameView.vue, and the selected word is recognized as matching the current prompt stored on the frontend. This triggers the guess text to change to Correct, and the image to change to a check mark. "Correct" and the check mark are displayed on the guess board. The "correct" guess is sent to server.js through an "update-user-guess" message and server.js echoes this message to all other gameView.vue frontends. 
+
+```Mermaid
+sequenceDiagram
+    participant User
+    participant gameView.vue
+    participant server.js
+    participant Other Players' gameView.vue
+
+    User ->> gameView.vue: Select word on AAC board
+    gameView.vue ->> gameView.vue: Check if word matches current prompt
+    alt Word matches prompt
+        gameView.vue ->> gameView.vue: Change guess text to "Correct"
+        gameView.vue ->> gameView.vue: Change image to check mark
+        gameView.vue ->> gameView.vue: Display "Correct" + check mark on guess board
+        gameView.vue ->> server.js: send "update-user-guess" ("Correct") (WebSocket)
+        server.js ->> Other Players' gameView.vue: send "update-user-guess" ("Correct") (WebSocket)
+        Other Players' gameView.vue ->> Other Players' gameView.vue: Display "Correct" + check mark beside guesser
+```
+Sequence Diagram 15
+
+#16 **All Guessers Guess Correctly**
+
+Precondition: All guessers have entered a guess.
+
+After a user enters a guess, server.js checks if all guessers have entered a guess and all of their guesses match the current prompt word. If they all guessed correctly, an "all-guessed-correct" websocket message is sent to all users. This triggers a popup message in gameView.vue with the function triggerAllGuessedCorrectPopup().
+
+```Mermaid
+sequenceDiagram
+    actor User (Guesser)
+    participant gameView.vue
+    participant server.js
+    participant All Users' gameView.vue
+
+    User (Guesser) ->> gameView.vue: select AAC word
+    gameView.vue ->> server.js: send "update-user-guess" (WebSocket)
+    
+    server.js ->> server.js: Check if all guessers have submitted and all correct
+    
+
+
+    server.js ->> All Users' gameView.vue: send "all-guessed-correct" (WebSocket)
+    All Users' gameView.vue ->> All Users' gameView.vue: triggerAllGuessedCorrectPopup()
+```
+
+Sequence Diagram 16
+
 
 
 #### 13. aacBoard
