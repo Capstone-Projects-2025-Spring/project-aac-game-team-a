@@ -24,20 +24,109 @@ RouterView is a placeholder component that renders the view corresponding to the
 #### 7. SettingState
 The SettingState class holds various user settings such as whether text-to-speech (TTS) is enabled, the opacity of the background, and the path to TTS images. It also includes methods to modify these settings, such as adjusting TTS volume or background opacity, and toggling the settings overlay.
 
-#### 8. GameState
-GameState manages the state of the game, such as player data (e.g., user, avatar, room code), game rules (e.g., rounds, max players), and the game’s progression (e.g., host status, game state).
+#8 **User is Assigned to Draw on the Drawing Board**
 
-#### 9. SettingsOverlay
-The SettingsOverlay class provides a UI overlay for adjusting game settings like TTS. It allows the user to change settings and control the volume and opacity of TTS. It also includes functionality for text-to-speech conversion.
+Precondition
+A new round has started and the game session is active with at least two players in this.players.
 
-#### 10. Router
-Router handles the routing between different views in the application. It defines routes to the HomeView, GameView, HostLobbyView, and JoinLobbyView components, each corresponding to different parts of the app.
+When startNewRound() runs on the server, it randomly selects a new drawer from the players array, updates this.drawer, and emits an "update-drawer" event.
 
-#### 11. HomeView
-HomeView is the main entry point or home page of the application. It displays initial content and provides navigation to other views.
+```mermaid
+sequenceDiagram
+    participant GameData as GameSession
+    participant Server as SocketServer
+    participant Client as Room Clients
 
-#### 12. GameView
-GameView is the main game interface, where players interact with each other. It includes methods for triggering popups, handling game mechanics (e.g., drawing, guessing), and communicating with the server.
+    GameData->>Server: select new drawer
+    Server->>Client: emit("update-drawer", newDrawer)
+    Client-->>Client: set role to drawer if matching newDrawer
+```
+Sequence Diagram 8
+
+#9 **Drawer Undoes a Drawing Stroke**
+
+Precondition
+The canvas has at least one saved drawing state in the undoHistory array, and the current user is in the drawer role.
+
+When the drawer clicks the Undo button, the undo_action() function fires. It checks that there’s at least one save state. It then pops the last ImageData savestate from undoHistory, re-renders the canvas with context.putImageData() and emits a "canvasUndo" event  to inform the other clients of the undo action.
+
+```mermaid
+  sequenceDiagram
+    participant Drawer as User
+    participant Ubutton as .Ubutton
+    participant Component as CanvasComponent
+    participant History as undoHistory
+    participant Peers as Other Clients
+
+    Drawer->>Ubutton: click Undo
+    Ubutton->>Component: undo_action()
+    Component->>History: pop()
+    History-->>Component: previousState
+    Component->>Component: putImageData(previousState)
+    Component->>Peers: emit("canvasUndo", previousState)
+
+```
+Sequence Diagram 9
+
+#10 **Drawer Clears the Drawing Board**
+
+Precondition
+The user is in the drawer role.
+
+When the drawer clicks the Clear button, the canvas is reset to its blank background.
+
+```mermaid
+sequenceDiagram
+    participant User as Drawer
+    participant Button as .Cbutton
+    participant Component as CanvasComponent
+    participant Canvas as HTMLCanvasElement
+
+    User->>Button: click Clear
+    Button->>Component: clear_canvas()
+    Component->>Canvas: clear & fill background
+
+```
+Sequence Diagram 10
+
+#11 **Drawer Changes Stroke Color**
+
+Precondition
+The user is in the drawer role.
+
+When the drawer clicks a color swatch, the component updates the draw_color value to the selected color.
+
+```mermaid
+sequenceDiagram
+    participant User as Drawer
+    participant Swatch as .color-field
+    participant Component as CanvasComponent
+
+    User->>Swatch: click color swatch
+    Swatch->>Component: set draw_color to selected colorackground
+
+```
+Sequence Diagram 11
+
+#12 **Drawer Changes Stroke Width**
+
+Precondition
+The user is in the drawer role.
+
+When the drawer adjusts the stroke width slider, the component updates the draw_width value to the slider’s current value.
+
+```mermaid
+sequenceDiagram
+    participant User as Drawer
+    participant Slider as .pen-range
+    participant Component as CanvasComponent
+
+    User->>Slider: input new value
+    Slider->>Component: set draw_width to slider.value
+
+```
+Sequence Diagram 12
+
 
 #### 13. aacBoard
 The aacBoard is a communication tool for users with special needs. It allows users to select items and categories, and it provides a text-to-speech function to speak the selected item.
