@@ -24,109 +24,20 @@ RouterView is a placeholder component that renders the view corresponding to the
 #### 7. SettingState
 The SettingState class holds various user settings such as whether text-to-speech (TTS) is enabled, the opacity of the background, and the path to TTS images. It also includes methods to modify these settings, such as adjusting TTS volume or background opacity, and toggling the settings overlay.
 
-#8 **User is Assigned to Draw on the Drawing Board**
+#### 8. GameState
+GameState manages the state of the game, such as player data (e.g., user, avatar, room code), game rules (e.g., rounds, max players), and the game’s progression (e.g., host status, game state).
 
-Precondition
-A new round has started and the game session is active with at least two players in this.players.
+#### 9. SettingsOverlay
+The SettingsOverlay class provides a UI overlay for adjusting game settings like TTS. It allows the user to change settings and control the volume and opacity of TTS. It also includes functionality for text-to-speech conversion.
 
-When startNewRound() runs on the server, it randomly selects a new drawer from the players array, updates this.drawer, and emits an "update-drawer" event.
+#### 10. Router
+Router handles the routing between different views in the application. It defines routes to the HomeView, GameView, HostLobbyView, and JoinLobbyView components, each corresponding to different parts of the app.
 
-```mermaid
-sequenceDiagram
-    participant GameData as GameSession
-    participant Server as SocketServer
-    participant Client as Room Clients
+#### 11. HomeView
+HomeView is the main entry point or home page of the application. It displays initial content and provides navigation to other views.
 
-    GameData->>Server: select new drawer
-    Server->>Client: emit("update-drawer", newDrawer)
-    Client-->>Client: set role to drawer if matching newDrawer
-```
-Sequence Diagram 8
-
-#9 **Drawer Undoes a Drawing Stroke**
-
-Precondition
-The canvas has at least one saved drawing state in the undoHistory array, and the current user is in the drawer role.
-
-When the drawer clicks the Undo button, the undo_action() function fires. It checks that there’s at least one save state. It then pops the last ImageData savestate from undoHistory, re-renders the canvas with context.putImageData() and emits a "canvasUndo" event  to inform the other clients of the undo action.
-
-```mermaid
-  sequenceDiagram
-    participant Drawer as User
-    participant Ubutton as .Ubutton
-    participant Component as CanvasComponent
-    participant History as undoHistory
-    participant Peers as Other Clients
-
-    Drawer->>Ubutton: click Undo
-    Ubutton->>Component: undo_action()
-    Component->>History: pop()
-    History-->>Component: previousState
-    Component->>Component: putImageData(previousState)
-    Component->>Peers: emit("canvasUndo", previousState)
-
-```
-Sequence Diagram 9
-
-#10 **Drawer Clears the Drawing Board**
-
-Precondition
-The user is in the drawer role.
-
-When the drawer clicks the Clear button, the canvas is reset to its blank background.
-
-```mermaid
-sequenceDiagram
-    participant User as Drawer
-    participant Button as .Cbutton
-    participant Component as CanvasComponent
-    participant Canvas as HTMLCanvasElement
-
-    User->>Button: click Clear
-    Button->>Component: clear_canvas()
-    Component->>Canvas: clear & fill background
-
-```
-Sequence Diagram 10
-
-#11 **Drawer Changes Stroke Color**
-
-Precondition
-The user is in the drawer role.
-
-When the drawer clicks a color swatch, the component updates the draw_color value to the selected color.
-
-```mermaid
-sequenceDiagram
-    participant User as Drawer
-    participant Swatch as .color-field
-    participant Component as CanvasComponent
-
-    User->>Swatch: click color swatch
-    Swatch->>Component: set draw_color to selected colorackground
-
-```
-Sequence Diagram 11
-
-#12 **Drawer Changes Stroke Width**
-
-Precondition
-The user is in the drawer role.
-
-When the drawer adjusts the stroke width slider, the component updates the draw_width value to the slider’s current value.
-
-```mermaid
-sequenceDiagram
-    participant User as Drawer
-    participant Slider as .pen-range
-    participant Component as CanvasComponent
-
-    User->>Slider: input new value
-    Slider->>Component: set draw_width to slider.value
-
-```
-Sequence Diagram 12
-
+#### 12. GameView
+GameView is the main game interface, where players interact with each other. It includes methods for triggering popups, handling game mechanics (e.g., drawing, guessing), and communicating with the server.
 
 #### 13. aacBoard
 The aacBoard is a communication tool for users with special needs. It allows users to select items and categories, and it provides a text-to-speech function to speak the selected item.
@@ -714,15 +625,108 @@ Sequence Diagram 7
 
 #7 **User is Assigned to Draw on the Drawing Board**
 
-#8 **Drawer Undoes a Drawing Stroke**
+Precondition
+A new round has started and the game session is active with at least two players in this.players.
 
-#9 **Drawer Clears the Drawing Board**
+When startNewRound() runs on the server, it randomly selects a new drawer from the players array, updates this.drawer, and emits an "update-drawer" event.
 
-#10 **Drawer Changes Stroke Color**
+```mermaid
+sequenceDiagram
+    participant GameData as GameSession
+    participant Server as SocketServer
+    participant Client as Room Clients
 
-#11 **Drawer Changes Stroke Width**
+    GameData->>Server: select new drawer
+    Server->>Client: emit("update-drawer", newDrawer)
+    Client-->>Client: set role to drawer if matching newDrawer
+```
+Sequence Diagram 8
 
-#12 **User is Assigned the Role of Guesser**
+#9 **Drawer Undoes a Drawing Stroke**
+
+Precondition
+The canvas has at least one saved drawing state in the undoHistory array, and the current user is in the drawer role.
+
+When the drawer clicks the Undo button, the undo_action() function fires. It checks that there’s at least one save state. It then pops the last ImageData savestate from undoHistory, re-renders the canvas with context.putImageData() and emits a "canvasUndo" event  to inform the other clients of the undo action.
+
+```mermaid
+  sequenceDiagram
+    participant Drawer as User
+    participant Ubutton as .Ubutton
+    participant Component as CanvasComponent
+    participant History as undoHistory
+    participant Peers as Other Clients
+
+    Drawer->>Ubutton: click Undo
+    Ubutton->>Component: undo_action()
+    Component->>History: pop()
+    History-->>Component: previousState
+    Component->>Component: putImageData(previousState)
+    Component->>Peers: emit("canvasUndo", previousState)
+
+```
+Sequence Diagram 9
+
+#10 **Drawer Clears the Drawing Board**
+
+Precondition
+The user is in the drawer role.
+
+When the drawer clicks the Clear button, the canvas is reset to its blank background.
+
+```mermaid
+sequenceDiagram
+    participant User as Drawer
+    participant Button as .Cbutton
+    participant Component as CanvasComponent
+    participant Canvas as HTMLCanvasElement
+
+    User->>Button: click Clear
+    Button->>Component: clear_canvas()
+    Component->>Canvas: clear & fill background
+
+```
+Sequence Diagram 10
+
+#11 **Drawer Changes Stroke Color**
+
+Precondition
+The user is in the drawer role.
+
+When the drawer clicks a color swatch, the component updates the draw_color value to the selected color.
+
+```mermaid
+sequenceDiagram
+    participant User as Drawer
+    participant Swatch as .color-field
+    participant Component as CanvasComponent
+
+    User->>Swatch: click color swatch
+    Swatch->>Component: set draw_color to selected colorackground
+
+```
+Sequence Diagram 11
+
+#12 **Drawer Changes Stroke Width**
+
+Precondition
+The user is in the drawer role.
+
+When the drawer adjusts the stroke width slider, the component updates the draw_width value to the slider’s current value.
+
+```mermaid
+sequenceDiagram
+    participant User as Drawer
+    participant Slider as .pen-range
+    participant Component as CanvasComponent
+
+    User->>Slider: input new value
+    Slider->>Component: set draw_width to slider.value
+
+```
+Sequence Diagram 12
+
+#13 **User is Assigned the Role of Guesser**
 
 Precondition: A drawing round if in progress.
 
@@ -768,7 +772,54 @@ Sequence Diagram 14
 
 #14 **Guesser Selects a Correct Guess**
 
+Precondition: The user is viewing the AAC board during a round.
+
+The user selects a word on the AAC board on gameView.vue, and the selected word is recognized as matching the current prompt stored on the frontend. This triggers the guess text to change to Correct, and the image to change to a check mark. "Correct" and the check mark are displayed on the guess board. The "correct" guess is sent to server.js through an "update-user-guess" message and server.js echoes this message to all other gameView.vue frontends. 
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant gameView.vue
+    participant server.js
+    participant Other Players' gameView.vue
+
+    User ->> gameView.vue: Select word on AAC board
+    gameView.vue ->> gameView.vue: Check if word matches current prompt
+        gameView.vue ->> gameView.vue: Change guess text to "Correct"
+        gameView.vue ->> gameView.vue: Change image to check mark
+        gameView.vue ->> gameView.vue: Display "Correct" + check mark on guess board
+        gameView.vue ->> server.js: send "update-user-guess" ("Correct") (WebSocket)
+        server.js ->> Other Players' gameView.vue: send "update-user-guess" ("Correct") (WebSocket)
+        Other Players' gameView.vue ->> Other Players' gameView.vue: Display "Correct" and check mark beside guesser
+```
+Sequence Diagram 15
+
 #15 **All Guessers Guess Correctly**
+
+Precondition: All guessers have entered a guess.
+
+After a user enters a guess, server.js checks if all guessers have entered a guess and all of their guesses match the current prompt word. If they all guessed correctly, an "all-guessed-correct" websocket message is sent to all users. This triggers a popup message in gameView.vue with the function triggerAllGuessedCorrectPopup().
+
+```mermaid
+sequenceDiagram
+    actor User (Guesser)
+    participant gameView.vue
+    participant server.js
+    participant All Users' gameView.vue
+
+    User (Guesser) ->> gameView.vue: select AAC word
+    gameView.vue ->> server.js: send "update-user-guess" (WebSocket)
+    
+    server.js ->> server.js: Check if all guessers have submitted and all correct
+    
+
+
+    server.js ->> All Users' gameView.vue: send "all-guessed-correct" (WebSocket)
+    All Users' gameView.vue ->> All Users' gameView.vue: triggerAllGuessedCorrectPopup()
+```
+
+Sequence Diagram 16
+
 
 #16 **Round Timer Ends Before All Guessers Guess Correctly**
 
@@ -861,282 +912,6 @@ sequenceDiagram
     WaitingRoom.vue (Frontend) -->> Player (Host): Display Waiting Room
 ```
 
-------------------------------------------------OLD DIAGRAMS ARE BELOW------------------------------------------------------
-
-#1 **Host hosts game**  
-
-```mermaid
-sequenceDiagram
-    actor User
-    participant JoinLobbyView.vue
-    participant server.js
-    participant WaitingRoom.vue
-
-    User->>JoinLobbyView.vue: click "host game"
-    JoinLobbyView.vue->>server.js: "create-new-lobby" (via websocket)
-    server.js->>server.js: create Lobby instance
-    server.js-->>JoinLobbyView.vue: "you-are-host"
-    JoinLobbyView.vue->>JoinLobbyView.vue: mark as host
-    JoinLobbyView.vue->>WaitingRoom.vue: navigate
-```
-Sequence Diagram 1
-
-The player setting up the game navigates to the host lobby screen. Upon arrival, they see a large "Host Game" Button. This triggers the creation of a lobby with a room code that the host can share to the other players.
-
-The host navigates to the website's host lobby screen (JoinLobbyView.vue), and after configuring the lobby settings, they click the large "host game" button. This triggers a "create-new-lobby" websocket message to server.js to create a new lobby instance. Server.js also sends a "you-are-host" websocket message back to JoinLobbyView.vue informing the frontend's stored memory that the user is host. Then the user is navigated to WaitingRoom.vue.
-
-Triggering Event:
-Host navigates to the game website and clicks a button "Host Game".
-
-#2 **Host gets room code**  
-
-```mermaid
-
-sequenceDiagram
-    participant server.js
-    participant WaitingRoomView.vue
-
-    server.js->>server.js: generate random 5-digit code
-    server.js-->>WaitingRoomView.vue: "update-lobby-code" (send code)
-    WaitingRoomView.vue->>WaitingRoomView.vue: display code to host
-
-```
-Sequence Diagram 2
-
-The host is presented with a short room code that they will tell the players so they can enter it and join.
-
-Once the new lobby is created in server.js, server.js generates a random 5 digit code and sends taht code over a websocket message "update-lobby-code" to the host. The host receives the code in the WaitingRoomView.vue and can then view the code and share it with others.
-
-Triggering Event: The host has created a lobby by pressing "Host Game".
-
-
-#3 **Host presses start game button**  
-
-```mermaid
-sequenceDiagram
-actor player
-
-actor host
-
-host ->> lobby.js: presses start game
-activate lobby.js
-lobby.js ->> backend.js: start game (websocket)
-backend.js ->> lobby.js: to all fontends: start game (websocket)
-lobby.js ->> drawing.js: navigate to
-
-
-
-```
-Sequence Diagram 3: one diagram showing the possibility of drawing.
-```mermaid
-sequenceDiagram
-actor player
-
-actor host
-
-host ->> lobby.js: presses start game
-activate lobby.js
-lobby.js ->> backend.js: start game (websocket)
-backend.js ->> lobby.js: to all frontends: start game (websocket)
-lobby.js ->> guessing.js: navigate to
-```
-Sequence Diagram 4: alternative diagram showing the possibility of guessing.
-
-Once everyone has joined, the host will choose to press the "start game button". This will send a websocket message to the backend, which will be echoed back to all frontends. Then all frontends will navigate to either drawing.js or guessing.js depending on their role for the first round.
-
-Triggering Event: All players have joined the lobby, and the host wants to start the game.
-
-#4 **Players enter room code**  
-```mermaid
-sequenceDiagram
-
-actor player
-
-player ->> landingPage.js: enters room code
-
-activate landingPage.js
-landingPage.js ->> backend.js: checks room code
-backend.js -->> landingPage.js: validates room code
-landingPage.js ->> lobby.js: navigates to
-deactivate landingPage.js
-lobby.js ->> player: player sees lobby screen
-
-
-```
-Sequence Diagram 5
-
-Players use the room code provided by the host to enter it and join the lobby. Once entered, the landingPage.js sends the code to the backend for verification, and returns whether it's a valid code or not. If it is valid, it will navigate the user to the appropriate lobby, lobby.js. Then the user will see the lobby screen. 
-
-Triggering Event: The host receives the room code and shares it with other players.
-
-#5 **Players select avatar**  
-
-```mermaid
-sequenceDiagram
-
-actor player
-landingPage.js ->> backend.js: fetch available avatars (websocket)
-backend.js -->> landingPage.js: return available avatars (websocket)
-landingPage.js ->> player: display possible avatars
-player ->> landingPage.js: select avatar
-landingPage.js ->> backend.js: update available avatars (websocket)
-backend.js -->> landingPage.js: confirm update (websocket)
-landingPage.js ->> lobby.js: navigates to
-lobby.js ->> player: shows avatar in lobby screen
-
-```
-Sequence Diagram 6
-
-Upon joining, each player will be presented with an array of avatars to choose from, and they must tap an avatar to join the lobby with that avatar. First, the frontend must fetch the available avatars from the backend as a websocket message. The backend returns the available avatars, and the landingPage displays them to the user for selection. The user will make a selection, and landingPage.js will update the avatar list in the backend, which will verify with a return value. Then the landingPage.js will navigate to lobby.js where the user will see the lobby along with their avatar.
-
-Triggering Event: A user has entered a valid room code.
-
-#6 **One player is selected at random to be a drawer**  
-
-```mermaid
-sequenceDiagram
-
-actor player
-participant drawing.js
-participant lobby.js
-participant backend.js
-
-backend.js ->> backend.js: randomly selects drawer
-backend.js ->> lobby.js: start game websocket message (contains role info)
-lobby.js ->> drawing.js: navigates to
-drawing.js ->> player: player sees drawing page
-
-```
-Sequence Diagram 7: showing the possibility of drawing first.
-```mermaid
-sequenceDiagram
-
-actor player
-participant guessing.js
-participant lobby.js
-participant backend.js
-
-backend.js ->> backend.js: randomly selects drawer
-backend.js ->> lobby.js: start game websocket message (contains role info)
-lobby.js ->> guessing.js: navigates to
-guessing.js ->> player: player sees guessing page
-
-```
-Sequence Diagram 8: alternative showing the possibility of guessing first.
-
-Out of all players, including the host, one is randomly selected to be the first drawer. They will be shown the drawing interface. First, the backend randomly select a drawer from the list of players. Next, it will send a start game websocket message containing role info. Each player's lobby.js will take that information and either navigate them to guessing.js or drawing.js, where the users will see the appropriate UI.
-
-Triggering Event: The host pressed start game.
-
-#7 **The drawer is given 3 random choices to choose from to draw**  
-
-```mermaid
-sequenceDiagram
-
-actor drawer
-participant drawing.js
-backend.js ->> backend.js: selects 3 random prompts from list
-backend.js ->> drawing.js: prompt choices (websocket)
-drawing.js ->> drawer: drawer sees prompt choices
-drawer ->> drawing.js: selects prompt
-drawing.js ->> backend.js: current prompt (websocket)
-
-```
-Sequence Diagram 9
-
-The drawer is provided with 3 random prompts on their screen as buttons to choose from to draw. They tap on the choice that they want, and then they can begin drawing. First, the backend must randomly select 3 prompts from the list of possible prompts. The backend relays these choices in a websocket message to the drawing.js frontend file. the drawer sees the list, makes a choice, and drawing.js relays the choice to the backend.
-
-Triggering Event: The drawer has been randomly selected.
-
-#8 **Guessers see a guessing interface and drawing as it progresses**  
-
-```mermaid
-sequenceDiagram
-
-actor guesser
-actor drawer
-participant guessing.js
-participant drawing.js
-participant backend.js
-
-drawer ->> drawing.js: draws on the interface
-drawing.js ->> backend.js: frequent drawing information (websocket)
-backend.js ->> guessing.js: frequent drawing information (websocket)
-guessing.js ->> guesser: guesser spectates drawing
-guesser ->> guessing.js: guesser makes a guess
-guessing.js ->> backend.js: guess information (websocket)
-backend.js ->> backend.js: checks guess
-backend.js -->> guessing.js: guess response (websocket)
-
-```
-Sequence Diagram 10
-
-Default flow: The guessers spectate the drawing and make guesses using the AAC tablet as the round progresses.  
-Alternative flow: The guessers spectate the drawing and make guesses using the keyboard after clicking the keyboard toggle button.  
-There is a timer counting down during each drawing phase. 
-
-Further explanation: First, the drawer begins drawing on the interface on drawing.js, and frequent websocket information containing drawing data is sent to the backend. The drawing data is echoed to all guessing.js frontends that are spectating. Guessers spectate and enter guesses, which are relayed from guessing.js to backend.js to be checked. The user sees the result of their guess when another websocket message comes back from the backend to guessing.js.
-
-Triggering Event: The drawer has selected one of the three random drawing prompts.  
-Alternate Triggering Event: The drawer ran out of time (15s) to choose a prompt and one has been randomly selected.
-
-#9 **Phase ends when the timer expires or everyone has guessed correctly**  
-
-```mermaid
-sequenceDiagram
-
-actor drawer
-actor guesser
-backend.js ->> guessing.js: guessing over (websocket)
-backend.js ->> drawing.js: drawing over (websocket)
-guessing.js ->> guesser: reveal the prompt
-drawing.js ->> drawer: show guessing phase results
-
-```
-Sequence Diagram 11
-
-At this point, the correct answer will be displayed, and players will be awarded points. Point award values have not been determined yet. First, the backend messages all guessing frontends and the drawing frontend that the drawing is over along with important information about the round. Then the prompt is revealed to the guessers, and the drawer sees the results of who guessed correctly.  
-
-Triggering Event: drawer draws prompt and players try to guess the drawing prompt.
-
-#10 **Players are awarded points for guessing correctly, drawer is awarded for players guessing the drawing** 
-```mermaid
-sequenceDiagram
-actor guesser
-participant guessing.js
-
-guesser ->> guessing.js: enters guess
-guessing.js ->> backend.js: guess (websocket)
-backend.js ->> backend.js: checks guess
-backend.js ->> backend.js: adds points to guesser's score
-backend.js -->> guessing.js: correct guess response (websocket)
-guessing.js -->> guesser: guesser sees they guessed correct
-
-```
-Sequence Diagram 12  
-
-Players will accumulate points based on their performance in the game. When a guesser enters a guess, guessing.js sends the guess in a websocket to the backend where it is checked, points are added to the players score, and the guess response data is sent back to guessing.js for the user to see.
-
-Triggering event: The drawer has begun drawing and one of the guessers wants to make a guess.
-
-#11 **Users see summary screen**  
-```mermaid
-sequenceDiagram
-
-actor player
-participant summary.js
-participant backend.js
-backend.js ->> backend.js: determines rankings
-backend.js ->> summary.js: summary information (websocket)
-summary.js ->> player: sees summary screen
-
-
-```
-Sequence Diagram 13  
-
-After everyone draws for their third time, total points will be displayed, and rankings will be shown at the end of the game. The backend will keep track of when the final round ends, and it will determine the rankings and deliver  the summary information to summary.js where users will see a summary screen.  
-
-Triggering Event: All players have drawn three times.
 
 ## Algorithms
 
