@@ -539,15 +539,82 @@ Sequence Diagram 14
 
 #16 **All Guessers Guess Correctly**
 
+
+
 #17 **Round Timer Ends Before All Guessers Guess Correctly**
+```mermaid
+   sequenceDiagram
+      participant GameData.js (Backend)
+      participant SocketServer (Socket.io)
+      participant SocketClientHandler.js (Frontend)
+      participant GameView.vue (Frontend)
+      actor Player
+
+      GameData.js (Backend) ->> SocketServer (Socket.io): emit "timer-ran-out" (with message)
+      SocketServer (Socket.io) -->> SocketClientHandler.js (Frontend): deliver "timer-ran-out" event
+      SocketClientHandler.js (Frontend) ->> GameView.vue (Frontend): call triggerTimeRanOutPopup()
+      GameView.vue (Frontend) ->> GameView.vue (Frontend): show popup (showTimeRanOutPopup = true)
+      GameView.vue (Frontend) -->> Player: Display "Time Ran Out!" popup
+      Note over Player: Popup disappears after 4 seconds
+```
+This diagram shows a game in progess where the timer ends before all users guess correctly. A popup is shown to explain the occurence.
 
 #18 **Game Ends (Regular Player)**
+```mermaid
+   sequenceDiagram
+      participant GameData.js (Backend)
+      participant SocketServer (Socket.io)
+      participant SocketClientHandler.js (Frontend)
+      participant GameView.vue (Frontend)
+      participant EndGameScreen.vue (Frontend)
+      actor Player (Non-Host)
+      
+      GameData.js (Backend) ->> SocketServer (Socket.io): emit "end-game"
+      SocketServer (Socket.io) -->> SocketClientHandler.js (Frontend): deliver "end-game" event
+      SocketClientHandler.js (Frontend) ->> GameView.vue (Frontend): update gameEnded = true, gameStarted = false
+      GameView.vue (Frontend) ->> EndGameScreen.vue (Frontend): render EndGameScreen component
+      EndGameScreen.vue (Frontend) -->> Player (Non-Host): display end screen with leaderboard
+```
+This diagram demonstrates how the end game screen is displayed to a user who IS NOT the host of the game lobby.
 
 #19 **Game Ends (Host)**
+```mermaid
+   sequenceDiagram
+      participant GameData.js (Backend)
+      participant SocketServer (Socket.io)
+      participant SocketClientHandler.js (Frontend)
+      participant GameView.vue (Frontend)
+      participant EndGameScreen.vue (Frontend)
+      actor Player (Host)
+      
+      GameData.js (Backend) ->> SocketServer (Socket.io): emit "end-game"
+      SocketServer (Socket.io) -->> SocketClientHandler.js (Frontend): deliver "end-game" event
+      SocketClientHandler.js (Frontend) ->> GameView.vue (Frontend): update gameEnded = true, gameStarted = false
+      GameView.vue (Frontend) ->> EndGameScreen.vue (Frontend): render EndGameScreen component
+      EndGameScreen.vue (Frontend) -->> Player (Host): display end screen with leaderboard + Play Again and Leave Lobby buttons
+```
+This diagram demonstrates how the end game screen is displayed to a user who IS the host of the game lobby.
 
 #20 **Users Choose to Play Again After Game Ends**
+```mermaid
+sequenceDiagram
+    actor Player (Host)
+    participant EndScreen.vue (Frontend)
+    participant GameView.vue (Frontend)
+    participant SocketServer (Socket.io Backend)
+    participant SocketClientHandler.js (Frontend for all players)
+    participant WaitingRoom.vue (Frontend)
 
-
+    Player (Host) ->> EndScreen.vue (Frontend): Click "Play again" button
+    EndScreen.vue (Frontend) ->> GameView.vue (Frontend): emit "playAgain" event
+    GameView.vue (Frontend) ->> SocketServer (Socket.io Backend): emit "reset-scores" and "play-again" (with room code)
+    SocketServer (Socket.io Backend) ->> SocketClientHandler.js (Frontend): broadcast "reset-scores" and "play-again" to all players
+    SocketClientHandler.js (Frontend) ->> GameView.vue (Frontend): set gameStarted = false, gameEnded = false
+    SocketClientHandler.js (Frontend) ->> GameView.vue (Frontend): reset all player scores
+    GameView.vue (Frontend) ->> WaitingRoom.vue (Frontend): render WaitingRoom component
+    WaitingRoom.vue (Frontend) -->> Player (Host): Display Waiting Room
+```
+This diagram demonstrates how the host will click the "Play again" button to throw all players back into the waiting room to start another game
 
 ------------------------------------------------OLD DIAGRAMS ARE BELOW------------------------------------------------------
 
