@@ -542,18 +542,160 @@ class Server {
 ## Sequence Diagrams
 
 #1 **Non-Playing User Hosts a Game Lobby**
+```mermaid
+sequenceDiagram
+    participant Player
+    participant HomeView.vue
+    participant CreateLobbyView.vue
+    participant GameView.vue
+    participant server.js
+
+    Player->>HomeView.vue: Navigates to home page
+    HomeView.vue->>HomeView.vue: Loads home content
+    HomeView.vue-->>Player: 
+    Player->>CreateLobbyView.vue: Clicks "Create Lobby" button
+    CreateLobbyView.vue->>CreateLobbyView.vue: Loads lobby creation content
+    CreateLobbyView.vue-->>Player: 
+    Player->>CreateLobbyView.vue: Enters max players, num rounds, and clicks "Launch Game"
+    CreateLobbyView.vue->>GameView.vue: Directs user to game
+    GameView.vue->>GameView.vue: Loads waiting room content
+    GameView.vue->>server.js: Initializes socket conneciton
+    server.js-->>GameView.vue: Returns socket connection data
+    GameView.vue->>server.js: Creates new lobby
+    server.js->>server.js: Generates unique 5-digit code
+    server.js-->>GameView.vue: "update-lobby-code" (lobby code)
+    GameView.vue->>GameView.vue: Updates waiting room content (host excluded as player)
+    server.js->>server.js: Initializes game data and adds to server data Map (host excluded as player)
+```
+
+After navigating to the home screen, the user clicks the "Create Lobby" button. This loads the CreateLobbyView.vue component. Next, the user specifies the maximum number of players (2–8) in the "Max Players" field and the number of rounds in the "Number of Rounds" field. Finally, the user clicks the "Launch Room" button, triggering the loading of the GameView component. On mount, socket connection is initialized, a unique 5-digit room code is generated and sent to the host, and game data on the back-end is initialized, excluding the host as a player.
 
 #2 **Playing User Hosts a Game Lobby**
+```mermaid
+sequenceDiagram
+    participant Player
+    participant HomeView.vue
+    participant CreateLobbyView.vue
+    participant GameView.vue
+    participant server.js
 
-#3 **Hosting User Shares Game Lobby Code**
+    Player->>HomeView.vue: Navigates to home page
+    HomeView.vue->>HomeView.vue: Loads home content
+    HomeView.vue-->>Player: 
+    Player->>CreateLobbyView.vue: Clicks "Create Lobby" button
+    CreateLobbyView.vue->>CreateLobbyView.vue: Loads lobby creation content
+    CreateLobbyView.vue-->>Player: 
+    Player->>CreateLobbyView.vue: Enters max players, num rounds, and clicks "I'm Playing Too"
+    CreateLobbyView.vue->>CreateLobbyView.vue: Loads Avatar selection menu
+    CreateLobbyView.vue-->>Player: 
+    Player->>CreateLobbyView.vue: Selects Avatar and clicks "Launch Game"
+    CreateLobbyView.vue->>GameView.vue: Directs user to game
+    GameView.vue->>GameView.vue: Loads waiting room content
+    GameView.vue->>server.js: Initializes socket conneciton
+    server.js-->>GameView.vue: Returns socket connection data
+    GameView.vue->>server.js: Creates new lobby
+    server.js->>server.js: Generates unique 5-digit code
+    server.js-->>GameView.vue: "update-lobby-code" (lobby code)
+    GameView.vue->>GameView.vue: Updates waiting room content (host included as player)
+    server.js->>server.js: Initializes game data and adds to server data Map (host included as player)
+```
 
-#4 **User Joins an Existing Game Lobby**
+After navigating to the home screen, the user clicks the "Create Lobby" button. This loads the CreateLobbyView.vue component. Next, the user specifies the maximum number of players (2–8) in the "Max Players" field and the number of rounds in the "Number of Rounds" field. Next, the user clicks the "I'm playing too" button and selects and Avatar from the player list. Finally, the user clicks the "Launch Room" button, triggering the loading of the GameView component. On mount, socket connection is initialized, a unique 5-digit room code is generated and sent to the host, and game data on the back-end is initialized, including the host as a player.
 
-#5 **User Attempts to Join a Non-Existing Lobby**
+#3 **User Joins an Existing Game Lobby**
+```mermaid
+sequenceDiagram
+    participant Player
+    participant HomeView.vue
+    participant JoinLobbyView.vue
+    participant GameView.vue
+    participant server.js
 
-#6 **Hosting User Starts a Game**
+    Player->>HomeView.vue: Navigates to home page
+    HomeView.vue->>HomeView.vue: Loads home content
+    HomeView.vue-->>Player: 
+    Player->>JoinLobbyView.vue: Clicks "Join Lobby" button
+    JoinLobbyView.vue->>JoinLobbyView.vue: Loads lobby join content
+    JoinLobbyView.vue-->>Player: 
+    Player->>JoinLobbyView.vue: Enters room code, selects an Avatar, and clicks "Join Lobby"
+    JoinLobbyView.vue->>GameView.vue: Directs user to game
+    GameView.vue->>GameView.vue: Loads waiting room content
+    GameView.vue->>server.js: Initializes socket conneciton
+    server.js-->>GameView.vue: Returns socket connection data
+    GameView.vue->>server.js: Requests to join lobby
+    server.js->>server.js: Checks if max players reached, game exists, and Avatar has not been selected
+    server.js->>server.js: Adds player to game data
+    server.js-->>GameView.vue: "add-player" (existingPlayer, existingPlayerData)
+    server.js-->>Host: "add-player" (newPlayer, newPlayerData)
+    server.js-->>GameView.vue: "update-max-players" (lobby code)
+    server.js-->>GameView.vue: "update-round" (lobby code)
+    server.js-->>GameView.vue: "update-num-rounds" (lobby code)
+    GameView.vue->>GameView.vue: Updates waiting room content (host included as player)
+```
 
-#7 **User is Presented with a Drawing Prompt**
+After being provided a valid room code, a new user is ready to attempt to join the lobby. From the home screen, the user clicks the "Join Lobby" button. This loads the JoinLobbyView.vue component. Next, the user enters the provided room code in the form of shapes and selects an Avatar from the Avatar selection menu. Finally, the user clicks the "Join Lobby", triggering the loading of the GameView component. On mount, socket connection is initialized, the server verifies there are no duplicate Avatars, the lobby exists, and max players hasn't been reached. Next, the server updates all users of a new player added to the game and updates the new player with each player already in the lobby, max players, current rounds, and number of rounds to be played.
+
+#4 **User Attempts to Join a Non-Existing Lobby**
+```mermaid
+sequenceDiagram
+    participant Player
+    participant HomeView.vue
+    participant JoinLobbyView.vue
+    participant GameView.vue
+    participant server.js
+
+    Player->>HomeView.vue: Navigates to home page
+    HomeView.vue->>HomeView.vue: Loads home content
+    HomeView.vue-->>Player: 
+    Player->>JoinLobbyView.vue: Clicks "Join Lobby" button
+    JoinLobbyView.vue->>JoinLobbyView.vue: Loads lobby join content
+    JoinLobbyView.vue-->>Player: 
+    Player->>JoinLobbyView.vue: Enters room code, selects an Avatar, and clicks "Join Lobby"
+    JoinLobbyView.vue->>GameView.vue: Directs user to game
+    GameView.vue->>GameView.vue: Loads waiting room content
+    GameView.vue->>server.js: Initializes socket conneciton
+    server.js-->>GameView.vue: Returns socket connection data
+    GameView.vue->>server.js: Requests to join lobby
+    server.js->>server.js: Checks if max players reached, game exists, and Avatar has not been selected
+    server.js-->>GameView.vue: "return-to-join-screen"
+    GameView.vue->>GameView.vue: Displays invalid code error
+    GameView.vue-->>Player: 
+    Player->>GameView.vue: Clicks "Return to Lobby" button
+    GameView.vue-->>JoinLobbyView.vue: 
+    JoinLobbyView.vue->>JoinLobbyView.vue: Load lobby join content
+    JoinLobbyView.vue-->>Player: 
+```
+After being provided an invalid room code, a new user is ready to attempt to join the lobby. From the home screen, the user clicks the "Join Lobby" button. This loads the JoinLobbyView.vue component. Next, the user enters the provided room code in the form of shapes and selects an Avatar from the Avatar selection menu. Finally, the user clicks the "Join Lobby", triggering the loading of the GameView component. On mount, socket connection is initialized, the server fails verification of an existing server and emits an request to return to join lobby screen. This will let the user leave the lobby once the error message is dismissed.
+
+#5 **Hosting User Starts a Game**
+```mermaid
+sequenceDiagram
+    participant Host
+    participant GameView.vue
+    participant server.js
+    participant Player
+
+    Host->>GameView.vue: Clicks "Start Game"
+    GameView.vue->>server.js: "start-game" (room code)
+    server.js-->>GameView.vue: "update-user-guess" (guess object)
+    server.js-->>Player: "update-user-guess" (guess object)
+    server.js->>server.js: Increments lobby round count
+    server.js-->>GameView.vue: "update-round" (round)
+    server.js-->>Player: "update-round" (round)
+    server.js->>server.js: Selects new drawer from player list
+    server.js-->>GameView.vue: "update-drawer" (drawer)
+    server.js-->>Player: "update-drawer" (drawer)
+    server.js->>server.js: Selects new drawing prompt
+    server.js-->>GameView.vue: "update-prompt" (prompt)
+    server.js-->>Player: "update-prompt" (prompt)
+    server.js->>server.js: Starts round timer
+    server.js-->>GameView.vue: "timer-update" (time)
+    server.js-->>Player: "timer-update" (time)
+```
+
+After a lobby has been created and at least two players have joined the lobby, the host presses the "Start Game" button to initiate a new game. A request to start the game is sent to the server. All guesses are cleared and sent to all users in the lobby. A new drawer is selected and sent to all users in the lobby. A new prompt is selected and sent to all users in the lobby. The timer is initialized and broadcasts a timer update every second.
+
+#6 **User is Presented with a Drawing Prompt**
 
 Precondition: Game has started, and it's the user's turn to draw.
 
@@ -570,17 +712,17 @@ sequenceDiagram
 ```
 Sequence Diagram 7
 
-#8 **User is Assigned to Draw on the Drawing Board**
+#7 **User is Assigned to Draw on the Drawing Board**
 
-#9 **Drawer Undoes a Drawing Stroke**
+#8 **Drawer Undoes a Drawing Stroke**
 
-#10 **Drawer Clears the Drawing Board**
+#9 **Drawer Clears the Drawing Board**
 
-#11 **Drawer Changes Stroke Color**
+#10 **Drawer Changes Stroke Color**
 
-#12 **Drawer Changes Stroke Width**
+#11 **Drawer Changes Stroke Width**
 
-#13 **User is Assigned the Role of Guesser**
+#12 **User is Assigned the Role of Guesser**
 
 Precondition: A drawing round if in progress.
 
@@ -601,7 +743,7 @@ sequenceDiagram
 ```
 Sequence Diagram 13
 
-#14 **Guesser Selects an Incorrect Guess**
+#13 **Guesser Selects an Incorrect Guess**
 
 Precondition: User is viewing the AAC board during a around as a guesser.
 
@@ -624,11 +766,11 @@ sequenceDiagram
 ```
 Sequence Diagram 14
 
-#15 **Guesser Selects a Correct Guess**
+#14 **Guesser Selects a Correct Guess**
 
-#16 **All Guessers Guess Correctly**
+#15 **All Guessers Guess Correctly**
 
-#17 **Round Timer Ends Before All Guessers Guess Correctly**
+#16 **Round Timer Ends Before All Guessers Guess Correctly**
 
 Preconditons: A drawing round is in progress.
 
@@ -650,7 +792,7 @@ The backend (GameData.js) detects that the round's timer has expired and emits a
       Note over Player: Popup disappears after 4 seconds
 ```
 
-#18 **Game Ends (Regular Player)**
+#17 **Game Ends (Regular Player)**
 
 Precondtion: The maximum number of rounds is reached.
 
@@ -672,7 +814,7 @@ When all rounds are completed, GameData.js (backend) emits an end-game event via
       EndGameScreen.vue (Frontend) -->> Player (Non-Host): display end screen with leaderboard
 ```
 
-#19 **Game Ends (Host)**
+#18 **Game Ends (Host)**
 
 Preconditions: The maximum number of rounds is reached.
 
@@ -694,7 +836,7 @@ After the final round, the backend (GameData.js) sends an end-game event through
       EndGameScreen.vue (Frontend) -->> Player (Host): display end screen with leaderboard + Play Again and Leave Lobby buttons
 ```
 
-#20 **Users Choose to Play Again After Game Ends**
+#19 **Users Choose to Play Again After Game Ends**
 
 Preconditons: Game session has ended, and players are on the endgame screen.
 
