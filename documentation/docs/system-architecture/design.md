@@ -462,7 +462,7 @@ sequenceDiagram
     participant WaitingRoom.vue
 
     User->>JoinLobbyView.vue: click "host game"
-    JoinLobbyView.vue->>server.js: "create-lobby" (via websocket)
+    JoinLobbyView.vue->>server.js: "create-new-lobby" (via websocket)
     server.js->>server.js: create Lobby instance
     server.js-->>JoinLobbyView.vue: "you-are-host"
     JoinLobbyView.vue->>JoinLobbyView.vue: mark as host
@@ -472,7 +472,7 @@ Sequence Diagram 1
 
 The player setting up the game navigates to the host lobby screen. Upon arrival, they see a large "Host Game" Button. This triggers the creation of a lobby with a room code that the host can share to the other players.
 
-The host navigates to the website's host lobby screen (JoinLobbyView.vue), and after configuring the lobby settings, they click the large "host game" button. This triggers a websocket message to server.js to create a new lobby instance. Server.js also sends a "you-are-host" websocket message back to JoinLobbyView.vue informing the frontend's stored memory that the user is host. Then the user is navigated to WaitingRoom.vue.
+The host navigates to the website's host lobby screen (JoinLobbyView.vue), and after configuring the lobby settings, they click the large "host game" button. This triggers a "create-new-lobby" websocket message to server.js to create a new lobby instance. Server.js also sends a "you-are-host" websocket message back to JoinLobbyView.vue informing the frontend's stored memory that the user is host. Then the user is navigated to WaitingRoom.vue.
 
 Triggering Event:
 Host navigates to the game website and clicks a button "Host Game".
@@ -480,24 +480,21 @@ Host navigates to the game website and clicks a button "Host Game".
 #2 **Host gets room code**  
 
 ```mermaid
+
 sequenceDiagram
+    participant server.js
+    participant WaitingRoomView.vue
 
-actor host
-
-landingPage.js ->> backend.js: hostGame websocket message
-
-backend.js ->> backend.js: generates room code
-landingPage.js ->> lobby.js: navigates to
-lobby.js ->> backend.js: request room code (websocket)
-activate lobby.js
-backend.js -->> lobby.js: return room code (websocket)
-deactivate lobby.js
-lobby.js ->> host: display room code
+    server.js->>server.js: generate random 5-digit code
+    server.js-->>WaitingRoomView.vue: "update-lobby-code" (send code)
+    WaitingRoomView.vue->>WaitingRoomView.vue: display code to host
 
 ```
 Sequence Diagram 2
 
 The host is presented with a short room code that they will tell the players so they can enter it and join.
+
+Once the new lobby is created in server.js, server.js generates a random 5 digit code and sends taht code over a websocket message "update-lobby-code" to the host. The host receives the code in the WaitingRoomView.vue and can then view the code and share it with others.
 
 Triggering Event: The host has created a lobby by pressing "Host Game".
 
